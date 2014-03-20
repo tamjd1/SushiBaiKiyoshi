@@ -168,10 +168,12 @@
         });
     </script>
     <div id="top" class="login-bar"> 
-        <!--<input id="register "type="button" class="float-left button" value="Register" />-->
+    <form id="loginForm" action="" method="post">
+        <input id="register "type="button" class="float-left button" value="Register" />
         <input id="go "type="button" class="float-right button" value=">" onclick=""/>         
         <input id="password" type="password" class="float-right textbox" value="password" /> 
         <input id="login" type="text" class="float-right textbox" value="Username" />
+    </form>
     </div>
     <header>
         <div id="logoDiv">
