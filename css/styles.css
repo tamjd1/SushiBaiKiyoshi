@@ -1,0 +1,181 @@
+/*html, body
+{
+font-size:18px;
+overflow-x:auto;
+padding:0px;
+margin:0px;
+background-color:#E8E8E8;
+min-height:100%;
+}*/
+
+/*--------------------- HEADER ---------------------*/
+
+/*#header
+{
+margin:0 auto 0 auto;
+width:900px;
+height:85px;
+background-color:lightblue;
+}
+
+#nav 
+{
+width:500px;
+text-align:center;
+position:relative;
+left:150px;
+border-collapse:collapse;
+
+}
+
+#nav a
+{
+text-decoration:none;
+display:block;
+color:black;
+}
+
+#nav td
+{
+padding:0px;
+margin:0px;
+line-height:40px;
+}
+
+#nav a:hover,a:active
+{
+background-color:orange;
+}*/
+
+/*--------------------- CONTENT --------------------*/
+
+/*#content
+{
+margin:0 auto 0 auto;
+width:900px;
+height:100%;
+text-align:left;
+}
+
+#content p
+{
+margin:0px;
+padding:30px;
+}
+
+#menu_header
+{
+text-align:center;
+font-size:26px;
+}
+
+.menu tr
+{
+border:1px solid black;
+}
+
+.menu_item_img
+{
+height:150px;
+width:150px;
+text-align:center;
+}*/
+
+#cart
+{
+position:relative;
+/*left:280px;*/
+border:1px solid black;
+margin:0 auto 0 auto;
+width:100%;
+background-color:lightgrey;
+border-collapse:collapse;
+text-align:center;
+}
+
+#cartDiv {
+    width: 20%;
+    padding-top:20px;
+}
+
+.t_c
+{
+text-align:center;
+}
+
+#menu {
+    width: 75%;
+}
+
+.menu
+{
+position:relative;
+/*right:150px;
+bottom:150px;*/
+width:500px;
+font-size:15px;
+margin:0 auto 0 auto;
+/*background-color:lightgrey;*/
+border-collapse:collapse;
+}
+
+#menu > li:nth-child(even) > .menu {
+    background-color: whitesmoke;
+}
+
+#menu > li:nth-child(odd) > .menu{
+    background-color: lightgrey;
+}
+
+#menu_options
+{
+margin:0 auto 0 auto;
+text-align:center;
+border-collapse:collapse;
+position:relative;
+bottom:20px;
+
+}
+
+#menu_options td
+{
+width:120px;
+border:1px solid black;
+background-color:orange;
+
+}
+
+#menu_options td:hover
+{
+background-color:yellow;
+
+}
+
+#creditcardinfo, #customerinfo, #billinginfo
+{
+margin:0 auto 0 auto;
+}
+
+/*--------------------- FOOTER ---------------------*/
+
+/*#footer
+{
+margin:0 auto 0 auto;
+width:900px;
+height:100%;
+background-color:lightblue;
+}
+
+#footer p
+{
+margin:0 auto 0 auto;
+text-align:center;
+padding:0px;
+line-height:22px;
+}
+
+.icon
+{
+width:35px;
+height:35px;
+}*/
