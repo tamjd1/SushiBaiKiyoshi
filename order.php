@@ -22,7 +22,7 @@ require 'header.php';
                 <td>Sashimi</td>
             </tr>
         </table>-->
-        fdfdfdfdfdfdfdsahghhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhh
+
             <div id="menu" class="float-left">
                           <ul class="toggleOptions">
             <li>
