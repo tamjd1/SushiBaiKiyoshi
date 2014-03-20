@@ -169,9 +169,9 @@
     </script>
     <div id="top" class="login-bar"> 
         <!--<input id="register "type="button" class="float-left button" value="Register" />-->
-        <input id="go "type="button" class="float-right button" value=">" />         
-        <input id="login" type="password" class="float-right textbox" value="password" /> 
-        <input id="password" type="text" class="float-right textbox" value="Username" />
+        <input id="go "type="button" class="float-right button" value=">" onclick=""/>         
+        <input id="password" type="password" class="float-right textbox" value="password" /> 
+        <input id="login" type="text" class="float-right textbox" value="Username" />
     </div>
     <header>
         <div id="logoDiv">
