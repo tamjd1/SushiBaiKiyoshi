@@ -42,6 +42,64 @@
 */
 ?>
 
+<?php
+	if(session_id() == "")
+	{
+		session_start();
+	}
+?>
+    
+<?php
+$login = "";
+$password = "";
+
+if ($_SERVER["REQUEST_METHOD"] == "POST")
+{
+  $login = test_input($_POST["login"]);
+  $password = test_input($_POST["password"]);
+  echo "ssssssssssssss";
+}
+
+function test_input($data)
+{
+  $data = trim($data);
+  $data = stripslashes($data);
+  $data = htmlspecialchars($data);
+  return $data;
+}
+
+
+    // if($_POST['login'] == "")
+    // {
+        // $errorMessage += ("Login is empty!<br>");
+     
+    // }
+    
+    // if(empty($_POST['password']))
+    // {
+        // $errorMessage += ("Password is empty!<br>");
+    // }
+     
+    //$username = trim($_POST['login']);
+    //$password = trim($_POST['password']);
+
+    //session_start();
+
+
+   //echo $errorMessage;   
+?>
+
+ <?PHP
+
+// session_start();
+
+// if (!(isset($_SESSION['login']) && $_SESSION['login'] != '')) {
+
+// header ("Location: index.php");
+
+// }
+
+// ?>
 <!DOCTYPE html>
 
 <html lang="en">
