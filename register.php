@@ -23,7 +23,7 @@ require 'header.php';
                     Name
                 </td>
                 <td>
-                    <input type="textbox"/>
+                    <input type="textbox"/ name="name">
                 </td> 
 
             </tr>
@@ -32,7 +32,7 @@ require 'header.php';
                     Email
                 </td>
                 <td>
-                    <input type="textbox"/>
+                    <input type="email" name="email"/>
                 </td>
             </tr>
             <tr>
@@ -40,7 +40,7 @@ require 'header.php';
                     Phone Number
                 </td>
                 <td>
-                    <input type="textbox"/>
+                    <input type="textbox" name="phoneNumber"/>
                 </td>
             </tr>            
         </table>
@@ -56,7 +56,7 @@ require 'header.php';
                     Card Type
                 </td>
                 <td>
-                    <select>
+                    <select name="cardType">
                         <option value="Visa">Visa</option>
                         <option value="Mastercard">Mastercard</option>
                     </select>
@@ -67,7 +67,7 @@ require 'header.php';
                     Name on Card
                 </td>
                 <td>
-                    <input type="textbox"/>
+                    <input type="textbox" name="nameOnCard"/>
                 </td>
             </tr>    
             <tr>
@@ -75,7 +75,7 @@ require 'header.php';
                     Card Number
                 </td>
                 <td>
-                    <input type="textbox"/>
+                    <input type="textbox" name="cardNumber"/>
                 </td> 
             </tr>
             <tr>
@@ -83,7 +83,7 @@ require 'header.php';
                     Expiration Date
                 </td>
                 <td>
-                    <input type="textbox"/>
+                    <input type="textbox" name="expirationDate"/>
                 </td>
             </tr>
             <tr>
@@ -91,7 +91,7 @@ require 'header.php';
                     Security Code
                 </td>
                 <td>
-                    <input type="textbox"/>
+                    <input type="textbox" name="securityCode"/>
                 </td>
             </tr>            
         
@@ -108,7 +108,7 @@ require 'header.php';
                     Address
                 </td>
                 <td>
-                    <input type="textbox"/>
+                    <input type="textbox" name="address"/>
                 </td> 
 
             </tr>
@@ -117,7 +117,7 @@ require 'header.php';
                     City
                 </td>
                 <td>
-                    <input type="textbox"/>
+                    <input type="textbox" name="city"/>
                 </td>
             </tr>
             <tr>
@@ -125,7 +125,7 @@ require 'header.php';
                     Province
                 </td>
                 <td>
-                    <input type="textbox"/>
+                    <input type="textbox" name="province"/>
                 </td>
             </tr>            
             <tr>
@@ -133,7 +133,7 @@ require 'header.php';
                     Postal Code
                 </td>
                 <td>
-                    <input type="textbox"/>
+                    <input type="textbox" name="postalCode"/>
                 </td>
             </tr>
             <tr>
