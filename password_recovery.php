@@ -17,19 +17,19 @@ require 'header.php';
          
             <form action="" method="post">
                 <table id="recovery">  
-                    <tr>
-                        <td>
-                        
-                        </td>
-                         <td>
-                        
-                        </td>
-                         <td>
-                             <input type="submit" value="Reset Password"/>
-                        </td>
-                    
-                    
-                    </tr>
+                <th class="t_c">Password Recovery</th>
+                <tr>
+                    <td>
+                    Email Address:
+                    </td>
+                    <td>
+                     <input type="text"/>
+                    </td>
+                </tr>
+                <tr>
+                    <td colspan="2" style="text-align:center;">
+                    <input type="submit" value="Reset Password"/>
+                    </td>                </tr>
                 </table>
             </form>
             
