@@ -242,9 +242,16 @@ function test_input($data)
             <ul> 
                 <li><a href="./index.php">Home</a></li>
                 <li><a href="./index.php">About Us</a></li>
-                <li><a href="./order.php">Order Online</a></li>
+                <li><a href="./order.php">Order Online</a></li>              
                 <li><a href="./register.php">Register</a></li>
                 <!--<li><a id="login" href="./login.php">Login</a></li>-->
+                
+                 <!-- temp links for testing-->
+                <li><a href="./edit_menu_items.php">Edit Menu Items</a></li>
+                <li><a href="./edit_fish_Prices.php">Edit Fish Prices</a></li>
+                <li><a href="./edit_profile.php">Edit Profile</a></li>
+                <li><a href="./password_recovery.php">Recover Password</a></li>
+                
             </ul>
         </nav>
     </header>

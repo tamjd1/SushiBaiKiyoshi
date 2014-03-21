@@ -15,7 +15,23 @@ require 'header.php';
 
         <section id="MainContent">            
          
-            
+            <form action="" method="post">
+                <table id="recovery">  
+                    <tr>
+                        <td>
+                        
+                        </td>
+                         <td>
+                        
+                        </td>
+                         <td>
+                             <input type="submit" value="Reset Password"/>
+                        </td>
+                    
+                    
+                    </tr>
+                </table>
+            </form>
             
             
         </section>

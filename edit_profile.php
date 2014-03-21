@@ -14,7 +14,11 @@ require 'header.php';
 
 
         <section id="MainContent">            
-         <p>Make Changes to your profile here</p>
+           <p class="t_c">
+            Make Changes to your profile here.
+        </p>
+        <hr/>
+    
          
           <table id="customerinfo">
             <th colspan="2" class="t_c">
@@ -47,12 +51,16 @@ require 'header.php';
             </tr>            
         </table>
         
+        
+       
+        
+        
         <br/>
         
-      <!-- There should be the option to just delete the credit card not change it-->
+
         
         <br/>
-        
+        <form action="" method="post">
         <table id="billinginfo">
             <th colspan="2" class="t_c">
                 Billing Information
@@ -90,16 +98,76 @@ require 'header.php';
                     <input type="textbox" name="postalCode" value="<? echo $postalCode; ?>"/>
                 </td>
             </tr>
-            <tr>
-                <td colspan="2" style="text-align:center;">
-                    <br/>
-                    <input type="button" value="Save Changes"/>
-                    
-                </td>
-            </tr>
+           
         </table>   
             
-            
+                  <!-- There should be the option to just delete the credit card not change it-->
+    <table id="creditcardinfo">
+    <th colspan="2" class="t_c">
+    Credit Card(s)
+    </th>
+    <tr>
+        <th>
+            Address
+        </th>
+        <th>
+            Name on Card
+        </th>
+        <th>
+            Card number
+        </th>
+        <th>
+            Expiration Date
+        </th>
+        <th>
+            Security Code
+        </th>
+        <th>
+            Delete
+        </th>
+    </tr>
+
+    <tr>
+        <td>
+            1303 Country RD 2
+        </td>
+        <td>
+            Thom Davison
+        </td>
+        <td>
+            ************4474
+        </td>
+        <td>
+            09/14
+        </td>
+        <td>
+            913
+        </td>               
+        <td>
+            <a href="edit_profile.php" <input type=\"submit\" value=\"Edit\" />Delete</a>
+        </td>
+    </tr>
+    <tr>
+        <td colspan="5" style="text-align:right;">
+            <input type="button" value="Add Another Card"/>
+        </td>
+    </tr>
+    </tr>
+        <tr>
+        <td colspan="5" style="text-align:center;">
+        <br>
+        <br>
+        <br>
+        <br>
+        <input type="submit" value="Save Changes"/>
+
+        </td>
+    </tr>
+    </table>  
+    
+    </form>
+    <br>
+    
         </section>
             
 <?php include 'footer.php'; ?>
