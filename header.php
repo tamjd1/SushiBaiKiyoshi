@@ -60,6 +60,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST")
   echo "ssssssssssssss";
 }
 
+// edits for input that could effect the database
 function test_input($data)
 {
   $data = trim($data);

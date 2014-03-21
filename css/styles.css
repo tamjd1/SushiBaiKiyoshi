@@ -151,10 +151,17 @@ background-color:yellow;
 
 }
 
-#creditcardinfo, #customerinfo, #billinginfo
+/*these are the tables*/
+#creditcardinfo, #customerinfo, #billinginfo, #addFishPrice, #menuItems
 {
 margin:0 auto 0 auto;
+
 }
+td
+{
+padding:5px;
+}
+
 
 /*--------------------- FOOTER ---------------------*/
 

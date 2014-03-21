@@ -14,8 +14,50 @@ require 'header.php';
 
 
         <section id="MainContent">            
-         
-            
+             <table id="addFishPrice">
+                <th colspan="2" class="t_c">
+                Add Fish Price Information
+                </th>
+                <tr>
+                    <td>
+                    Type:
+                    </td>
+                    <td>
+                    <input type="textbox"/ name="type">
+                    </td> 
+                </tr>
+                <tr>
+                    <td>
+                    Date:
+                    </td>
+                    <td>
+                    <input type="textbox"/ name="date">
+                    </td> 
+                </tr>
+                <tr>
+                    <td>
+                    Location:
+                    </td>
+                    <td>
+                    <input type="textbox"/ name="location">
+                    </td> 
+                </tr>
+                <tr>
+                    <td>
+                    Supply Status:
+                    </td>
+                    <td>
+                    <input type="textbox"/ name="supplyStatus">
+                    </td> 
+                </tr>
+                  <tr>
+                <td colspan="2" style="text-align:center;">
+                    <br/>
+                    <input type="button" value="Enter Pricing"/>
+                    
+                </td>
+            </tr>
+            </table>
             
             
         </section>
