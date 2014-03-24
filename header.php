@@ -255,6 +255,3 @@ function test_input($data)
                 
             </ul>
         </nav>
-    </header>
-
-    <div id="body">
