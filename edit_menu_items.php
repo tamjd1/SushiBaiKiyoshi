@@ -27,7 +27,7 @@ echo '<table class="tableLayout">';
             <td>ID here</td>
             <td>Description Here</td>
             <td>Type Here</td>
-            <td></td>';
+            </tr>';
      
 
             echo "<td><a href=\"\" <input type=\"submit\" value=\"Edit\" />Edit</a></td>";
