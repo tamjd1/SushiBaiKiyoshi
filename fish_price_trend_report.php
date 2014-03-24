@@ -119,14 +119,25 @@ $fish_prices_trend = array
         priceDomain.push(i); //set price domain at $5 intervals
     }
     
-    fishTypesUnique = fishTypes.unique(); //get unique values for fish types and add checkboxes 
-    for (var i = 0; i < fishTypesUnique.length; i++) { //add checkbox for each fish type
-        $('#checkboxes').append('<input type="checkbox" value='+fishTypesUnique[i]+' onchange="plotLineGraph(this.checked,this.value)"/>'+fishTypesUnique[i]+'<br />');
-    }
+    fishTypesUnique = fishTypes.unique(); //get unique values for fish types and add checkboxes     
     
     var year = parseDate(fishData[0].Date).getFullYear();
     var daysInAYear = (((year % 4 == 0) && (year % 100 != 0)) || (year % 400 == 0)) ? 366 : 365;
 
+    function createCheckboxList() {
+        //for (var i = 0; i < fishTypesUnique.length; i++) { //add checkbox for each fish type
+        //    $('#checkboxes').append('<div style="display:inline-block; background-color: ' + getRandomColour(i) + ';"><input type="checkbox" id="' + i + '" value='+fishTypesUnique[i]+' onchange="plotLineGraph(this.checked,this.value,getRandomColour(this.id))"/></div> '+fishTypesUnique[i]+'<br/>');
+        //}
+        var html = "<table>";
+        for (var i = 0; i < fishTypesUnique.length; i++) { //add checkbox for each fish type
+            html +='<tr><td><div style="display:inline-block; background-color:'+getRandomColour(i)+';"><input type="checkbox" id="'+i+'" value='+fishTypesUnique[i]+' onchange="plotLineGraph(this.checked,this.value,getRandomColour(this.id))"/></div></td><td style="text-align:left;">'+fishTypesUnique[i]+'</td></tr>';
+        }
+        html += "</table>";
+        
+        $('#checkboxes').append(html);
+        
+    }
+    
     /**
     This function creates the <svg> canvas on which line graph will be drawn
     */
@@ -309,8 +320,36 @@ $fish_prices_trend = array
     }
     
     
-    function plotLineGraph(checked, name) {
+    /**
+    This functions returns a random colour depending on the value of the id
+    @param id - id of the (fish type) checkbox
+    @return colour - returns the colour as a string
+    */
+    function getRandomColour(id) {
+        id += ""; //make it a string if its not
+        return colour = (id === "0") ? "red" 
+                   : (id === "1") ? "blue" 
+                   : (id === "2") ? "purple" 
+                   : (id === "3") ? "green" 
+                   : (id === "4") ? "magenta"
+                   : (id === "5") ? "black"
+                   : (id === "6") ? "orange"
+                   : (id === "7") ? "brown"                       
+                   : (id === "8") ? "lime"
+                   : (id === "8") ? "yellow"
+                   : (id === "9") ? "cyan" : "black";
+    }
+    
+    /**
+    This function sets the x and y coordinates of the line and draws it on the graph.
+    This function also deletes a line from the graph.
+    @param checked - nature of the checkbox (checked = true or unchecked = false) 
+    @param name - name of the checkbox
+    @param colour - colour of the line
+    */
+    function plotLineGraph(checked, name, colour) {
         if(checked) {
+
             var points = new Array();
             for (var i = 0; i < fishData.length; i++) {
                 if (fishData[i].Type === name) {
@@ -319,7 +358,7 @@ $fish_prices_trend = array
             }
             console.log(points);    
             var gLine = graph.append("g");
-            drawPolyLine(gLine, points, "black", 1, name, name);
+            drawPolyLine(gLine, points, colour, 2, name, name);
         }    
         else {
             if ($("#"+name))
@@ -424,6 +463,7 @@ $fish_prices_trend = array
     }
     
     $(document).ready(function () {    
+        createCheckboxList();
         createCanvas();
         setScales();
         drawAxes();
