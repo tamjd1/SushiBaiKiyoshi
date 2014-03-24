@@ -9,7 +9,7 @@ require 'header.php';
 
 
 $test =0;
-echo '<table class="tableLayout">';
+echo '<br/><table class="tableLayout">';
             echo '<tr>';
                 echo '<td>ID</td>';
                 echo '<td>Description</td>';
