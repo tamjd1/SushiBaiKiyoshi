@@ -13,8 +13,8 @@ require 'header.php';
 
 
 
-        <section id="MainContent">            
-         
+        <section class="center">            
+         <br/>
             <form action="" method="post">
                 <table id="recovery">  
                 <th class="t_c">Password Recovery</th>
@@ -32,7 +32,7 @@ require 'header.php';
                     </td>                </tr>
                 </table>
             </form>
-            
+            <br/>
             
         </section>
             
