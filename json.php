@@ -1,7 +1,9 @@
 <?php
     //$arr = array ('a'=>1,'b'=>2,'c'=>3,'d'=>4,'e'=>5);
     //echo json_encode($arr); // {"a":1,"b":2,"c":3,"d":4,"e":5}
-    
+   
+
+   
      $fish_prices_trend = array
      (
          array('Type'=>"Salmon",'Date'=>'01-12-2000','Price'=>15.5),
@@ -38,3 +40,7 @@
     
     
 ?>
+
+        //$.getJSON('http://localhost/SushiBaiKiyoshi/json.php', function(data) {
+            
+        //});
