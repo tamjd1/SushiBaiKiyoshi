@@ -11,23 +11,22 @@ require 'header.php';
 $test =0;
 echo '<table class="tableLayout">';
             echo '<tr>';
-            echo '<td>ID</td>';
-            echo '<td>Description</td>';
-            echo '<td>Price</td>';
-            echo '<td>Type</td>';
-            echo '<td>Edit</td>';
-
+                echo '<td>ID</td>';
+                echo '<td>Description</td>';
+                echo '<td>Price</td>';
+                echo '<td>Type</td>';
+                echo '<td>Edit</td>';
             echo '</tr>';
 
 
             while ($test < 30){
 
             echo '<tr align="center">
-
-            <td>ID here</td>
-            <td>Description Here</td>
-            <td>Type Here</td>
-            </tr>';
+                    <td>ID here</td>
+                    <td>Description Here</td>
+                    <td>Type Here</td>
+                    <td></td>';
+                
      
 
             echo "<td><a href=\"\" <input type=\"submit\" value=\"Edit\" />Edit</a></td>";
