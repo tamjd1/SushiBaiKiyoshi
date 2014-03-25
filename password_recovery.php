@@ -11,32 +11,36 @@ require 'header.php';
 
 if($_SERVER["REQUEST_METHOD"] == "GET")
 {
-	$user_id="";
-	$email_address="";
+	$userName="";
+	$emailAddress="";
 }
 else if($_SERVER["REQUEST_METHOD"] == "POST")
 {
-	$user_id = trim($_POST["user_id"]);
-	$email_address = trim($_POST["email_address"]);
+	$userName = trim($_POST["userName"]);
+	$emailAddress = trim($_POST["emailAddress"]);
 	
-	$sql = "SELECT id, email_address, password 
-				FROM users, agents
-				WHERE users.id=agents.user_id AND id ='$user_id' AND email_address = '$email_address'";
+    
+    $sql = "SELECT UserID, UserEmail, UserPassword 
+				FROM tblUsers
+				WHERE UserID ='$userName' AND emailAddress = '$emailAddress'";
+    
+    
 	$conn = db_connect();
 	$result = pg_query($conn, $sql);			
 	$records = pg_num_rows($result);
 	
 	//$password = pg_fetch_result($result, 'password');
 		
+    // If there are results send the email
 	if ($records > 0)
 	{		
 		
 	
-		echo "email: " . pg_fetch_result($result, 0, 'email_address')."</br>";
+		echo "email: " . pg_fetch_result($result, 0, 'emailAddress')."</br>";
 		echo "password: " . pg_fetch_result($result, 0, 'password')."</br>";
 		
 		
-		$to = pg_fetch_result($result, 0, 'email_address');
+		$to = pg_fetch_result($result, 0, 'emailAddress');
 		$subject = 'Forgotten Password';
 		$message = 'Your password is: '.pg_fetch_result($result, 0, 'password');
 		$headers = 'From: admin@mkt2.ca' . "\r\n" .
@@ -55,11 +59,11 @@ else if($_SERVER["REQUEST_METHOD"] == "POST")
 
 		
 	}
-	else
+	else // No results
 	{	
 		echo "<h2>Username / Email Invalid</h2>";
-		$user_id="";
-		$email_address="";	
+		$userName="";
+		$emailAddress="";	
 	}
 }
 else
@@ -72,28 +76,26 @@ else
 
 ?>
 
-
-
-        <section class="center">            
-         <br/>
-            <form action="" method="post">
-                <table id="recovery">  
-                <th class="t_c">Password Recovery</th>
-               	<tr>
-					<td>User Id</td> 
-					<td> <input type="text" name="user_id" value="<?php $user_id;?>" size="25"/> </td>
-				</tr>	
-				<tr>
-					<td>Email Address</td> 
-					<td> <input type="text" name="email_address" value="<?php $email_address;?>" size="25"/></td>
-				</tr>		
-				<tr>
-					<td colspan="3" align="center"><input type="submit" name="submit1" value="Submit"/></td>
-				</tr>
-                </table>
-            </form>
-            <br/>
-            
-        </section>
+<section class="center">            
+ <br/>
+    <form action="" method="post">
+        <table id="recovery">  
+        <th class="t_c">Password Recovery</th>
+        <tr>
+            <td>User-name</td> 
+            <td> <input type="text" name="userName" value="<?php $userName;?>" size="25"/> </td>
+        </tr>	
+        <tr>
+            <td>Email Address</td> 
+            <td> <input type="text" name="emailAddress" value="<?php $emailAddress;?>" size="25"/></td>
+        </tr>		
+        <tr>
+            <td colspan="3" align="center"><input type="submit" name="submit1" value="Submit"/></td>
+        </tr>
+        </table>
+    </form>
+    <br/>
+    
+</section>
             
 <?php include 'footer.php'; ?>

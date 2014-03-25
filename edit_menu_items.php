@@ -34,27 +34,28 @@ else if($_SERVER["REQUEST_METHOD"] == "POST") // If the page has been submitted
     $type = "";
     
     // Trim the inputs
-    $user_id = trim ($_POST ["user_id"]);      
+    $description = trim ($_POST ["description"]); 
+    $type = trim ($_POST ["type"]);          
     
     // Set the SQL statement
     // Check if there is just one search field
     if($description == "" | $type == "")
         {
         
-            $sql = "SELECT users.id, users.usertype, agents.first_name, agents.last_name
-                    FROM users, agents 
-                    WHERE users.id=agents.user_id AND ( LOWER(agents.first_name) LIKE LOWER('$firstname') OR LOWER(agents.last_name) LIKE LOWER('$lastname') )
-                    ORDER BY users.enroll_date ASC";    
+            $sql = "SELECT tblMenuItems.ItemID, tblMenuItems.ItemDescription, tblMenuItems.ItemPrice ,tblMenuItems.ItemType 
+                    FROM tblMenuItems
+                    WHERE LOWER(tblMenuItems.ItemDescription) LIKE LOWER('$description') OR LOWER(tblMenuItems.ItemType) LIKE LOWER('$type') )
+                    ORDER BY tblMenuItems.ItemDescription ASC";    
         }
-        else
+        else // Search using both fields
         {
-            $sql = "SELECT users.id, users.usertype, agents.first_name, agents.last_name
-                FROM users, agents 
-                WHERE users.id=agents.user_id AND ( LOWER(agents.first_name) LIKE LOWER('$firstname') AND LOWER(agents.last_name) LIKE LOWER('$lastname') )
-                ORDER BY users.enroll_date ASC";    
+           $sql = "SELECT tblMenuItems.ItemID, tblMenuItems.ItemDescription, tblMenuItems.ItemPrice ,tblMenuItems.ItemType 
+                    FROM tblMenuItems
+                    WHERE LOWER(tblMenuItems.ItemDescription) LIKE LOWER('$description') AND LOWER(tblMenuItems.ItemType) LIKE LOWER('$type') )
+                    ORDER BY tblMenuItems.ItemDescription ASC";    
         }
     
-    $sql = "";
+    //$sql = "";
 
     // connect to the database
     $conn = db_connect();
@@ -90,7 +91,7 @@ else if($_SERVER["REQUEST_METHOD"] == "POST") // If the page has been submitted
                 <td>'.pg_fetch_result($result, $i, "ItemDescription").'</td>
                 <td>'.pg_fetch_result($result, $i, "ItemPrice").'</td>
                 <td>'.pg_fetch_result($result, $i, "ItemType").'</td>
-                <td><a href=\"\" <input type=\"submit\" value=\"Edit\" />Edit</a></td>
+                <td><a href=\"\" <input type=\"submit\" value=\"Edit\" />Edit</a></td>               
             </tr>';       
         }
         
@@ -146,7 +147,9 @@ else if($_SERVER["REQUEST_METHOD"] == "POST") // If the page has been submitted
 
 
 
-<section id="MainContent">            
+<section id="MainContent">         
+<br/>   
+<form method="post" action="<?php echo $_SERVER['PHP_SELF']; ?>">
     <table class="center">
         <th colspan="2" class="t_c">
         Search for a Menu Item
@@ -159,6 +162,11 @@ else if($_SERVER["REQUEST_METHOD"] == "POST") // If the page has been submitted
         <input type="textbox"/ name="description" value="<?php echo $description;?>">
         </td> 
     </tr>
+     </tr>
+        <td colspan="2" style="text-align:center;">
+        or
+        </td>
+    </tr>
     <tr>
         <td>
         Item Type:
@@ -168,11 +176,12 @@ else if($_SERVER["REQUEST_METHOD"] == "POST") // If the page has been submitted
         </td> 
     </tr>
         <td colspan="2" style="text-align:center;">
-        <br/>
-        <input type="button" value="Search"/>
+      
+        <input type="submit" value="Search"/>
         </td>
     </tr>
     </table>
+    	</form>
             
             
             

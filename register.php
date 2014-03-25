@@ -254,7 +254,7 @@ else if($_SERVER["REQUEST_METHOD"] == "POST"){
                     First Name
                 </td>
                 <td>
-                    <input type="text" name="fname"/>
+                    <input type="text" name="firstName"/>
                 </td> 
             </tr>
             <td>
