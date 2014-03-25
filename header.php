@@ -111,6 +111,7 @@ function test_input($data)
     <script src="http://code.jquery.com/jquery-1.9.1.js"></script>
     <script src="http://code.jquery.com/ui/1.10.3/jquery-ui.js"></script>
     <script src="./js/d3.js"></script>
+    <script src="./js/functions.js"></script>
     <!--
         PageAccessed: <?php date_default_timezone_set('Canada/Eastern'); echo date("m/d/y"); ?>
         Author: Taha/Alejandro 
@@ -248,10 +249,11 @@ function test_input($data)
                 <!--<li><a id="login" href="./login.php">Login</a></li>-->
                 
                  <!-- temp links for testing-->
-                 <!-- <li><a href="./edit_menu_items.php">Edit Menu Items</a></li>-->
-                 <!-- <li><a href="./edit_fish_Prices.php">Edit Fish Prices</a></li>-->
-                 <!-- <li><a href="./edit_profile.php">Edit Profile</a></li>-->
-                 <!-- <li><a href="./password_recovery.php">Recover Password</a></li>-->
+                 <li><a href="./edit_menu_items.php">Edit Menu Items</a></li>
+                  <li><a href="./edit_fish_Prices.php">Edit Fish Prices</a></li>
+                  <li><a href="./edit_profile.php">Edit Profile</a></li>
+                  <li><a href="./password_recovery.php">Recover Password</a></li>
                 
             </ul>
         </nav>
+        </header>
