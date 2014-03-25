@@ -17,7 +17,7 @@ $outputError = "";
 //Initialize $user_type to "u" meaning unregistered.
 if($_SERVER["REQUEST_METHOD"] == "GET")
 {
-	$username = "";
+	$userName = "";
 	$pass1 = "";
 	$pass2 = "";
 	$fname = "";  
@@ -34,7 +34,7 @@ if($_SERVER["REQUEST_METHOD"] == "GET")
 	$address = "";
 	$city = "";
 	$province = "";
-	$postal_code = "";
+	$postalCode = "";
 
     $user_type = "";
 	$requiredIsInvalid = false;
@@ -43,7 +43,7 @@ if($_SERVER["REQUEST_METHOD"] == "GET")
 //once form is submitted, remove all whitespaces before and after each variable, 
 //and do the validation before saving it to the database.
 else if($_SERVER["REQUEST_METHOD"] == "POST"){
-	$username = trim ($_POST ["username"]);
+	$userName = trim ($_POST ["userName"]);
 	$pass1 = trim ($_POST ["pass1"]);
 	$pass2 = trim ($_POST ["pass2"]);   
 	$fname = trim ($_POST ["fname"]);
@@ -66,16 +66,16 @@ else if($_SERVER["REQUEST_METHOD"] == "POST"){
 
 	//USERNAME VALIDATION
 	//function for id validation. this will return the vallue of $error.
-	$error = validate_Id($id);
+	$error = validate_Username($userName);
 	if (!$error == "")
 	{
 		$outputError .= $error;
-		echo $id = "";
+		echo $username = "";
 		$requiredIsInvalid = true;
 	}	
 	else
 	{
-		$sql = "Select id FROM users WHERE id='".$id."'";
+		$sql = "Select id FROM users WHERE id='".$userName."'";
 		$result = pg_query($conn,$sql);
 		$records = pg_num_rows($result);
 			
@@ -132,8 +132,78 @@ else if($_SERVER["REQUEST_METHOD"] == "POST"){
 		$outputError .= $error;
 		echo $phoneNumber = "";
 		$requiredIsInvalid = true;
+	}	
+
+	$error = validate_CardType($cardType);
+	if (!$error == "")
+	{
+		$outputError .= $error;
+		echo $cardType = "";
+		$requiredIsInvalid = true;
 	}		
-		
+    
+	//NAME ON CARD HOLDER VALIDATION
+    if ($nameOnCard != ""){
+        $error = validate_NameOnCard($nameOnCard);
+        if (!$error == "")
+        {
+            $outputError .= $error;
+            echo $nameOnCard = "";
+            $requiredIsInvalid = true;
+        }  
+    }
+    
+	//CARD NUMBER VALIDATION
+    
+    if($cardNumber != ""){
+        $error = validate_CardNumber($cardNumber);
+        if (!$error == "")
+        {
+            $outputError .= $error;
+            echo $nameOnCard = "";
+            $requiredIsInvalid = true;
+        }     
+    }
+    
+ 	//Expiration Date VALIDATION
+    
+    if ($month != "")
+    {
+        if (($month < 0) || ($month > 12)){
+            $error = "month must be between 1 - 12 <br/>";
+            $output .= $error;
+            echo $month = "";
+            $requiredIsInvalid = true;
+    }
+    
+    if ($year != "")
+    {
+        if (($year < 14) ){
+            $error = "year must not be less than 2014 <br/>";
+            $output .= $error;
+            echo $year = "";
+            $requiredIsInvalid = true;
+    } 
+    
+    $expirationDate = $month ."/". $year;
+    
+ 	$error = validate_ExpirationDate($expirationDate);
+	if (!$error == "")
+	{
+		$outputError .= $error;
+		echo $nameOnCard = "";
+		$requiredIsInvalid = true;
+	}  
+ 
+	//CARD NUMBER VALIDATION
+ 	$error = validate_CardNumber($cardNumber);
+	if (!$error == "")
+	{
+		$outputError .= $error;
+		echo $nameOnCard = "";
+		$requiredIsInvalid = true;
+	}  
+        
 	//ADDRESS VALIDATION
 	
 	if ($address != "")
@@ -145,43 +215,40 @@ else if($_SERVER["REQUEST_METHOD"] == "POST"){
 			echo $address = "";	
 		}	
 	}
+    	//CITY VALIDATION
 	
-	//POSTAL CODE VALIDATION
-	if ($postal_code != "")
+	if ($city != "")
 	{
-		$error = validate_Postal_Code($postal_code);
+		$error = validate_City($city);
 		if (!$error == "")
 		{
 			$outputError .= $error;
-			echo $postal_code = "";	
+			echo $city = "";
 		}	
 	}
-	//COMPANY VALIDATION	
-	if ($company != "")
-	{
-		$error = validate_Company($company);
-		if (!$error == "")
-		{
-			$outputError .= $error;
-			echo $company = "";
-		}
-	}
-		
-	//WEBSITE VALIDATION
+        //PROVINCE VALIDATION
 	
-	if ($website != "")
+	if ($province != "")
 	{
-		$website = checkHttp($website);
-		$error = validate_Website($website);
+		$error = validate_Province($province);
 		if (!$error == "")
 		{
 			$outputError .= $error;
-			echo $website = "";
-		}
+			echo $province = "";
+		}	
 	}
-		
-	//PREFERRED CONTACT
-	$pref_con = substr($pref_con, 0, 1);
+    
+	
+	//POSTAL CODE VALIDATION
+	if ($postalCode != "")
+	{
+		$error = validate_PostalCode($postalCode);
+		if (!$error == "")
+		{
+			$outputError .= $error;
+			echo $postalCode = "";	
+		}	
+	}
 
 	//USER TYPE
 	//set user type to "u" by default;
@@ -198,12 +265,12 @@ else if($_SERVER["REQUEST_METHOD"] == "POST"){
 		$today = date("Y-m-d", time());//set today to current system date
 		//sql statement to insert the valid inputted data to the username database 
 		$sql = "INSERT INTO users(id, password, usertype, email_address, enroll_date, last_access) 
-		VALUES('".$id."','".$pass."','".$user_type."','".$email."','".$today."','".$today."')";
+		VALUES('".$userName."','".$pass1."','".$user_type."','".$email."','".$today."','".$today."')";
 		pg_query($conn,$sql);//connect to the username dataase and execute the sql statement
 		
 		//sql statement to insert the valid inputted data to the agent's database 
 		$sql = "INSERT INTO agents(user_id, salutation, first_name, last_name, phone, address, city, province, postal_code, company, website, pref_con) 
-		VALUES('".$id."','".$salutation."','".$first_name."','".$last_name."','".$phone."','".$address."','".$city."','".$province."','".$postal_code."','".$company."','".$website."','".$pref_con."')";
+		VALUES('".$userName."','".$pass1."','".$first_name."','".$last_name."','".$phone."','".$address."','".$city."','".$province."','".$postal_code."','".$company."','".$website."','".$pref_con."')";
 		pg_query($conn,$sql);//connect to the username dataase and execute the sql statement
 		header ("location: login.php");//redirects to login.php which is the login process		
 	}
@@ -230,7 +297,7 @@ else if($_SERVER["REQUEST_METHOD"] == "POST"){
                     Username
                 </td>
                 <td>
-                    <input type="text" name="username"/>
+                    <input type="text" name="userName"/>
                 </td>
             </tr>
             <tr>
@@ -320,7 +387,42 @@ else if($_SERVER["REQUEST_METHOD"] == "POST"){
                     Expiration Date
                 </td>
                 <td>
-                    <input type="text" name="expirationDate"/>
+                    <table>
+                        <tr>
+                            <td>Month
+                            </td>
+                            <td>
+                            <select name="month">
+                                <option value="01">01</option>
+                                <option value="02">02</option>
+                                <option value="03">03</option>
+                                <option value="04">04</option>
+                                <option value="05">05</option>
+                                <option value="06">06</option>
+                                <option value="07">07</option>
+                                <option value="08">08</option>
+                                <option value="09">09</option>
+                                <option value="10">10</option>
+                                <option value="11">11</option>
+                                <option value="12">12</option>
+                            </select>
+                            </td>
+                            <td>Year
+                            </td>
+                            <td>
+                            <select name="year">
+                                <option value="14">14</option>
+                                <option value="15">15</option>
+                                <option value="16">16</option>
+                                <option value="17">17</option>
+                                <option value="18">18</option>
+                                <option value="19">19</option>
+                                <option value="20">20</option>
+                            </select>
+                            </td>
+                        </tr>
+                    </table>
+                  
                 </td>
             </tr>
             <tr>
@@ -331,15 +433,6 @@ else if($_SERVER["REQUEST_METHOD"] == "POST"){
                     <input type="text" name="securityCode"/>
                 </td>
             </tr>            
-        
-        </table>        
-        
-        <br/>
-        
-        <table id="billinginfo">
-            <th colspan="2" class="t_c">
-                Billing Information
-            </th>
             <tr>
                 <td>
                     Address
@@ -354,7 +447,7 @@ else if($_SERVER["REQUEST_METHOD"] == "POST"){
                     City
                 </td>
                 <td>
-                    <input type="textbox" name="city"/>
+                    <input type="text" name="city"/>
                 </td>
             </tr>
             <tr>
