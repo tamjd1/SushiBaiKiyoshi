@@ -14,6 +14,7 @@ require 'header.php';
 
 
         <section id="MainContent">            
+        <br/>
              <table id="addFishPrice">
                 <th colspan="2" class="t_c">
                 Add Fish Price Information
