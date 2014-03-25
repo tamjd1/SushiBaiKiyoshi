@@ -20,6 +20,30 @@ require 'header.php';
             </th>
             <tr>
                 <td>
+                    Email
+                </td>
+                <td>
+                    <input type="email" name="email"/>
+                </td>
+            </tr>
+            <tr>
+                <td>
+                    Password
+                </td>
+                <td>
+                    <input type="Password" name="pass1"/>
+                </td>
+            </tr>
+            <tr>
+                <td>
+                    Confirm Password
+                </td>
+                <td>
+                    <input type="Password" name="pass2"/>
+                </td>
+            </tr>
+            <tr>
+                <td>
                     Name
                 </td>
                 <td>
@@ -27,14 +51,7 @@ require 'header.php';
                 </td> 
 
             </tr>
-            <tr>
-                <td>
-                    Email
-                </td>
-                <td>
-                    <input type="email" name="email"/>
-                </td>
-            </tr>
+
             <tr>
                 <td>
                     Phone Number
