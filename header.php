@@ -1,106 +1,104 @@
-<?php 
-/*
-	error_reporting(E_ALL ^ E_NOTICE ^ E_WARNING);
-
-	ob_start();
-
-	require ('./includes/constants.php');
-	require ('./includes/db.php');
-	require ('./includes/util.php');
-
-	if(session_id() == "")
-	{
-		session_start();
-	}
-	
-	$message = "";
-	
-	if(isset($_SESSION['message']))
-	{
-		$message = $_SESSION['message'];
-		unset($_SESSION['message']);
-	}
-	
-	if (isset($page_specific_css))
-	{
-		$count = count($page_specific_css);
-		for ($i = 0; $i < $count; $i++)
-		{
-			echo "<link rel='syltesheet' type='text/css' href='".$page_specific_css[$i]."' />";
-		}
-	}
-	
-	if (isset($page_specific_js))
-	{
-		$count = 0;
-		$count = count($page_specific_js);
-		for ($i = 0; $i < $count; $i++)
-		{
-			echo "<script src='".$page_specific_js[$i]."' type='text/javascript'></script>";
-		}
-	}
-*/
-?>
-
 <?php
-	if(session_id() == "")
-	{
-		session_start();
-	}
-?>
+    if(session_id() == "")
+    {
+        session_start();
+    }
     
-<?php
-$login = "";
-$password = "";
-
-if ($_SERVER["REQUEST_METHOD"] == "POST")
-{
-  $login = test_input($_POST["login"]);
-  $password = test_input($_POST["password"]);
-  echo "ssssssssssssss";
-}
-
-// edits for input that could effect the database
-function test_input($data)
-{
-  $data = trim($data);
-  $data = stripslashes($data);
-  $data = htmlspecialchars($data);
-  return $data;
-}
-
-
-    // if($_POST['login'] == "")
-    // {
-        // $errorMessage += ("Login is empty!<br>");
-     
-    // }
     
-    // if(empty($_POST['password']))
-    // {
-        // $errorMessage += ("Password is empty!<br>");
-    // }
-     
-    //$username = trim($_POST['login']);
-    //$password = trim($_POST['password']);
-
-    //session_start();
-
-
-   //echo $errorMessage;   
+    if($_SERVER["REQUEST_METHOD"] == "POST")
+    {       
+        //the page got here from submitting the form, let's try to process
+        $loginID = trim($_POST["login"]);
+        $password = trim($_POST["pass"]);
+        
+        //let's do some data validation
+        if(!isset($loginID) || $loginID == "" || !isset($password) || $password == "" )
+        {
+            //means the user did not enter anything
+            $error = "Login/password not found in the database";
+            $loginID = "";
+        }
+        else
+        {
+            //no errors connent to db
+            //Attempts to select a record where the entered information is matching
+            $sql = "SELECT id, password, usertype, last_access, first_name, last_name
+                    FROM users, agents
+                    WHERE users.id=agents.user_id AND id ='".$loginID."' AND password = '".$password."'";
+            //Runs the select query
+            $result = pg_query($conn, $sql);
+            //Checks how many records result from the query
+            $records = pg_num_rows($result);
+            
+            //If the information entered results in a resulting record (ie. the username&password are legit) then do this stuff
+            if ($records > 0)
+            {           
+                session_start();            
+                $_SESSION['id'] = $loginID;     
+                $_SESSION['last_access'] = pg_fetch_result($result, 0, 3);
+                $_SESSION['usertype'] = pg_fetch_result($result, 0, 2);
+                $_SESSION['firstname'] = pg_fetch_result($result, 0, 4);
+                $_SESSION['lastname'] = pg_fetch_result($result, 0, 5);
+                $_SESSION['message'] = "";
+                $sql = "UPDATE users SET last_access = '". date("Y-m-d", time()) . "' WHERE id = '".$loginID."'";
+                $results = pg_query($conn, $sql);
+                
+                if (!isset($_COOKIE["loginID"]))
+                {               
+                    setcookie("loginID", $loginID, time() + 60*60*24*30); // Expire in 30 days
+                }
+            
+            
+                //Updates the last access date
+                $sql = "UPDATE users SET last_access = '" . date("Y-m-d",time()) . "' WHERE id = '" . $loginID . "'";               
+                //Run the update query
+                pg_query($conn,$sql); 
+            
+            
+                echo $_SESSION['id'];   
+                echo $_SESSION['last_access'];
+                echo $_SESSION['usertype'];
+                echo $_SESSION['firstname'];
+                echo $_SESSION['lastname'];
+            
+                //REMOVE THIS LINE AFTER??????????????? --------------------Temp to redirect to welcome.php, need to create a session here to store user login.
+                header('Location:./welcome.php');
+            /*
+                //Displays the login message
+                $msg = "Welcome back " . pg_fetch_result($result,0,'id') ." ". 
+                       "<br/>Our records show that your<br/>
+                       email address is: " . pg_fetch_result($result,0,'email_address') .
+                       "<br/>and you last accessed our system: " . pg_fetch_result($result,0,'last_access');
+                       */
+            }
+            else
+            {
+                //lets check to see if the username is real!
+                $sql = "SELECT * FROM users WHERE id = '".$loginID."'";
+                //Runs the select query
+                $result = pg_query($conn, $sql);
+                //Checks how many records result from the query
+                $records = pg_num_rows($result);
+                //If the information entered results in a resulting record (ie. the username&password are legit) then do this stuff
+                if ($records > 0)
+                {   
+                    $error = "Login/password combination not found in the database";
+                }
+                else
+                {
+                $error = "Login/password not found in the database";
+                $loginID = ""; //clears the sticky form if we cant find the desired id in the database
+                //$password = ""; //no need to clear password, because it is not a sticky form
+                }
+            }
+        }
+    }
+    else
+    {
+        //there were problems, concatentate the TRY AGAIN message
+        $error .= "<br/>Please Try Again";      
+    }
 ?>
-
- <?PHP
-
-// session_start();
-
-// if (!(isset($_SESSION['login']) && $_SESSION['login'] != '')) {
-
-// header ("Location: index.php");
-
-// }
-
-// ?>
 <!DOCTYPE html>
 
 <html lang="en">
@@ -118,8 +116,8 @@ function test_input($data)
         Filename: <?php echo $file; ?>
         Date: <?php echo $date; ?>
         Description: <?php echo $description; ?>
-	-->
-	<title><?php echo $title ?></title>
+    -->
+    <title><?php echo $title ?></title>
 </head>
 <body>
     <script>
@@ -231,9 +229,16 @@ function test_input($data)
     <div id="top" class="login-bar"> 
     <form id="loginForm" action="" method="post">
         <input id="register "type="button" class="float-left button" value="Register" />
-        <input id="go "type="button" class="float-right button" value=">" onclick=""/>         
-        <input id="password" type="password" class="float-right textbox" value="password" /> 
-        <input id="login" type="text" class="float-right textbox" value="Username" />
+        <input id="go "type="button" class="float-right button" value=">" onclick=""/> 
+
+
+        
+        
+        
+        <input id="password" type="password" class="float-right textbox" value="" /> 
+        <input id="login" type="text" class="float-right textbox" value="" /> 
+      
+        
     </form>
     </div>
     <header>

@@ -29,6 +29,7 @@ if($_SERVER["REQUEST_METHOD"] == "GET") // If it the first time the page is load
     $date = "";
     $location = "";
     $supplyStatus = "";
+    $price = "";
 }
 //if (isset($_POST['submit']) alternate way
 if($_SERVER["REQUEST_METHOD"] == "POST") // If the page has been submitted
@@ -38,15 +39,17 @@ if($_SERVER["REQUEST_METHOD"] == "POST") // If the page has been submitted
     $date = "";
     $location = "";
     $supplyStatus = "";
+    $price = "";
     
     // Trim the inputs
     $type = trim ($_POST ["type"]); 
     $date = trim ($_POST ["date"]); 
     $location = trim ($_POST ["location"]); 
     $supplyStatus = trim ($_POST ["supplyStatus"]); 
+     $price = trim ($_POST ["price"]); 
   
     $sql = "INSERT INTO tblFishMarket(Type, Date, Price, Location, SupplyStatus)
-            VALUES '$type', '$date', '$location' , '$supplyStatus'";
+            VALUES '$type', '$date', '$price', '$location' , '$supplyStatus'";
 
     // connect to the database
     $conn = db_connect();
@@ -63,8 +66,6 @@ if($_SERVER["REQUEST_METHOD"] == "POST") // If the page has been submitted
     }
    }
 ?>
-
-
         <section id="MainContent">            
         <br/>
         <form method="post" action="<?php echo $_SERVER['PHP_SELF']; ?>">
