@@ -23,14 +23,6 @@ if ($_SESSION['UserType'] != 'a') // If not an administrator redirect to main pa
 */
 
 
-if($_SERVER["REQUEST_METHOD"] == "GET") // If it the first time the page is loaded
-{
-    $type = "";
-    $date = "";
-    $location = "";
-    $supplyStatus = "";
-    $price = "";
-}
 //if (isset($_POST['submit']) alternate way
 if($_SERVER["REQUEST_METHOD"] == "POST") // If the page has been submitted
 {      
@@ -52,7 +44,10 @@ if($_SERVER["REQUEST_METHOD"] == "POST") // If the page has been submitted
             VALUES '$type', '$date', '$price', '$location' , '$supplyStatus'";
 
     // connect to the database
-    $conn = db_connect();
+    //$conn = db_connect();
+    
+    
+    $conn = pg_connect("host=localhost port=5432 dbname=sb user=postgres password=vdragon");
     //issue the query       
     $result = pg_query($conn, $sql);
       

@@ -4,7 +4,7 @@
         session_start();
     }
     
-    
+    /*
     if($_SERVER["REQUEST_METHOD"] == "POST")
     {       
         //the page got here from submitting the form, let's try to process
@@ -69,7 +69,7 @@
                        "<br/>Our records show that your<br/>
                        email address is: " . pg_fetch_result($result,0,'email_address') .
                        "<br/>and you last accessed our system: " . pg_fetch_result($result,0,'last_access');
-                       */
+                       
             }
             else
             {
@@ -98,7 +98,7 @@
         //there were problems, concatentate the TRY AGAIN message
         $error .= "<br/>Please Try Again";      
     }
-?>
+*/?>
 <!DOCTYPE html>
 
 <html lang="en">

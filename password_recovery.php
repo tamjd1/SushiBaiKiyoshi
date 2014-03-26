@@ -40,17 +40,17 @@ else if($_SERVER["REQUEST_METHOD"] == "POST")
 		echo "password: " . pg_fetch_result($result, 0, 'password')."</br>";
 		
 		
-		$to = pg_fetch_result($result, 0, 'emailAddress');
+		$to = '$emailAddress';
 		$subject = 'Forgotten Password';
 		$message = 'Your password is: '.pg_fetch_result($result, 0, 'password');
-		$headers = 'From: admin@mkt2.ca' . "\r\n" .
-			'Cc: admin@mtk2.ca\r\n';
-			'Reply-To: admin@mtk2.ca' . "\r\n" .
+		$headers = 'From: admin@sushi.ca' . "\r\n" .
+			'Cc: admin@sushi.ca\r\n';
+			'Reply-To: admin@sushi.ca' . "\r\n" .
 			'X-Mailer: PHP/' . phpversion();
 
 		if( mail($to,$subject,$message,$headers))  
 		{
-		  echo "Message sent successfully.";
+		  echo "Email has been sent with your forgotten password.";
 		}
 		else
 		{
@@ -80,7 +80,7 @@ else
  <br/>
     <form action="" method="post">
         <table id="recovery">  
-        <th class="t_c">Password Recovery</th>
+        <th class="t_c" colspan="2">Password Recovery</th>
         <tr>
             <td>User-name</td> 
             <td> <input type="text" name="userName" value="<?php $userName;?>" size="25"/> </td>
