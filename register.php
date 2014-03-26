@@ -262,16 +262,36 @@ else if($_SERVER["REQUEST_METHOD"] == "POST"){
 	//INSERT VALID DATA TO THE USERS AND AGENTS DATABASE 
 	if ($error == "" && $requiredIsInvalid == false)		
 	{
-		$today = date("Y-m-d", time());//set today to current system date
-		//sql statement to insert the valid inputted data to the username database 
-		$sql = "INSERT INTO users(id, password, usertype, email_address, enroll_date, last_access) 
-		VALUES('".$userName."','".$pass1."','".$user_type."','".$email."','".$today."','".$today."')";
-		pg_query($conn,$sql);//connect to the username dataase and execute the sql statement
 		
-		//sql statement to insert the valid inputted data to the agent's database 
-		$sql = "INSERT INTO agents(user_id, salutation, first_name, last_name, phone, address, city, province, postal_code, company, website, pref_con) 
-		VALUES('".$userName."','".$pass1."','".$first_name."','".$last_name."','".$phone."','".$address."','".$city."','".$province."','".$postal_code."','".$company."','".$website."','".$pref_con."')";
-		pg_query($conn,$sql);//connect to the username dataase and execute the sql statement
+		//sql statement to insert the valid data to the credit card database 
+		
+        $sql = "INSERT INTO tblCreditCards(UserID, CreditCardNumber, CreditCardExpiryDate, CreditCardSecurityCode, CreditCardType, CardHolder, 
+        BillingAddress, BillingCity,BillingProvince, BillingPostalCode);
+        VALUES(
+            '".$userName."',
+            '".$cardType."',
+            '".$nameOnCard."',
+            '".$cardNumber."',
+            '".$expirationDate."',
+            '".$securityCode."', 
+            '".$address."',
+            '".$city." ',
+            '".$province."',
+            '".$postalCode."')";
+        
+		pg_query($conn,$sql);//connect to the credit card database and execute the sql statement
+		
+		//sql statement to insert the valid data to the users database 
+		$sql = "INSERT INTO tblUsers(UserID, UserFirst, UserLast, UserEmail, UserPhone, UserType) 
+		VALUES(
+        	'".$userName."',
+            '".$pass1."',
+            '".$pass2."',
+            '".$fname."',
+            '".$lname."',  
+            '".$email."',
+            '".$phoneNumber"')";
+		pg_query($conn,$sql);//connect to the username database and execute the sql statement
 		header ("location: login.php");//redirects to login.php which is the login process		
 	}
 	else
@@ -282,7 +302,6 @@ else if($_SERVER["REQUEST_METHOD"] == "POST"){
 }
 
 ?>
-
         <p class="t_c">
             Enter the following information and create an account that can be used to place orders for pick-up online.
         </p>
@@ -321,7 +340,7 @@ else if($_SERVER["REQUEST_METHOD"] == "POST"){
                     First Name
                 </td>
                 <td>
-                    <input type="text" name="firstName"/>
+                    <input type="text" name="fname"/>
                 </td> 
             </tr>
             <td>
