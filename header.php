@@ -110,6 +110,7 @@
     <script src="http://code.jquery.com/ui/1.10.3/jquery-ui.js"></script>
     <script src="./js/d3.js"></script>
     <script src="./js/functions.js"></script>
+    <script src="./js/jquery-1.8.2.min.js"></script>
     <!--
         PageAccessed: <?php date_default_timezone_set('Canada/Eastern'); echo date("m/d/y"); ?>
         Author: Taha/Alejandro 
