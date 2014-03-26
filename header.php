@@ -230,6 +230,7 @@
     <div id="top" class="login-bar"> 
     <form id="loginForm" action="" method="post">
         <input id="register "type="button" class="float-left button" value="Register" />
+        <a href="./admin.php">Admin Page</a>
         <input id="go "type="button" class="float-right button" value=">" onclick=""/> 
 
 
@@ -255,10 +256,11 @@
                 <!--<li><a id="login" href="./login.php">Login</a></li>-->
                 
                  <!-- temp links for testing-->
+                 <!--
                  <li><a href="./edit_menu_items.php">Edit Menu Items</a></li>
                   <li><a href="./edit_fish_Prices.php">Edit Fish Prices</a></li>
                   <li><a href="./edit_profile.php">Edit Profile</a></li>
-                  <li><a href="./password_recovery.php">Recover Password</a></li>
+                  <li><a href="./password_recovery.php">Recover Password</a></li>-->
                 
             </ul>
         </nav>

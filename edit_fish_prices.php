@@ -51,15 +51,18 @@ if($_SERVER["REQUEST_METHOD"] == "POST") // If the page has been submitted
     //issue the query       
     $result = pg_query($conn, $sql);
       
+    echo '<p class="t_c">';
+      
     if (!$result)
     {
-        echo "Update failed!!"; 
+        echo "An error occurred"; 
     }
     else
     {
-        echo "Error";
+        echo "Pricing added!";
         
     }
+    echo '</p>';
    }
 ?>
         <section id="MainContent">            

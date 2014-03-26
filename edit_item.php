@@ -20,10 +20,11 @@ if (!isset($_SESSION['id'])) // Non login in users to be sent back to index
 
 if($_SERVER["REQUEST_METHOD"] == "GET") // If it the first time the page is loaded
 {
-
+$itemID = $_GET["itemID"];
 $description = $_GET["description"];
 $price = $_GET["price"];
 $type = $_GET["type"];
+$promotionID = $_GET["promotionID"];
 
 
 /*
@@ -50,6 +51,7 @@ if($_SERVER["REQUEST_METHOD"] == "POST") // If the page has been submitted
     $description = trim ($_POST["description"]);
     $price = trim ($_POST["price"]);
     $type =trim ( $_POST["type"]);
+    $promotion =trim ( $_POST["promotion"]);
 
     
     // Set the SQL statement
@@ -57,8 +59,8 @@ if($_SERVER["REQUEST_METHOD"] == "POST") // If the page has been submitted
 
 
     $sql = "UPDATE \"tblMenuItems\"
-        SET \"ItemDescription\"='$description', \ItemPrice\"='$price', \"ItemType\"='$type', \"PromotionID\"=?
-        WHERE <condition>";
+        SET \"ItemDescription\"='$description', \ItemPrice\"='$price', \"ItemType\"='$type', \"PromotionID\"='$promotion'
+        WHERE ItemID='$itemID'";
 
     
    
@@ -91,7 +93,7 @@ if($_SERVER["REQUEST_METHOD"] == "POST") // If the page has been submitted
             Description
             </td>
             <td>
-            <input type="textbox"/ name="name" value="<?php echo $description ?>">
+            <input type="textbox"/ name="description" value="<?php echo $description ?>">
             </td> 
         </tr>
          <tr>
@@ -99,7 +101,7 @@ if($_SERVER["REQUEST_METHOD"] == "POST") // If the page has been submitted
             Price
             </td>
             <td>
-            <input type="textbox"/ name="name" value="<?php echo $price ?>">
+            <input type="textbox"/ name="price" value="<?php echo $price ?>">
             </td> 
         </tr>
          <tr>
@@ -107,7 +109,20 @@ if($_SERVER["REQUEST_METHOD"] == "POST") // If the page has been submitted
             Type
             </td>
             <td>
-            <input type="textbox"/ name="name" value="<?php echo $type ?>">
+            <input type="textbox"/ name="type" value="<?php echo $type ?>">
+            </td> 
+        </tr>
+         <tr>
+            <td>
+            Promotion
+            </td>
+            <td>
+            <select name="promotion">
+              <option value="none">None</option>
+              <option value="saab">Saab</option>
+              <option value="mercedes">Mercedes</option>
+              <option value="audi">Audi</option>
+            </select>
             </td> 
         </tr>
         

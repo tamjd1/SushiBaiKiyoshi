@@ -25,10 +25,30 @@ if($_SERVER["REQUEST_METHOD"] == "GET") // If it the first time the page is load
 {
     $description = "";
     $type = "";
+    $sql="SELECT 
+              \"tblMenuItems\".\"ItemID\", 
+              \"tblMenuItems\".\"ItemDescription\", 
+              \"tblMenuItems\".\"ItemPrice\", 
+              \"tblMenuItems\".\"ItemType\", 
+              \"tblMenuItems\".\"PromotionID\", 
+              
+              \"tblPromotions\".\"PromotionID\", 
+              \"tblPromotions\".\"PromotionDescription\", 
+              \"tblPromotions\".\"PromotionValue\", 
+              \"tblPromotions\".\"IsPercent\", 
+              \"tblPromotions\".\"StartDate\", 
+              \"tblPromotions\".\"EndDate\"
+            FROM 
+              \"tblPromotions\", 
+              \"tblMenuItems\"
+            WHERE 
+              \"tblPromotions\".\"PromotionID\" = \"tblMenuItems\".\"PromotionID\";
+";
+    /*
     $sql =  "SELECT \"ItemID\", \"ItemDescription\", \"ItemPrice\", \"ItemType\", \"PromotionID\"
                         FROM \"tblMenuItems\" 
                         
-                        ORDER BY \"ItemDescription\" ASC"; 
+                        ORDER BY \"ItemDescription\" ASC"; */
                         
      //$conn = db_connect();
     $conn = pg_connect("host=localhost port=5432 dbname=sb user=postgres password=vdragon");
@@ -49,6 +69,7 @@ if($_SERVER["REQUEST_METHOD"] == "GET") // If it the first time the page is load
             <td>Description</td>
             <td>Price</td>
             <td>Type</td>
+            <td>Promotion</td>
             <td>Enabled</td>
             <td>Edit</td>
          </tr>';  
@@ -60,15 +81,34 @@ if($_SERVER["REQUEST_METHOD"] == "GET") // If it the first time the page is load
             '<tr align="center">
                   <td>'.pg_fetch_result($result, $i, 0).'</td>
                 <td>'.pg_fetch_result($result, $i, 1).'</td>
-                <td>'.pg_fetch_result($result, $i, 2).'</td>
-                <td>'.pg_fetch_result($result, $i, 3).'</td>
-                <td><input type="checkbox" name="vehicle" ></td>';
+                <td>'.pg_fetch_result($result, $i, 2).'$</td>
+                 <td>'.pg_fetch_result($result, $i, 4).'</td>';
+                 
+                 if(pg_fetch_result($result, $i, 5) != null)
+                 {
+                    echo '<td>'.pg_fetch_result($result, $i, 6).' = ';
+                    if(pg_fetch_result($result, $i, 8))
+                    {
+                        echo pg_fetch_result($result, $i, 7).'%</td>';
+                    }
+                    else
+                    {
+                        echo pg_fetch_result($result, $i, 7).'$</td>';
+                    }
+                 }
+                 else
+                 {
+                 
+                    echo '<td>'.pg_fetch_result($result, $i, 7).'%</td>';
+                 }
+                echo '<td><input type="checkbox" name="vehicle" ></td>';
                 
                 echo "<td><a href=
                 \"./edit_item.php?
-                id=".pg_fetch_result($result, $i, 0).
+                itemID=".pg_fetch_result($result, $i, 0).
                 "&description=".pg_fetch_result($result, $i, 1).
                 "&price=".pg_fetch_result($result, $i, 2).
+                 "promotionID=".pg_fetch_result($result, $i, 5).
                 "&type=".pg_fetch_result($result, $i, 3).
                 "\">Edit</a></td>
                 
