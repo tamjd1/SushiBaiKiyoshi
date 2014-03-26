@@ -40,24 +40,25 @@ if($_SERVER["REQUEST_METHOD"] == "POST") // If the page has been submitted
     $supplyStatus = trim ($_POST ["supplyStatus"]); 
      $price = trim ($_POST ["price"]); 
   
-    $sql = "INSERT INTO tblFishMarket(Type, Date, Price, Location, SupplyStatus)
-            VALUES '$type', '$date', '$price', '$location' , '$supplyStatus'";
+    $sql = "INSERT INTO \"tblFishMarket\"(\"Type\", \"Date\", \"Price\", \"Location\", \"SupplyStatus\")
+            VALUES ('$type', '$date', '$price', '$location' , '$supplyStatus')";
 
     // connect to the database
     //$conn = db_connect();
     
-    
+   
     $conn = pg_connect("host=localhost port=5432 dbname=sb user=postgres password=vdragon");
     //issue the query       
     $result = pg_query($conn, $sql);
       
-    if (!result)
+    if (!$result)
     {
         echo "Update failed!!"; 
     }
     else
     {
         echo "Error";
+        
     }
    }
 ?>
@@ -102,7 +103,7 @@ if($_SERVER["REQUEST_METHOD"] == "POST") // If the page has been submitted
                 </tr>
                 <tr>
                     <td>
-                    Supply Status
+                    Supply Status <!--this needs to be either L M or H -->
                     </td>
                     <td>
                     <input type="textbox" name="supplyStatus" size="4" maxlength="1">

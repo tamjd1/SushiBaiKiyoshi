@@ -25,11 +25,70 @@ if($_SERVER["REQUEST_METHOD"] == "GET") // If it the first time the page is load
 {
     $description = "";
     $type = "";
+    $sql =  "SELECT \"ItemID\", \"ItemDescription\", \"ItemPrice\", \"ItemType\", \"PromotionID\"
+                        FROM \"tblMenuItems\" 
+                        
+                        ORDER BY \"ItemDescription\" ASC"; 
+                        
+     //$conn = db_connect();
+    $conn = pg_connect("host=localhost port=5432 dbname=sb user=postgres password=vdragon");
+    //issue the query       
+    $result = pg_query($conn, $sql);
+    // set records variable to number of found results
+    $records = pg_num_rows($result);    
+    
+    if ($records > 0) // If there are results from the query
+    {       
+       
+        
+        echo '<br/><table class="tableLayout">';
+        
+        echo  // Create the table titles
+        '<tr>
+            <td>ID</td>
+            <td>Description</td>
+            <td>Price</td>
+            <td>Type</td>
+            <td>Enabled</td>
+            <td>Edit</td>
+         </tr>';  
+                 
+        // Generate the table from the results
+        for($i = 0; $i < $records; $i++)
+        {
+            echo // Generate the table rows
+            '<tr align="center">
+                  <td>'.pg_fetch_result($result, $i, 0).'</td>
+                <td>'.pg_fetch_result($result, $i, 1).'</td>
+                <td>'.pg_fetch_result($result, $i, 2).'</td>
+                <td>'.pg_fetch_result($result, $i, 3).'</td>
+                <td><input type="checkbox" name="vehicle" ></td>';
+                
+                echo "<td><a href=
+                \"./edit_item.php?
+                id=".pg_fetch_result($result, $i, 0).
+                "&description=".pg_fetch_result($result, $i, 1).
+                "&price=".pg_fetch_result($result, $i, 2).
+                "&type=".pg_fetch_result($result, $i, 3).
+                "\">Edit</a></td>
+                
+                 </tr>";  
+               // echo '<td><a href=\"\" <input type=\"submit\" value=\"Edit\" />Edit</a></td>               
+                
+        }
+        
+        echo "</table>"; // Closing table tag
+    }
+    // If no query results
+    else 
+    {
+        echo "<br/>No search results";    
+    }   
 }
 
 else if($_SERVER["REQUEST_METHOD"] == "POST") // If the page has been submitted
 {      
-    // Clear out the forms
+    // Clear out the variables
     $description = "";
     $type = "";
     
@@ -41,24 +100,33 @@ else if($_SERVER["REQUEST_METHOD"] == "POST") // If the page has been submitted
     // Check if there is just one search field
     if($description == "" | $type == "")
         {
-        
-            $sql = "SELECT tblMenuItems.ItemID, tblMenuItems.ItemDescription, tblMenuItems.ItemPrice ,tblMenuItems.ItemType 
-                    FROM tblMenuItems
-                    WHERE LOWER(tblMenuItems.ItemDescription) LIKE LOWER('$description') OR LOWER(tblMenuItems.ItemType) LIKE LOWER('$type') )
-                    ORDER BY tblMenuItems.ItemDescription ASC";    
+        "SELECT \"ItemID\", \"ItemDescription\", \"ItemPrice\", \"ItemType\", \"PromotionID\"
+FROM \"tblMenuItems\" 
+WHERE LOWER(\"ItemDescription\") LIKE LOWER('$description') OR 
+	LOWER(\"ItemType\") LIKE LOWER('$type')
+	ORDER BY \"ItemDescription\" ASC";
+    
+            $sql =  "SELECT \"ItemID\", \"ItemDescription\", \"ItemPrice\", \"ItemType\", \"PromotionID\"
+                        FROM \"tblMenuItems\" 
+                        WHERE LOWER(\"ItemDescription\") LIKE LOWER('$description') OR 
+                        LOWER(\"ItemType\") LIKE LOWER('$type')
+                        ORDER BY \"ItemDescription\" ASC"; 
         }
         else // Search using both fields
         {
-           $sql = "SELECT tblMenuItems.ItemID, tblMenuItems.ItemDescription, tblMenuItems.ItemPrice ,tblMenuItems.ItemType 
-                    FROM tblMenuItems
-                    WHERE LOWER(tblMenuItems.ItemDescription) LIKE LOWER('$description') AND LOWER(tblMenuItems.ItemType) LIKE LOWER('$type') )
-                    ORDER BY tblMenuItems.ItemDescription ASC";    
+           $sql = "SELECT \"ItemID\", \"ItemDescription\", \"ItemPrice\", \"ItemType\", \"PromotionID\"
+                        FROM \"tblMenuItems\" 
+                        WHERE LOWER(\"ItemDescription\") LIKE LOWER('$description') AND 
+                        LOWER(\"ItemType\") LIKE LOWER('$type')
+                        ORDER BY \"ItemDescription\" ASC";  
         }
     
-    //$sql = "";
+     
+   
 
     // connect to the database
-    $conn = db_connect();
+    //$conn = db_connect();
+    $conn = pg_connect("host=localhost port=5432 dbname=sb user=postgres password=vdragon");
     //issue the query       
     $result = pg_query($conn, $sql);
     // set records variable to number of found results
@@ -66,10 +134,7 @@ else if($_SERVER["REQUEST_METHOD"] == "POST") // If the page has been submitted
     
     if ($records > 0) // If there are results from the query
     {       
-        echo
-        "<h1>
-            ".$message."
-        </h1>";
+       
         
         echo '<table class="tableLayout">';
         
@@ -87,12 +152,20 @@ else if($_SERVER["REQUEST_METHOD"] == "POST") // If the page has been submitted
         {
             echo // Generate the table rows
             '<tr align="center">
-                  <td>'.pg_fetch_result($result, $i, "ItemID").'</td>
-                <td>'.pg_fetch_result($result, $i, "ItemDescription").'</td>
-                <td>'.pg_fetch_result($result, $i, "ItemPrice").'</td>
-                <td>'.pg_fetch_result($result, $i, "ItemType").'</td>
-                <td><a href=\"\" <input type=\"submit\" value=\"Edit\" />Edit</a></td>               
-            </tr>';       
+                  <td>'.pg_fetch_result($result, $i, 0).'</td>
+                <td>'.pg_fetch_result($result, $i, 1).'</td>
+                <td>'.pg_fetch_result($result, $i, 2).'</td>
+                <td>'.pg_fetch_result($result, $i, 3).'</td>';
+                echo "<td><a href=
+                \"./edit_item.php?
+                id=".pg_fetch_result($result, $i, 0).
+                "&description=".pg_fetch_result($result, $i, 1).
+                "&price=".pg_fetch_result($result, $i, 2).
+                "&type=".pg_fetch_result($result, $i, 3).
+                "\">Edit</a></td>
+                 </tr>";  
+               // echo '<td><a href=\"\" <input type=\"submit\" value=\"Edit\" />Edit</a></td>               
+                
         }
         
         echo "</table>"; // Closing table tag
@@ -175,6 +248,7 @@ else if($_SERVER["REQUEST_METHOD"] == "POST") // If the page has been submitted
         <input type="textbox"/ name="type" value="<?php echo $type;?>"> 
         </td> 
     </tr>
+    <tr>
         <td colspan="2" style="text-align:center;">
       
         <input type="submit" value="Search"/>

@@ -24,9 +24,10 @@ else if($_SERVER["REQUEST_METHOD"] == "POST")
 				FROM tblUsers
 				WHERE UserID ='$userName' AND emailAddress = '$emailAddress'";
     
-    
-	$conn = db_connect();
-	$result = pg_query($conn, $sql);			
+    echo $sql;
+	//$conn = db_connect();
+    $conn = pg_connect("host=localhost port=5432 dbname=sb user=postgres password=vdragon");
+	$result = pg_query($conn, $sql);
 	$records = pg_num_rows($result);
 	
 	//$password = pg_fetch_result($result, 'password');
