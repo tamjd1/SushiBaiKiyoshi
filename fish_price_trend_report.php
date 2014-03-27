@@ -9,56 +9,44 @@
 
 <?php
 
-$fish_prices_trend = array
-     (
-         array('Type'=>"Salmon",'Date'=>'01-12-2000','Supply'=>'High'),
-         array('Type'=>"Tuna",'Date'=>'01-15-2000','Supply'=>'High'),
-         array('Type'=>"Swordfish",'Date'=>'01-13-2000','Supply'=>'Medium'),
-         array('Type'=>"Carp",'Date'=>'01-12-2000','Supply'=>'Low'),
-         array('Type'=>"Salmon",'Date'=>'02-10-2000','Supply'=>'Medium'),
-         array('Type'=>"Tuna",'Date'=>'02-05-2000','Supply'=>'Medium'),
-         array('Type'=>"Swordfish",'Date'=>'02-13-2000','Supply'=>'Low'),
-         array('Type'=>"Carp",'Date'=>'02-12-2000','Supply'=>'Medium'),
-         array('Type'=>"Salmon",'Date'=>'03-02-2000','Supply'=>'High'),
-         array('Type'=>"Tuna",'Date'=>'03-16-2000','Supply'=>'Medium'),
-         array('Type'=>"Swordfish",'Date'=>'03-13-2000','Supply'=>'Medium'),
-         array('Type'=>"Carp",'Date'=>'03-22-2000','Supply'=>'High'),
-         array('Type'=>"Salmon",'Date'=>'04-12-2000','Supply'=>'Medium'),
-         array('Type'=>"Tuna",'Date'=>'04-12-2000','Supply'=>'Medium'),
-         array('Type'=>"Swordfish",'Date'=>'04-23-2000','Supply'=>'Low'),
-         array('Type'=>"Carp",'Date'=>'04-25-2000','Supply'=>'High'),
-         array('Type'=>"Salmon",'Date'=>'05-29-2000','Supply'=>'Medium'),
-         array('Type'=>"Tuna",'Date'=>'05-15-2000','Supply'=>'High'),
-         array('Type'=>"Swordfish",'Date'=>'05-03-2000','Supply'=>'High'),
-         array('Type'=>"Carp",'Date'=>'05-22-2000','Supply'=>'Medium'),
-         array('Type'=>"Salmon",'Date'=>'06-16-2000','Supply'=>'Low'),
-         array('Type'=>"Tuna",'Date'=>'06-15-2000','Supply'=>'Medium'),
-         array('Type'=>"Swordfish",'Date'=>'06-19-2000','Supply'=>'Low'),
-         array('Type'=>"Carp",'Date'=>'06-20-2000','Supply'=>'High'),         
-         array('Type'=>"Salmon",'Date'=>'07-12-2000','Supply'=>'Medium'),
-         array('Type'=>"Tuna",'Date'=>'07-15-2000','Supply'=>'Low'),
-         array('Type'=>"Swordfish",'Date'=>'07-13-2000','Supply'=>'High'),
-         array('Type'=>"Carp",'Date'=>'07-12-2000','Supply'=>'High')
-     );
+function db_connect() {
+	$conn = pg_connect("host=127.0.0.1 port=5432 dbname=sushi user=postgres password=100338841");
+	return $conn;
+}
+
+$fish_prices_trend = array();
+
+$conn = db_connect();
+$sql = "SELECT \"Type\", \"Date\", \"Price\" FROM \"tblFishMarket\" ORDER BY \"Date\"";
+$result = pg_query($conn, $sql);
+
+$i = 0;
+$tabular_report = "<table id='tabular_report'><tr><th>Date</th><th>Fish Type</th><th>Price</th></tr>";
+while ($row = pg_fetch_row($result))
+{
+    $tabular_report .= "<tr><td>".$row[1]."</td><td>".$row[0]."</td><td>".$row[2]."</td></tr>";
+    $fish_prices_trend[$i] = array('Type'=>$row[0],'Date'=>$row[1],'Price'=>$row[2]);
+    $i++;
+}
+$tabular_report .="</table>";
+
 
 ?>
 
 
-<section id="MainContent">            
-
+<section id="MainContent">         
+    <h1 class="center">Fish Price Trend Report</h1> 
     <div style="display:inline">
         <div class="float-left" style="max-width:85%; max-height:100%; min-width:100px; min-height:100px; margin-left:20px" id="myCanvas"></div>
         <div class="float-right" style="max-width:15%; max-height:100%; min-width:100px; min-height:100px;margin-right:20px" id="checkboxes">
         Select year:
-        <select>
-          <option value="1998">1998</option>
-          <option value="1999">1999</option>
-          <option value="2000">2000</option>
-          <option value="2001">2001</option>
-        </select><br/>
+        <select id="years" onchange="yearChanged(this.value);"></select><br/>
         </div>
     </div>
 </section>
+<div>
+<?php //echo $tablular_report; ?>
+</div>
 <style>
     .axis text {
         font: 10px sans-serif;
@@ -73,15 +61,18 @@ $fish_prices_trend = array
   
 <script>
 
-    var parseDate = d3.time.format("%m-%d-%Y").parse;
-    var fishData, MAX_CANVAS_WIDTH, MAX_CANVAS_HEIGHT, CENTRE_X, CENTRE_Y, svg, canvas, graph, MAX_PRICE, timeScale;
+    var parseDate = d3.time.format("%Y-%m-%d").parse;
+    var fishData, yearSelected, daysInAYear, MAX_CANVAS_WIDTH, MAX_CANVAS_HEIGHT, CENTRE_X, CENTRE_Y, svg, canvas, graph, MAX_PRICE, timeScale;
     var yScale = d3.scale.linear();        
     var xScale = d3.scale.linear();
     var fishTypes = new Array();
     var fishTypesUnique = new Array();
+    var years = new Array();
+    var yearsUnique = new Array();
     var dates = new Array();
     var prices = new Array();
     var priceDomain = new Array();
+    var fishDataByYear = new Array();
     
     fishData = <?php print json_encode($fish_prices_trend); ?>;
     console.log(fishData);
@@ -90,26 +81,58 @@ $fish_prices_trend = array
         fishTypes.push(fishData[i].Type); //
         dates.push(fishData[i].Date);
         prices.push(fishData[i].Price);
-    }
-    
-    MAX_PRICE = getMaxPrice(); //get max price
-    for (var i = MAX_PRICE; i >= 0; i-=5) {
-        priceDomain.push(i); //set price domain at $5 intervals
+        years.push(parseDate(fishData[i].Date).getFullYear());
     }
     
     fishTypesUnique = fishTypes.unique(); //get unique values for fish types and add checkboxes     
     
-    var year = parseDate(fishData[0].Date).getFullYear();
-    var daysInAYear = (((year % 4 == 0) && (year % 100 != 0)) || (year % 400 == 0)) ? 366 : 365;
+    yearsUnique = years.unique(); //get unique values for year to add to dropdown.
+    yearsUnique.sort();
 
     function createCheckboxList() {
         var html = "<table>";
         for (var i = 0; i < fishTypesUnique.length; i++) { //add checkbox for each fish type
-            html +='<tr><td><div style="display:inline-block; background-color:'+getRandomColour(i)+';"><input type="checkbox" id="'+i+'" value='+fishTypesUnique[i]+' onchange="plotLineGraph(this.checked,this.value,getRandomColour(this.id))"/></div></td><td style="text-align:left;">'+fishTypesUnique[i]+'</td></tr>';
+            html +='<tr><td><div style="display:inline-block; background-color:'+getRandomColour(i)+';"><input type="checkbox" id="'+i+'" value="'+fishTypesUnique[i]+'" onchange="plotLineGraph(this.id, this.checked,this.value,getRandomColour(this.id))"/></div></td><td style="text-align:left;">'+fishTypesUnique[i]+'</td></tr>';
         }
         html += "</table>";
         html += "<a href='./fish_price_trend_tabular.php'>Tabular Report</a>";
         $('#checkboxes').append(html);
+    }
+    
+    function createDropdownList() {
+        var html = "";
+        for (var i = 0; i < yearsUnique.length; i++) { //add checkbox for each fish type
+            html +="<option value='"+yearsUnique[i]+"'>"+yearsUnique[i]+"</option>";
+        }
+        $('#years').append(html);
+    }
+   
+    function yearChanged(value) {
+        //var e = document.getElementById("years");
+        //var value = e.options[e.selectedIndex].text;
+        alert(value);
+        yearSelected = value;
+        
+        fishDataByYear = new Array();
+        
+        for(var i = 0; i < fishData.length; i++) {
+            if(parseDate(fishData[i].Date).getFullYear() == yearSelected) {
+                fishDataByYear.push(fishData[i]);
+            }
+        }
+        console.log(fishDataByYear);
+
+        MAX_PRICE = getMaxPrice(); //get max price
+        for (var i = MAX_PRICE; i >= 0; i-=5) {
+            priceDomain.push(i); //set price domain at $5 intervals
+        }        
+    
+        daysInAYear = (((yearSelected % 4 == 0) && (yearSelected % 100 != 0)) || (yearSelected % 400 == 0)) ? 366 : 365;
+        
+        timeScale = d3.time.scale()
+            .domain([new Date(yearSelected, 0, 1), new Date(yearSelected, 11, 31)])
+            .range([0, xScale(daysInAYear)]); 
+    
     }
     
     /**
@@ -117,11 +140,9 @@ $fish_prices_trend = array
     */
     function createCanvas() {
         $("#myCanvas").height(($(window).height() - $("footer").height() - $("header").height()));
-        $("#myCanvas").width($("#body").width() - 50); 
+        $("#myCanvas").width($(window).width()*0.80); 
         $("#myCanvas").css("margin-bottom", 20); 
-    
-        //var GRID_PADDING = 25 / 2;                  //size of the squares in the grid        
-        //var CELL_PADDING = GRID_PADDING / 2;    //cell padding is half less than the grid padding
+        
         MAX_CANVAS_WIDTH = $("#myCanvas").width();             //max width of canvas
         MAX_CANVAS_HEIGHT = $("#myCanvas").height();            //max height of canvas
         CENTRE_X = MAX_CANVAS_WIDTH / 2;
@@ -146,7 +167,7 @@ $fish_prices_trend = array
 
     //bottom axis
         timeScale = d3.time.scale()
-            .domain([new Date(year, 0, 1), new Date(year, 11, 31)])
+            .domain([new Date(yearSelected, 0, 1), new Date(yearSelected, 11, 31)])
             .range([0, xScale(daysInAYear)]); 
 
         var xAxis = d3.svg.axis()
@@ -191,7 +212,7 @@ $fish_prices_trend = array
         var pt1, pt2;
         
         //horizontal grid lines
-        for (var i = yScale(5); i < yScale(d3.max(priceDomain)) - yScale(5); i+=yScale(5)) {
+        for (var i = yScale(5); i < yScale(d3.max(priceDomain)); i+=yScale(5)) {
             pt1 = { "x": 0, "y": -i }; //line left coordinates
             pt2 = { "x": xScale(daysInAYear), "y": -i }; //line left coordinates
             drawLine(pt1, pt2, graph, 1, "lightgray"); 
@@ -274,9 +295,9 @@ $fish_prices_trend = array
     */
     function getMaxDate() {
         var maxPrice = 0;
-        for(var i = 0; i < fishData.length; i++) {
-            if(fishData[i].Price > maxPrice) 
-                maxPrice = fishData[i].Price;
+        for(var i = 0; i < fishDataByYear.length; i++) {
+            if(fishDataByYear[i].Price > maxPrice) 
+                maxPrice = fishDataByYear[i].Price;
         }
         return maxPrice;
     }
@@ -286,9 +307,9 @@ $fish_prices_trend = array
     */
     function getMaxPrice() {
         var maxPrice = 0;
-        for(var i = 0; i < fishData.length; i++) {
-            if(fishData[i].Price > maxPrice) 
-                maxPrice = fishData[i].Price;
+        for(var i = 0; i < fishDataByYear.length; i++) {
+            if(fishDataByYear[i].Price > maxPrice) 
+                maxPrice = fishDataByYear[i].Price;
         }
         return (Math.round(maxPrice / 10) * 10) + 10;
     }
@@ -321,22 +342,24 @@ $fish_prices_trend = array
     @param name - name of the checkbox
     @param colour - colour of the line
     */
-    function plotLineGraph(checked, name, colour) {
+    function plotLineGraph(id, checked, name, colour) {
+ 
         if(checked) {
 
             var points = new Array();
-            for (var i = 0; i < fishData.length; i++) {
-                if (fishData[i].Type === name) {
-                    points.push({"x": timeScale(parseDate(fishData[i].Date)), "y": (-yScale(fishData[i].Price))});
+            for (var i = 0; i < fishDataByYear.length; i++) {
+                if (fishDataByYear[i].Type === name) {
+                    points.push({"x": timeScale(parseDate(fishDataByYear[i].Date)), "y": (-yScale(fishDataByYear[i].Price))});
                 }
             }
-            console.log(points);    
+            //console.log(points);    
             var gLine = graph.append("g");
-            drawPolyLine(gLine, points, colour, 2, name, name);
+            drawPolyLine(gLine, points, colour, 2, "poly"+id, name);
         }    
         else {
-            if ($("#"+name))
-                d3.selectAll("#"+name).remove(); //remove existing walls
+            if ($("#poly"+id)) {
+                d3.selectAll("#poly"+id).remove(); //remove existing walls
+            }
         }
     }
     
@@ -437,6 +460,8 @@ $fish_prices_trend = array
     }
     
     $(document).ready(function () {    
+        createDropdownList();
+        yearChanged(d3.min(yearsUnique));
         createCheckboxList();
         createCanvas();
         setScales();

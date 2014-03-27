@@ -5,51 +5,44 @@
     $description = "This page generates a report of prices of different types of fish over a period of time";
     $date = "22/03/2014";
     require 'header.php';
-?>
-
-<?php
 
 function db_connect() {
-	$conn = pg_connect("host=127.0.0.1 port=5432 dbname=sushi_db user=postgres password=100338841");
+	$conn = pg_connect("host=127.0.0.1 port=5432 dbname=sushi user=postgres password=100338841");
 	return $conn;
 }
 
-$fish_prices_trend = array();
+$fish_supply_trend = array();
 
 $conn = db_connect();
-$sql = "SELECT \"Type\", \"Date\", \"Price\" FROM \"tblFishMarket\" ORDER BY \"Date\"";
+$sql = "SELECT \"Type\", \"Date\", \"SupplyStatus\" FROM \"tblFishMarket\" ORDER BY \"Date\"";
 $result = pg_query($conn, $sql);
 
 $i = 0;
+$tabular_report = "<table id='tabular_report'><tr><th>Date</th><th>Fish Type</th><th>Status</th></tr>";
 while ($row = pg_fetch_row($result))
 {
-    $fish_prices_trend[$i] = array('Type'=>$row[0],'Date'=>$row[1],'Price'=>$row[2]);
+    $status_letter = ($row[2] == "l") ? "Low" : ($row[2] == "m") ? "Medium" : ($row[2] == "h") ? "High" : "None"; 
+    $status_value = ($row[2] == "l") ? 10 : ($row[2] == "m") ? 20 : ($row[2] == "h") ? 30 : 0; 
+    $tabular_report .= "<tr><td>".$row[1]."</td><td>".$row[0]."</td><td>".$status_letter."</td></tr>";
+    $fish_supply_trend[$i] = array('Type'=>$row[0],'Date'=>$row[1],'Status'=>$status_letter, 'StatusValue'=>$status_value);
     $i++;
 }
+$tabular_report .="</table>";
 
-$years = array();
-
-//$sql = "SELECT EXTRACT(YEAR FROM \"Date\") FROM \"tblFishMarket\" ORDER BY \"Date\"";
-//$result = pg_query($conn, $sql);
-
-//$i = 0;
-//while ($row = pg_fetch_row($result))/
-//{
-//    $years[$i] = $row[0];
-//    $i++;/
-//}
 ?>
 
 
 <section id="MainContent">            
+    <h1 class="center">Fish Supply Trend Report</h1> 
     <div style="display:inline">
         <div class="float-left" style="max-width:85%; max-height:100%; min-width:100px; min-height:100px; margin-left:20px" id="myCanvas"></div>
         <div class="float-right" style="max-width:15%; max-height:100%; min-width:100px; min-height:100px;margin-right:20px" id="checkboxes">
         Select year:
-        <select id="years" onchange="yearSelected(this.value)"></select><br/>
+        <select id="years" onchange="yearChanged(this.value);"></select><br/>
         </div>
     </div>
 </section>
+<?php //echo $tablular_report; ?>
 <style>
     .axis text {
         font: 10px sans-serif;
@@ -65,7 +58,7 @@ $years = array();
 <script>
 
     var parseDate = d3.time.format("%Y-%m-%d").parse;
-    var fishData, yearSelected, daysInAYear, MAX_CANVAS_WIDTH, MAX_CANVAS_HEIGHT, CENTRE_X, CENTRE_Y, svg, canvas, graph, MAX_PRICE, timeScale;
+    var fishData, yearSelected, daysInAYear, MAX_CANVAS_WIDTH, MAX_CANVAS_HEIGHT, CENTRE_X, CENTRE_Y, svg, canvas, graph, timeScale;
     var yScale = d3.scale.linear();        
     var xScale = d3.scale.linear();
     var fishTypes = new Array();
@@ -73,22 +66,29 @@ $years = array();
     var years = new Array();
     var yearsUnique = new Array();
     var dates = new Array();
-    var prices = new Array();
-    var priceDomain = new Array();
+    var statuses = new Array();
+    var statusDomain = new Array();
+    var statusValue = new Array();
+    var statusValueDomain = new Array();
     var fishDataByYear = new Array();
     
-    fishData = <?php print json_encode($fish_prices_trend); ?>;
+    fishData = <?php print json_encode($fish_supply_trend); ?>;
     console.log(fishData);
     
     for(var i = 0; i < fishData.length; i++) {
         fishTypes.push(fishData[i].Type); //
         dates.push(fishData[i].Date);
-        prices.push(fishData[i].Price);
+        statuses.push(fishData[i].Status);
+        statusValue.push(fishData[i].StatusValue);
         years.push(parseDate(fishData[i].Date).getFullYear());
+        
     }
     
     fishTypesUnique = fishTypes.unique(); //get unique values for fish types and add checkboxes     
-    
+    statusDomain = statuses.unique();
+    statusDomain.sort();
+    statusValueDomain = statusValue.unique();
+    statusValueDomain.sort();
     yearsUnique = years.unique(); //get unique values for year to add to dropdown.
     yearsUnique.sort();
 
@@ -110,29 +110,32 @@ $years = array();
         $('#years').append(html);
     }
    
-    function yearSelected(value) {
+    function yearChanged(value) {
+        //var e = document.getElementById("years");
+        //var value = e.options[e.selectedIndex].text;
+        //alert(value);
         yearSelected = value;
         
         fishDataByYear = new Array();
         
         for(var i = 0; i < fishData.length; i++) {
-            if(parseDate(fishData[i].Date).getFullYear() === yearSelected)
+            if(parseDate(fishData[i].Date).getFullYear() == yearSelected) {
                 fishDataByYear.push(fishData[i]);
+            }
         }
         console.log(fishDataByYear);
 
-        MAX_PRICE = getMaxPrice(); //get max price
-        for (var i = MAX_PRICE; i >= 0; i-=5) {
-            priceDomain.push(i); //set price domain at $5 intervals
-        }        
+        //MAX_PRICE = getMaxPrice(); //get max price
+        //for (var i = MAX_PRICE; i >= 0; i-=5) {
+        //    priceDomain.push(i); //set price domain at $5 intervals
+        //}        
     
         daysInAYear = (((yearSelected % 4 == 0) && (yearSelected % 100 != 0)) || (yearSelected % 400 == 0)) ? 366 : 365;
+        
+        timeScale = d3.time.scale()
+            .domain([new Date(yearSelected, 0, 1), new Date(yearSelected, 11, 31)])
+            .range([0, xScale(daysInAYear)]); 
     
-        createCheckboxList();
-        createCanvas();
-        setScales();
-        drawAxes();
-        drawGraph();
     }
     
     /**
@@ -187,10 +190,10 @@ $years = array();
             .attr("y", 6);
     //end of bottom axis
 
-        //left (y) axis representing the start height
+        
         var leftScale = d3.scale.ordinal()
-            .domain(priceDomain)
-            .rangePoints([0, yScale(d3.max(priceDomain))]);
+            .domain(statusDomain)
+            .rangePoints([0, yScale(d3.max(statusValueDomain))]);
 
         var leftAxis = d3.svg.axis()
             .scale(leftScale)
@@ -208,11 +211,11 @@ $years = array();
     */
     function drawGraph(){ 
         //graph area
-        drawRect(graph, xScale(daysInAYear), yScale(d3.max(priceDomain)), 0, -yScale(d3.max(priceDomain)), "white", 1.0, "white");
+        drawRect(graph, xScale(daysInAYear), yScale(d3.max(statusValueDomain)), 0, -yScale(d3.max(statusValueDomain)), "white", 1.0, "white");
         var pt1, pt2;
         
         //horizontal grid lines
-        for (var i = yScale(5); i < yScale(d3.max(priceDomain)); i+=yScale(5)) {
+        for (var i = yScale(5); i < yScale(d3.max(statusValueDomain)); i+=yScale(5)) {
             pt1 = { "x": 0, "y": -i }; //line left coordinates
             pt2 = { "x": xScale(daysInAYear), "y": -i }; //line left coordinates
             drawLine(pt1, pt2, graph, 1, "lightgray"); 
@@ -235,47 +238,47 @@ $years = array();
         ///vertical grid lines
             //january
             pt1 = { "x": xScale(jan), "y": 0 }; //line left coordinates
-            pt2 = { "x": xScale(jan), "y": -yScale(d3.max(priceDomain)) }; //line left coordinates
+            pt2 = { "x": xScale(jan), "y": -yScale(d3.max(statusValueDomain)) }; //line left coordinates
             drawLine(pt1, pt2, graph, 1, "lightgray"); 
             //february
             pt1 = { "x": xScale(feb), "y": 0 }; //line left coordinates
-            pt2 = { "x": xScale(feb), "y": -yScale(d3.max(priceDomain)) }; //line left coordinates
+            pt2 = { "x": xScale(feb), "y": -yScale(d3.max(statusValueDomain)) }; //line left coordinates
             drawLine(pt1, pt2, graph, 1, "lightgray"); 
             //march
             pt1 = { "x": xScale(mar), "y": 0 }; //line left coordinates
-            pt2 = { "x": xScale(mar), "y": -yScale(d3.max(priceDomain)) }; //line left coordinates
+            pt2 = { "x": xScale(mar), "y": -yScale(d3.max(statusValueDomain)) }; //line left coordinates
             drawLine(pt1, pt2, graph, 1, "lightgray"); 
             //april
             pt1 = { "x": xScale(apr), "y": 0 }; //line left coordinates
-            pt2 = { "x": xScale(apr), "y": -yScale(d3.max(priceDomain)) }; //line left coordinates
+            pt2 = { "x": xScale(apr), "y": -yScale(d3.max(statusValueDomain)) }; //line left coordinates
             drawLine(pt1, pt2, graph, 1, "lightgray"); 
             //may
             pt1 = { "x": xScale(may), "y": 0 }; //line left coordinates
-            pt2 = { "x": xScale(may), "y": -yScale(d3.max(priceDomain)) }; //line left coordinates
+            pt2 = { "x": xScale(may), "y": -yScale(d3.max(statusValueDomain)) }; //line left coordinates
             drawLine(pt1, pt2, graph, 1, "lightgray"); 
             //june
             pt1 = { "x": xScale(jun), "y": 0 }; //line left coordinates
-            pt2 = { "x": xScale(jun), "y": -yScale(d3.max(priceDomain)) }; //line left coordinates
+            pt2 = { "x": xScale(jun), "y": -yScale(d3.max(statusValueDomain)) }; //line left coordinates
             drawLine(pt1, pt2, graph, 1, "lightgray"); 
             //july
             pt1 = { "x": xScale(jul), "y": 0 }; //line left coordinates
-            pt2 = { "x": xScale(jul), "y": -yScale(d3.max(priceDomain)) }; //line left coordinates
+            pt2 = { "x": xScale(jul), "y": -yScale(d3.max(statusValueDomain)) }; //line left coordinates
             drawLine(pt1, pt2, graph, 1, "lightgray"); 
             //august
             pt1 = { "x": xScale(aug), "y": 0 }; //line left coordinates
-            pt2 = { "x": xScale(aug), "y": -yScale(d3.max(priceDomain)) }; //line left coordinates
+            pt2 = { "x": xScale(aug), "y": -yScale(d3.max(statusValueDomain)) }; //line left coordinates
             drawLine(pt1, pt2, graph, 1, "lightgray"); 
             //september
             pt1 = { "x": xScale(sep), "y": 0 }; //line left coordinates
-            pt2 = { "x": xScale(sep), "y": -yScale(d3.max(priceDomain)) }; //line left coordinates
+            pt2 = { "x": xScale(sep), "y": -yScale(d3.max(statusValueDomain)) }; //line left coordinates
             drawLine(pt1, pt2, graph, 1, "lightgray"); 
             //october
             pt1 = { "x": xScale(oct), "y": 0 }; //line left coordinates
-            pt2 = { "x": xScale(oct), "y": -yScale(d3.max(priceDomain)) }; //line left coordinates
+            pt2 = { "x": xScale(oct), "y": -yScale(d3.max(statusValueDomain)) }; //line left coordinates
             drawLine(pt1, pt2, graph, 1, "lightgray"); 
             //november
             pt1 = { "x": xScale(nov), "y": 0 }; //line left coordinates
-            pt2 = { "x": xScale(nov), "y": -yScale(d3.max(priceDomain)) }; //line left coordinates
+            pt2 = { "x": xScale(nov), "y": -yScale(d3.max(statusValueDomain)) }; //line left coordinates
             drawLine(pt1, pt2, graph, 1, "lightgray"); 
         ///end of vertical grid lines        
     }
@@ -284,7 +287,7 @@ $years = array();
     This function sets the scale for x and y axis to optimally draw the graph regardless of the size of the screen
     */
     function setScales() {
-        yScale.domain([0 , MAX_PRICE])
+        yScale.domain([0, d3.max(statusValueDomain)])
              .range([0 , MAX_CANVAS_HEIGHT - 100]);
         xScale.domain([0 , daysInAYear]) 
              .range([0 , MAX_CANVAS_WIDTH - 100]);
@@ -349,16 +352,16 @@ $years = array();
             var points = new Array();
             for (var i = 0; i < fishDataByYear.length; i++) {
                 if (fishDataByYear[i].Type === name) {
-                    points.push({"x": timeScale(parseDate(fishDataByYear[i].Date)), "y": (-yScale(fishDataByYear[i].Price))});
+                    points.push({"x": timeScale(parseDate(fishDataByYear[i].Date)), "y": (-yScale(fishDataByYear[i].StatusValue))});
                 }
             }
             //console.log(points);    
             var gLine = graph.append("g");
-            drawPolyLine(gLine, points, colour, 2, id, name);
+            drawPolyLine(gLine, points, colour, 2, "poly"+id, name);
         }    
         else {
-            if ($("#"+id)) {
-                d3.selectAll("#"+id).remove(); //remove existing walls
+            if ($("#poly"+id)) {
+                d3.selectAll("#poly"+id).remove(); //remove existing walls
             }
         }
     }
@@ -461,7 +464,12 @@ $years = array();
     
     $(document).ready(function () {    
         createDropdownList();
-        yearSelected(d3.max(yearsUnique));
+        yearChanged(d3.min(yearsUnique));
+        createCheckboxList();
+        createCanvas();
+        setScales();
+        drawAxes();
+        drawGraph();
     }); 
    
 </script>
