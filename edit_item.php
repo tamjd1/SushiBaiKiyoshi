@@ -84,10 +84,60 @@ $itemStatus = $_POST["itemStatus"];
     else
     {
         $_SESSION['message'] = "Change Made to ".$description."!";
+        //header("Location: ./edit_menu_items.php");
+        
+        
+        $sql="SELECT 
+              \"tblUsers\".\"UserID\", 
+              \"tblUsers\".\"UserEmail\"
+              
+            FROM \"tblUsers\"
+            LEFT OUTER JOIN \"tblCustomerFavourites\"
+                ON \"tblUsers\".\"UserID\"=\"tblCustomerFavourites\".\"UserID\"
+            LEFT OUTER JOIN \"tblMenuItems\"
+                ON \"tblCustomerFavourites\".\"ItemID\"=\"tblMenuItems\".\"ItemID\"
+            LEFT OUTER JOIN \"tblPromotions\"
+                ON \"tblMenuItems\".\"PromotionID\"=\"tblPromotions\".\"PromotionID\"
+            WHERE \"tblMenuItems\".\"PromotionID\" = $promotion
+            GROUP BY \"tblUsers\".\"UserID\", \"tblUsers\".\"UserEmail\"";
+
+ //$conn = db_connect();
+    $conn = pg_connect("host=localhost port=5432 dbname=sb user=postgres password=vdragon");
+    //issue the query       
+    $result = pg_query($conn, $sql);
+    // set records variable to number of found results
+    $records = pg_num_rows($result);    
+
+    if($records > 0)
+    {
+         echo '<p class="t_c">Customers who favourited that item</p>';
+             echo '<table class="tableLayout">';
+        echo  // Create the table titles
+        '
+       
+        <tr>
+            <td>User ID</td>
+            <td>Email Adress</td>         
+         </tr>';  
+         
+        for($i = 0; $i < $records; $i++)
+        {
+        echo   
+        '<tr>
+            <td>'.pg_fetch_result($result, $i, 0).'</td>
+            <td>'.pg_fetch_result($result, $i, 1).'</td>         
+        </tr>';  
+         
+         }
+        echo '</table><br/>';
+    }    
+    else 
+    {
         header("Location: ./edit_menu_items.php");
     }
+    }
     
-    
+
    
    
 }#end of post

@@ -190,7 +190,10 @@ WHERE LOWER(\"ItemDescription\") LIKE LOWER('$description') OR
                 
         }
         
-        echo "</table>"; // Closing table tag
+        echo "</table><br/>"; // Closing table tag
+        
+      
+        
     }
     // If no query results
     else 
