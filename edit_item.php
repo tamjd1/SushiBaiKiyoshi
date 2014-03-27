@@ -100,6 +100,7 @@ $itemStatus = $_POST["itemStatus"];
     Make Changes to "<?php echo $description ?>".
     </p>
     <hr/>
+
 <form action="" method="post">
 <a href="./edit_menu_items.php">Back</a>
     <table id="customerinfo">

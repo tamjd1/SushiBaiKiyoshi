@@ -24,6 +24,7 @@ if ($_SESSION['usertype'] != 'a') // If not an administrator redirect to main pa
 
 if($_SERVER["REQUEST_METHOD"] == "GET") // If it the first time the page is loaded
 {
+
 }
 if($_SERVER["REQUEST_METHOD"] == "POST") 
 {
@@ -56,11 +57,11 @@ if($_SERVER["REQUEST_METHOD"] == "POST")
     
     if (!$result)
     {
-        echo "Error occurred"; 
+        $_SESSION['message'] = "Error occurred"; 
     }
     else
     {
-        echo "Promotion Added!";
+        $_SESSION['message'] = "Promotion Added!";
         
     }
 }
@@ -73,8 +74,11 @@ if($_SERVER["REQUEST_METHOD"] == "POST")
 
 <p class="t_c">Promotions listed from newest to oldest</p>
 <hr/>
-<form action="" method="post">
 <a href="./admin.php">Back</a>
+<p class="message">
+<?php echo  $_SESSION['message']; ?></p>
+<form action="" method="post">
+
     <table id="customerinfo">
         <th colspan="2" class="t_c">
         Add Promotion
@@ -163,7 +167,7 @@ if($_SERVER["REQUEST_METHOD"] == "POST")
             <td>Value</td>
             <td>Start Date</td>
             <td>End Date</td>
-            <td>Enabled</td>
+           
             <td>Edit</td>
          </tr>';  
                  
@@ -192,17 +196,7 @@ if($_SERVER["REQUEST_METHOD"] == "POST")
                 <td>'.pg_fetch_result($result, $i, 5).'</td>';
              
                 
-                // Check item status
-                if( date('Y-m-d', strtotime(pg_fetch_result($result, $i, 5))) >  date("Y-m-d"))
-                {
-                    echo '<td>yes</td>';
-                    //echo '<td><input type="checkbox" name="enabled" disabled></td>';
-                }
-                else
-                {
-                    echo '<td>no</td>';
-                    //echo '<td><input type="checkbox" name="enabled" checked disabled></td>';
-                }
+             
                   
    
                   echo "<td><a href=

@@ -21,14 +21,15 @@ if ($_SESSION['usertype'] != 'a') // If not an administrator redirect to main pa
 }
     */
     
-$message = $_SESSION['message'];
-echo $_SESSION['message'];
+
 if($_SERVER["REQUEST_METHOD"] == "GET") // If it the first time the page is loaded
-{
-if($message!="")
-{
-    echo $message;
-}
+{?>
+<a href="./admin.php">Back</a>
+<p class="message"><?php echo  $_SESSION['message']; ?></p>
+
+
+<?php
+//$_SESSION['message'] = "";
     $description = "";
     $type = "";
     $sql= "SELECT \"tblMenuItems\".\"ItemID\", \"tblMenuItems\".\"ItemDescription\", \"tblMenuItems\".\"ItemPrice\", \"tblMenuItems\".\"ItemType\", \"tblMenuItems\".\"ItemStatus\", \"tblMenuItems\".\"PromotionID\", \"tblPromotions\".\"PromotionDescription\", \"tblPromotions\".\"PromotionValue\", \"tblPromotions\".\"IsPercent\", \"tblPromotions\".\"StartDate\", \"tblPromotions\".\"EndDate\" 
@@ -301,6 +302,8 @@ WHERE LOWER(\"ItemDescription\") LIKE LOWER('$description') OR
 
 <section id="MainContent">         
 <br/>   
+
+
 
 <form method="post" action="<?php echo $_SERVER['PHP_SELF']; ?>">
     <table class="center">

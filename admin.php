@@ -8,7 +8,7 @@ $date = "05/03/2014";
 require 'header.php';
 
 
-
+$_SESSION['message'] = "";
 ?>
 
 
