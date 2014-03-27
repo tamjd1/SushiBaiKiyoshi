@@ -1,10 +1,24 @@
 <?php
-	//error_reporting(E_ALL ^ E_NOTICE ^ E_WARNING);
+    //error_reporting(E_ALL ^ E_NOTICE ^ E_WARNING);
+    if(session_id() == "")
+    {
+        session_start();
+        //$_SESSION['user_type'] = "a";
+        //$_SESSION['id'] = "a";
+    }
+    
+    if(isset($_SESSION['message']) && $_SESSION['message'] != "")
+		{
+			$message = ($_SESSION['message']);
+			unset($_SESSION['message']);
+		}	
+    
     $login = '';
     $password = '';
     $message = '';
     $error = '';
-
+    
+    /*
     if($_SERVER['REQUEST_METHOD'] == 'POST')
     {           
         $login = trim($_POST['login']);
@@ -40,7 +54,7 @@
             $message = $error;
         }
     }
-    
+    */
 ?>
 <!DOCTYPE html>
 
@@ -174,15 +188,17 @@
         <form id="loginForm" action="" method="post">
             <?php
             
-            if (!isset($_SESSION)) {
+            //if not signed in
+            if (!isset($_SESSION['id'])) {
                 //echo "<input id='register' type='button' class='float-left button' value='Register' onclick='' />";
-                echo "<input id='go' type='button' class='float-right button' value='Login' onclick='submit()'/>";
+                echo "<input id='go' type='submit' class='float-right button' value='Login' onclick='login()'/>";
                 echo "<input id='password' name='password' type='password' class='float-right textbox' value='$password' />"; 
                 echo "<input id='login' name='login' type='text' class='float-right textbox' value='$login' />";
             }
-            else {
+            else // if signed in
+            {
                 echo "<p style='margin:0; text-align:center'>Welcome, $login</p>"; 
-                echo "<input id='go' type='button' style='position:relative; bottom:20px;' class='float-right button' value='Logout' onclick='logout()'/>";
+                echo "<input id='go' type='submit' style='position:relative; bottom:20px;' class='float-right button' value='Logout' onclick='logout()'/>";
             }
 
             ?>
@@ -199,21 +215,30 @@
                 <li><a href="./index.php">About Us</a></li>
                 <li><a href="./order.php">Order Online</a></li>           
                 <?php
-            
-                if (!isset($_SESSION))
+                //if not signed in
+                if (!isset($_SESSION['user_type']))
+                    {
+                        echo "<li><a href=\"register.php\">Register</a></li>";                                 
+                    }
+                else// if signed in
                 {
-                    echo "<li><a href='./register.php'>Register</a></li>";
-                }                              
-                else if (isset($_SESSION) && $_SESSION['user_type'] == 'c')
-                {
-                    echo "<li><a href='./edit_profile.php'>Edit Account</a></li>";
-                    echo "<li><a href='./password_recovery.php'>Recover Password</a></li>";
+                    if (isset($_SESSION['user_type']))
+                    {
+                        if($_SESSION['user_type'] == 'c')
+                        {
+                            
+                            echo "<li><a href=\"edit_profile.php\">Edit Profile</li></a>";       
+                        }
+                    }                          
+                    if (isset($_SESSION['user_type']))
+                    {
+                        if ($_SESSION['user_type'] == 'a')
+                        {
+                            echo "<li><a href=\"admin.php\">Admin Panel</a></li>";
+                        }
+                    };
                 }
-                else if (isset($_SESSION) && $_SESSION['user_type'] == 'a')
-                {
-                    echo "<li><a href='./admin.php'>Admin Pages</a></li>";
-                }
-                
+                            
                 ?>
             </ul>
         </nav>
