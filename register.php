@@ -6,17 +6,20 @@ $description = "This page displays the promotions and general information about 
 $date = "05/03/2014";
 
 require 'header.php';
+require 'functions.php';
 ?>
         <section id="MainContent">            
 
-        <?php
-        $error = ""; //initialize error variable to nothing.
+<?php
+
+$error = ""; //initialize error variable to nothing.
 $outputError = "";
 
 //when the website/webpage first loaded, initialize all the variable except $user_type to nothing. 
 //Initialize $user_type to "u" meaning unregistered.
 if($_SERVER["REQUEST_METHOD"] == "GET")
 {
+
 	$userName = "";
 	$pass1 = "";
 	$pass2 = "";
@@ -25,11 +28,13 @@ if($_SERVER["REQUEST_METHOD"] == "GET")
 	$email = "";
 	$phoneNumber = "";
     
-    $cardType = "";
-    $nameOnCard = "";
-    $cardNumber = "";
-    $expirationDate = "";
-    $securityCode = "";
+    $cardType = ""; 
+    $nameOnCard = "";  
+    $cardNumber = "";   
+    $month = "";
+    $year = "";
+    $expirationDate = "";   
+    $securityCode = "";  
     
 	$address = "";
 	$city = "";
@@ -43,6 +48,7 @@ if($_SERVER["REQUEST_METHOD"] == "GET")
 //once form is submitted, remove all whitespaces before and after each variable, 
 //and do the validation before saving it to the database.
 else if($_SERVER["REQUEST_METHOD"] == "POST"){
+
 	$userName = trim ($_POST ["userName"]);
 	$pass1 = trim ($_POST ["pass1"]);
 	$pass2 = trim ($_POST ["pass2"]);   
@@ -65,7 +71,7 @@ else if($_SERVER["REQUEST_METHOD"] == "POST"){
 	$requiredIsInvalid = false;
 
 	//USERNAME VALIDATION
-	//function for id validation. this will return the vallue of $error.
+	//function for id validation. this will return the value of $error.
 	$error = validate_Username($userName);
 	if (!$error == "")
 	{
@@ -101,7 +107,7 @@ else if($_SERVER["REQUEST_METHOD"] == "POST"){
 	if (!$error == "")
 	{
 		$outputError .= $error;
-		echo $echo = "";
+		echo $email = "";
 		$requiredIsInvalid = true;
 	}
 		
@@ -174,6 +180,7 @@ else if($_SERVER["REQUEST_METHOD"] == "POST"){
             $output .= $error;
             echo $month = "";
             $requiredIsInvalid = true;
+            }
     }
     
     if ($year != "")
@@ -183,6 +190,7 @@ else if($_SERVER["REQUEST_METHOD"] == "POST"){
             $output .= $error;
             echo $year = "";
             $requiredIsInvalid = true;
+        }
     } 
     
     $expirationDate = $month ."/". $year;
@@ -262,11 +270,11 @@ else if($_SERVER["REQUEST_METHOD"] == "POST"){
 	//INSERT VALID DATA TO THE USERS AND AGENTS DATABASE 
 	if ($error == "" && $requiredIsInvalid == false)		
 	{
-		
+		$conn = pg_connect("host=localhost port:5432 dbname:sushi user=postgres password=mercymott");  
 		//sql statement to insert the valid data to the credit card database 
 		
         $sql = "INSERT INTO tblCreditCards(UserID, CreditCardNumber, CreditCardExpiryDate, CreditCardSecurityCode, CreditCardType, CardHolder, 
-        BillingAddress, BillingCity,BillingProvince, BillingPostalCode);
+        BillingAddress, BillingCity,BillingProvince, BillingPostalCode)
         VALUES(
             '".$userName."',
             '".$cardType."',
@@ -275,33 +283,40 @@ else if($_SERVER["REQUEST_METHOD"] == "POST"){
             '".$expirationDate."',
             '".$securityCode."', 
             '".$address."',
-            '".$city." ',
+            '".$city."',
             '".$province."',
             '".$postalCode."')";
         
 		pg_query($conn,$sql);//connect to the credit card database and execute the sql statement
 		
 		//sql statement to insert the valid data to the users database 
-		$sql = "INSERT INTO tblUsers(UserID, UserFirst, UserLast, UserEmail, UserPhone, UserType) 
+		$sql = "INSERT INTO tblUsers(UserID, UserFirst, UserLast, UserEmail, UserPhone, UserType)
 		VALUES(
         	'".$userName."',
             '".$pass1."',
-            '".$pass2."',
             '".$fname."',
             '".$lname."',  
             '".$email."',
-            '".$phoneNumber"')";
+            '".$phoneNumber."')";
 		pg_query($conn,$sql);//connect to the username database and execute the sql statement
 		header ("location: login.php");//redirects to login.php which is the login process		
 	}
 	else
 	{
-		echo $outputError .= "Please try again";
+		$outputError .= "Please try again";
 	}	
 		
-}
-
+   //echo $error; 
+}   
+#end of post
 ?>
+
+<?php echo $outputError;?>
+
+
+
+<form method="post" action="<?php echo $_SERVER['PHP_SELF']; ?>">
+
         <p class="t_c">
             Enter the following information and create an account that can be used to place orders for pick-up online.
         </p>
@@ -316,7 +331,7 @@ else if($_SERVER["REQUEST_METHOD"] == "POST"){
                     Username
                 </td>
                 <td>
-                    <input type="text" name="userName"/>
+                    <input type="text" name="<?php echo $userName;?>"/>
                 </td>
             </tr>
             <tr>
@@ -324,7 +339,7 @@ else if($_SERVER["REQUEST_METHOD"] == "POST"){
                     Password
                 </td>
                 <td>
-                    <input type="Password1" name="pass1"/>
+                    <input type="Password1" name="<?php echo $pass1;?>"/>
                 </td>
             </tr>
             <tr>
@@ -332,7 +347,7 @@ else if($_SERVER["REQUEST_METHOD"] == "POST"){
                     Confirm Password
                 </td>
                 <td>
-                    <input type="Password2" name="pass2"/>
+                    <input type="Password2" name="<?php echo $pass2;?>"/>
                 </td>
             </tr>
             <tr>
@@ -340,14 +355,14 @@ else if($_SERVER["REQUEST_METHOD"] == "POST"){
                     First Name
                 </td>
                 <td>
-                    <input type="text" name="fname"/>
+                    <input type="text" name="<?php echo $fname;?>"/>
                 </td> 
             </tr>
             <td>
                     Last Name
                 </td>
                 <td>
-                    <input type="text" name="lname"/>
+                    <input type="text" name="<?php echo $lname;?>"/>
                 </td> 
             </tr>
             <tr>
@@ -355,7 +370,7 @@ else if($_SERVER["REQUEST_METHOD"] == "POST"){
                     Email
                 </td>
                 <td>
-                    <input type="email" name="email"/>
+                    <input type="email" name="<?php echo $email;?>"/>
                 </td>
             </tr>
             <tr>
@@ -363,7 +378,7 @@ else if($_SERVER["REQUEST_METHOD"] == "POST"){
                     Phone Number
                 </td>
                 <td>
-                    <input type="text" name="phoneNumber"/>
+                    <input type="text" name="<?php echo $phoneNumber;?>"/>
                 </td>
             </tr>            
         </table>
@@ -379,7 +394,7 @@ else if($_SERVER["REQUEST_METHOD"] == "POST"){
                     Card Type
                 </td>
                 <td>
-                    <select name="cardType">
+                    <select name="<?php echo $cardType;?>">
                         <option value="Visa">Visa</option>
                         <option value="Mastercard">Mastercard</option>
                     </select>
@@ -390,7 +405,7 @@ else if($_SERVER["REQUEST_METHOD"] == "POST"){
                     Name on Card
                 </td>
                 <td>
-                    <input type="text" name="nameOnCard"/>
+                    <input type="text" name="<?php echo $nameOnCard;?>"/>
                 </td>
             </tr>    
             <tr>
@@ -398,7 +413,7 @@ else if($_SERVER["REQUEST_METHOD"] == "POST"){
                     Card Number
                 </td>
                 <td>
-                    <input type="text" name="cardNumber"/>
+                    <input type="text" name="<?php echo $cardNumber;?>"/>
                 </td> 
             </tr>
             <tr>
@@ -411,7 +426,7 @@ else if($_SERVER["REQUEST_METHOD"] == "POST"){
                             <td>Month
                             </td>
                             <td>
-                            <select name="month">
+                            <select name="<?php echo $month;?>">
                                 <option value="01">01</option>
                                 <option value="02">02</option>
                                 <option value="03">03</option>
@@ -429,7 +444,7 @@ else if($_SERVER["REQUEST_METHOD"] == "POST"){
                             <td>Year
                             </td>
                             <td>
-                            <select name="year">
+                            <select name="<?php echo $year;?>">
                                 <option value="14">14</option>
                                 <option value="15">15</option>
                                 <option value="16">16</option>
@@ -449,7 +464,7 @@ else if($_SERVER["REQUEST_METHOD"] == "POST"){
                     Security Code
                 </td>
                 <td>
-                    <input type="text" name="securityCode"/>
+                    <input type="text" name="<?php echo $securityCode;?>"/>
                 </td>
             </tr>            
             <tr>
@@ -457,7 +472,7 @@ else if($_SERVER["REQUEST_METHOD"] == "POST"){
                     Address
                 </td>
                 <td>
-                    <input type="text" name="address"/>
+                    <input type="text" name="<?php echo $address;?>"/>
                 </td> 
 
             </tr>
@@ -466,7 +481,7 @@ else if($_SERVER["REQUEST_METHOD"] == "POST"){
                     City
                 </td>
                 <td>
-                    <input type="text" name="city"/>
+                    <input type="text" name="<?php echo $city;?>"/>
                 </td>
             </tr>
             <tr>
@@ -474,7 +489,7 @@ else if($_SERVER["REQUEST_METHOD"] == "POST"){
                     Province
                 </td>
                 <td>
-                    <input type="text" name="province"/>
+                    <input type="text" name="<?php echo $province;?>"/>
                 </td>
             </tr>            
             <tr>
@@ -482,7 +497,7 @@ else if($_SERVER["REQUEST_METHOD"] == "POST"){
                     Postal Code
                 </td>
                 <td>
-                    <input type="text" name="postalCode"/>
+                    <input type="text" name="<?php echo $postalCode;?>"/>
                 </td>
             </tr>
             <tr>
@@ -497,5 +512,6 @@ else if($_SERVER["REQUEST_METHOD"] == "POST"){
         <br/>
 
         </section>
+ </form>
             
 <?php include 'footer.php'; ?>
