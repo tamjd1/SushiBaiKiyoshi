@@ -40,28 +40,33 @@ if($_SERVER["REQUEST_METHOD"] == "POST") // If the page has been submitted
     $supplyStatus = trim ($_POST ["supplyStatus"]); 
      $price = trim ($_POST ["price"]); 
   
-    $sql = "INSERT INTO tblFishMarket(Type, Date, Price, Location, SupplyStatus)
-            VALUES '$type', '$date', '$price', '$location' , '$supplyStatus'";
+    $sql = "INSERT INTO \"tblFishMarket\"(\"Type\", \"Date\", \"Price\", \"Location\", \"SupplyStatus\")
+            VALUES ('$type', '$date', '$price', '$location' , '$supplyStatus')";
 
     // connect to the database
     //$conn = db_connect();
     
-    
+   
     $conn = pg_connect("host=localhost port=5432 dbname=sb user=postgres password=vdragon");
     //issue the query       
     $result = pg_query($conn, $sql);
       
-    if (!result)
+    echo '<p class="t_c">';
+      
+    if (!$result)
     {
-        echo "Update failed!!"; 
+        echo "An error occurred"; 
     }
     else
     {
-        echo "Error";
+        echo "Pricing added!";
+        
     }
+    echo '</p>';
    }
 ?>
-        <section id="MainContent">            
+        <section id="MainContent">   
+ <a href="./admin.php">Back</a>        
         <br/>
         <form method="post" action="<?php echo $_SERVER['PHP_SELF']; ?>">
              <table class="center">
@@ -81,7 +86,7 @@ if($_SERVER["REQUEST_METHOD"] == "POST") // If the page has been submitted
                     Date
                     </td>
                     <td>
-                    <input type="date"/ name="date">
+                    <input type="date"/ name="date" value="<?php echo date('Y-m-d'); ?>">
                     </td> 
                 </tr>
                  <tr>
@@ -101,11 +106,15 @@ if($_SERVER["REQUEST_METHOD"] == "POST") // If the page has been submitted
                     </td> 
                 </tr>
                 <tr>
-                    <td>
+                  <td>
                     Supply Status
                     </td>
                     <td>
-                    <input type="textbox" name="supplyStatus" size="4" maxlength="1">
+                    <select name="supplyStatus">
+                        <option value="l" >Low</option>
+                        <option value="m" >Medium</option>
+                        <option value="h">High</option>                        
+                    </select>
                     </td> 
                 </tr>
                   <tr>

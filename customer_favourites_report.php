@@ -8,16 +8,18 @@ $date = "25/03/2014";
 require 'header.php';
 
 
+
 function db_connect() {
-	$conn = pg_connect("host=127.0.0.1 port=5432 dbname=sushi_db user=postgres password=100338841");
+	$conn = pg_connect("host=127.0.0.1 port=5432 dbname=sushi user=postgres password=100338841");
 	return $conn;
 }
 
-$customers = array();
-$cancels = array();
+$id = $_GET['id'];
+$favourites = array();
+//$cancels = array();
 
 $conn = db_connect();
-$sql = "SELECT \"tblUsers\".\"UserID\", \"tblUsers\".\"UserFirst\", \"tblUsers\".\"UserLast\", COUNT(\"tblInvoices\".\"InvoiceID\")
+$sql = "SELECT \"tblUsers\".\"UserFirst\", \"tblUsers\".\"UserLast\", COUNT(\"tblInvoices\".\"InvoiceID\")
   FROM \"tblUsers\" JOIN \"tblInvoices\" ON \"tblUsers\".\"UserID\" = \"tblInvoices\".\"UserID\"
   GROUP BY \"tblUsers\".\"UserID\", \"tblUsers\".\"UserFirst\", \"tblUsers\".\"UserLast\"
   ORDER BY COUNT(\"tblInvoices\".\"InvoiceID\") DESC LIMIT 10";
@@ -26,9 +28,9 @@ $result = pg_query($conn, $sql);
 $i = 0;
 while ($row = pg_fetch_row($result))
 {
-    $sql = "SELECT COUNT(\"InvoiceStatus\") FROM \"tblInvoices\" WHERE \"UserID\" = '".$row[0]."' AND \"InvoiceStatus\" = 'x'";
-    $result2 = pg_query($conn, $sql);
-    $row2 = pg_fetch_row($result2);
+    //$sql = "SELECT COUNT(\"InvoiceStatus\") FROM \"tblInvoices\" WHERE \"UserID\" = '".$row[0]."' AND \"InvoiceStatus\" = 'x'";
+    //$result2 = pg_query($conn, $sql);
+    //$row2 = pg_fetch_row($result2);
     $customers[$i] = array('UserID'=>$row[0],'FullName'=>$row[1].' '.$row[2],'FirstName'=>$row[1],'LastName'=>$row[2],'OrderCount'=>$row[3], 'CancelCount'=>$row2[0]);
     $i++;
 }
@@ -57,11 +59,7 @@ while ($row = pg_fetch_row($result))
 </style>
 
 <section class="center">
-    <h1 class="center"  style="display:inline-block; padding-left:20px; padding-top:20px;">Regular Customers Report</h1> 
-    <div class="float-right" style="display:inline-block; padding-right:20px; padding-top:20px;">
-        <div style="background:#2d578b; display:inline-block;"><input type="checkbox" name="legend" value="invoices" disabled="disabled"></div>Total Invoice Count<br>
-        <div style="background:red; display:inline-block;"><input type="checkbox" name="legend" value="cancels" disabled="disabled"></div>Cancelled Invoice Count
-    </div>   
+    <h1 class="center">Customer Favourites Report</h1>    
     <div style="max-width:95%; max-height:100%; min-width:100px; min-height:100px; margin-left:auto; margin-right:auto; margin-top:20px" id="myCanvas"></div>    
 </section>
 
@@ -200,7 +198,7 @@ while ($row = pg_fetch_row($result))
               .attr("height", function(d) { return yScale(d.OrderCount); })
               .attr("width", xScale(0.5))
               .style("cursor", "pointer")
-              .on("click", function(d){ document.location.href = "http://localhost/SushiBaiKiyoshi/index.php?id=" + d.UserID; })
+              .on("click", function(d){ document.location.href = "http://localhost/SushiBaiKiyoshi/index.php?" + d.UserID; })
               .attr("fill", "#2d578b");
            
            var g2 = graph.append("g");   
@@ -237,7 +235,7 @@ while ($row = pg_fetch_row($result))
               .attr("dx", -(xScale(0.5)/2))
               .attr("dy", "1.2em")
               .attr("text-anchor", "middle")
-              .text(function(d) { return (d.CancelCount == 0) ? "" : d.CancelCount;})
+              .text(function(d) { return d.CancelCount;})
               .attr("fill", "white");
               
           g.selectAll("text.yAxis")

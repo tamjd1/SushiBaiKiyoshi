@@ -19,14 +19,19 @@ else if($_SERVER["REQUEST_METHOD"] == "POST")
 	$userName = trim($_POST["userName"]);
 	$emailAddress = trim($_POST["emailAddress"]);
 	
-    
+    $sql ="SELECT \"UserID\", \"UserEmail\", \"Password\"
+            FROM \"tblUsers\"
+            WHERE \"UserEmail\" = '$emailAddress'";
+  
+  /*
     $sql = "SELECT UserID, UserEmail, UserPassword 
 				FROM tblUsers
-				WHERE UserID ='$userName' AND emailAddress = '$emailAddress'";
+				WHERE UserID ='$userName' AND emailAddress = '$emailAddress'";*/
     
-    
-	$conn = db_connect();
-	$result = pg_query($conn, $sql);			
+    echo $sql;
+	//$conn = db_connect();
+    $conn = pg_connect("host=localhost port=5432 dbname=sb user=postgres password=vdragon");
+	$result = pg_query($conn, $sql);
 	$records = pg_num_rows($result);
 	
 	//$password = pg_fetch_result($result, 'password');
@@ -36,13 +41,13 @@ else if($_SERVER["REQUEST_METHOD"] == "POST")
 	{		
 		
 	
-		echo "email: " . pg_fetch_result($result, 0, 'emailAddress')."</br>";
-		echo "password: " . pg_fetch_result($result, 0, 'password')."</br>";
+		echo "email: " . pg_fetch_result($result, 0, 1)."</br>";
+		echo "password: " . pg_fetch_result($result, 0, 2)."</br>";
 		
 		
 		$to = '$emailAddress';
 		$subject = 'Forgotten Password';
-		$message = 'Your password is: '.pg_fetch_result($result, 0, 'password');
+		$message = 'Your password is: '.pg_fetch_result($result, 0, 2);
 		$headers = 'From: admin@sushi.ca' . "\r\n" .
 			'Cc: admin@sushi.ca\r\n';
 			'Reply-To: admin@sushi.ca' . "\r\n" .

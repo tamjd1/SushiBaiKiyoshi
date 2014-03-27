@@ -1,104 +1,61 @@
 <?php
+    //error_reporting(E_ALL ^ E_NOTICE ^ E_WARNING);
     if(session_id() == "")
     {
         session_start();
+        //$_SESSION['user_type'] = "a";
+        //$_SESSION['id'] = "a";
     }
     
+    if(isset($_SESSION['message']) && $_SESSION['message'] != "")
+		{
+			$message = ($_SESSION['message']);
+			unset($_SESSION['message']);
+		}	
+    
+    $login = '';
+    $password = '';
+    $message = '';
+    $error = '';
+    
     /*
-    if($_SERVER["REQUEST_METHOD"] == "POST")
-    {       
-        //the page got here from submitting the form, let's try to process
-        $loginID = trim($_POST["login"]);
-        $password = trim($_POST["pass"]);
+    if($_SERVER['REQUEST_METHOD'] == 'POST')
+    {           
+        $login = trim($_POST['login']);
+        $password = trim($_POST['password']);
         
-        //let's do some data validation
-        if(!isset($loginID) || $loginID == "" || !isset($password) || $password == "" )
+        if(!isset($login) || $login == '' || !isset($password) || $password == '')
         {
-            //means the user did not enter anything
-            $error = "Login/password not found in the database";
-            $loginID = "";
+            $error = 'Must enter a login and password.';
         }
         else
         {
-            //no errors connent to db
-            //Attempts to select a record where the entered information is matching
-            $sql = "SELECT id, password, usertype, last_access, first_name, last_name
-                    FROM users, agents
-                    WHERE users.id=agents.user_id AND id ='".$loginID."' AND password = '".$password."'";
-            //Runs the select query
+            $conn = pg_connect('host=localhost port=5432 dbname= user=postgres password=');
+            $sql = "SELECT \"UserID\", \"UserType\" FROM \"tblUsers\" WHERE \"UserID\" = '$login' AND \"Password\" = '$password'";
+            //echo $sql;
             $result = pg_query($conn, $sql);
-            //Checks how many records result from the query
-            $records = pg_num_rows($result);
+            $record = pg_num_rows($result);
             
-            //If the information entered results in a resulting record (ie. the username&password are legit) then do this stuff
-            if ($records > 0)
-            {           
-                session_start();            
-                $_SESSION['id'] = $loginID;     
-                $_SESSION['last_access'] = pg_fetch_result($result, 0, 3);
-                $_SESSION['usertype'] = pg_fetch_result($result, 0, 2);
-                $_SESSION['firstname'] = pg_fetch_result($result, 0, 4);
-                $_SESSION['lastname'] = pg_fetch_result($result, 0, 5);
-                $_SESSION['message'] = "";
-                $sql = "UPDATE users SET last_access = '". date("Y-m-d", time()) . "' WHERE id = '".$loginID."'";
-                $results = pg_query($conn, $sql);
-                
-                if (!isset($_COOKIE["loginID"]))
-                {               
-                    setcookie("loginID", $loginID, time() + 60*60*24*30); // Expire in 30 days
-                }
-            
-            
-                //Updates the last access date
-                $sql = "UPDATE users SET last_access = '" . date("Y-m-d",time()) . "' WHERE id = '" . $loginID . "'";               
-                //Run the update query
-                pg_query($conn,$sql); 
-            
-            
-                echo $_SESSION['id'];   
-                echo $_SESSION['last_access'];
-                echo $_SESSION['usertype'];
-                echo $_SESSION['firstname'];
-                echo $_SESSION['lastname'];
-            
-                //REMOVE THIS LINE AFTER??????????????? --------------------Temp to redirect to welcome.php, need to create a session here to store user login.
-                header('Location:./welcome.php');
-            /*
-                //Displays the login message
-                $msg = "Welcome back " . pg_fetch_result($result,0,'id') ." ". 
-                       "<br/>Our records show that your<br/>
-                       email address is: " . pg_fetch_result($result,0,'email_address') .
-                       "<br/>and you last accessed our system: " . pg_fetch_result($result,0,'last_access');
-                       
-            }
-            else
+            if ($record > 0)
             {
-                //lets check to see if the username is real!
-                $sql = "SELECT * FROM users WHERE id = '".$loginID."'";
-                //Runs the select query
-                $result = pg_query($conn, $sql);
-                //Checks how many records result from the query
-                $records = pg_num_rows($result);
-                //If the information entered results in a resulting record (ie. the username&password are legit) then do this stuff
-                if ($records > 0)
-                {   
-                    $error = "Login/password combination not found in the database";
-                }
-                else
-                {
-                $error = "Login/password not found in the database";
-                $loginID = ""; //clears the sticky form if we cant find the desired id in the database
-                //$password = ""; //no need to clear password, because it is not a sticky form
-                }
+                session_start();
+                $_SESSION['user'] = pg_fetch_result($result, 0, 0);
+                $_SESSION['user_type'] = pg_fetch_result($result, 0, 1);
+                $_SESSION['cart'] = array();
             }
+            else 
+            {
+                $error = 'Login information not found.';
+            }   
+        }
+        
+        if ($error != '')
+        {
+            $message = $error;
         }
     }
-    else
-    {
-        //there were problems, concatentate the TRY AGAIN message
-        $error .= "<br/>Please Try Again";      
-    }
-*/?>
+    */
+?>
 <!DOCTYPE html>
 
 <html lang="en">
@@ -124,7 +81,6 @@
     <script>
         $(document).ready(function () {
             $("#body").css("min-height", ($(window).height() - $("footer").height() - $("header").height() - $("#top").height()) - 50);
-
             /*
             // slide navigation 
             $('.slidePanel').click(function () {
@@ -227,21 +183,28 @@
 
         });
     </script>
-    <div id="top" class="login-bar"> 
-    <form id="loginForm" action="" method="post">
-        <input id="register "type="button" class="float-left button" value="Register" />
-        <input id="go "type="button" class="float-right button" value=">" onclick=""/> 
+    
+    <div id="top" class="login-bar" style="text-align:center"> 
+        <form id="loginForm" action="" method="post">
+            <?php
+            
+            //if not signed in
+            if (!isset($_SESSION['id'])) {
+                //echo "<input id='register' type='button' class='float-left button' value='Register' onclick='' />";
+                echo "<input id='go' type='submit' class='float-right button' value='Login' onclick='login()'/>";
+                echo "<input id='password' name='password' type='password' class='float-right textbox' value='$password' />"; 
+                echo "<input id='login' name='login' type='text' class='float-right textbox' value='$login' />";
+            }
+            else // if signed in
+            {
+                echo "<p style='margin:0; text-align:center'>Welcome, $login</p>"; 
+                echo "<input id='go' type='submit' style='position:relative; bottom:20px;' class='float-right button' value='Logout' onclick='logout()'/>";
+            }
 
-
-        
-        
-        
-        <input id="password" type="password" class="float-right textbox" value="" /> 
-        <input id="login" type="text" class="float-right textbox" value="" /> 
-      
-        
-    </form>
-    </div>
+            ?>
+        </form>
+    </div>   
+    
     <header>
         <div id="logoDiv">
             <img height="130px" src="./images/logo.jpg" alt="logo" />
@@ -250,16 +213,38 @@
             <ul> 
                 <li><a href="./index.php">Home</a></li>
                 <li><a href="./index.php">About Us</a></li>
-                <li><a href="./order.php">Order Online</a></li>              
-                <li><a href="./register.php">Register</a></li>
-                <!--<li><a id="login" href="./login.php">Login</a></li>-->
-                
-                 <!-- temp links for testing-->
-                 <li><a href="./edit_menu_items.php">Edit Menu Items</a></li>
-                  <li><a href="./edit_fish_Prices.php">Edit Fish Prices</a></li>
-                  <li><a href="./edit_profile.php">Edit Profile</a></li>
-                  <li><a href="./password_recovery.php">Recover Password</a></li>
-                
+                <li><a href="./order.php">Order Online</a></li>           
+                <?php
+                //if not signed in
+                if (!isset($_SESSION['user_type']))
+                    {
+                        echo "<li><a href=\"register.php\">Register</a></li>";                                 
+                    }
+                else// if signed in
+                {
+                    if (isset($_SESSION['user_type']))
+                    {
+                        if($_SESSION['user_type'] == 'c')
+                        {
+                            
+                            echo "<li><a href=\"edit_profile.php\">Edit Profile</li></a>";       
+                        }
+                    }                          
+                    if (isset($_SESSION['user_type']))
+                    {
+                        if ($_SESSION['user_type'] == 'a')
+                        {
+                            echo "<li><a href=\"admin.php\">Admin Panel</a></li>";
+                        }
+                    };
+                }
+                            
+                ?>
             </ul>
         </nav>
-        </header>
+    </header>
+        
+    <div id="messageArea" style="text-align:center; width:100%; color:red;">
+        <p id="message"><?php echo $message; ?></p>
+    </div>
+        

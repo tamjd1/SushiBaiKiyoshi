@@ -20,33 +20,19 @@ if ($_SESSION['usertype'] != 'a') // If not an administrator redirect to main pa
     header('Location:./index.php');
 }
     */
-    
 
 if($_SERVER["REQUEST_METHOD"] == "GET") // If it the first time the page is loaded
 {?>
 <a href="./admin.php">Back</a>
-<p class="message"><?php echo  $_SESSION['message']; ?></p>
-
+ <p class="message">
+<?php echo  $_SESSION['message']; ?></p>
 
 <?php
-//$_SESSION['message'] = "";
     $description = "";
     $type = "";
-    $sql= "SELECT \"tblMenuItems\".\"ItemID\", \"tblMenuItems\".\"ItemDescription\", \"tblMenuItems\".\"ItemPrice\", \"tblMenuItems\".\"ItemType\", \"tblMenuItems\".\"ItemStatus\", \"tblMenuItems\".\"PromotionID\", \"tblPromotions\".\"PromotionDescription\", \"tblPromotions\".\"PromotionValue\", \"tblPromotions\".\"IsPercent\", \"tblPromotions\".\"StartDate\", \"tblPromotions\".\"EndDate\" 
-            FROM \"tblMenuItems\" 
-            left JOIN \"tblPromotions\"
-            ON \"tblMenuItems\".\"PromotionID\" = \"tblPromotions\".\"PromotionID\"
-            ORDER BY \"ItemDescription\" ASC";
-              
-              
-
-
-    /*
-    $sql =  "SELECT \"ItemID\", \"ItemDescription\", \"ItemPrice\", \"ItemType\", \"PromotionID\"
-                        FROM \"tblMenuItems\" 
+    $sql =  "SELECT * FROM \"tblUsers\"";
                         
-                        ORDER BY \"ItemDescription\" ASC"; */
-                        
+     
      //$conn = db_connect();
     $conn = pg_connect("host=localhost port=5432 dbname=sb user=postgres password=vdragon");
     //issue the query       
@@ -56,19 +42,20 @@ if($_SERVER["REQUEST_METHOD"] == "GET") // If it the first time the page is load
     
     if ($records > 0) // If there are results from the query
     {       
-       
-        
-        echo '<br/><table class="tableLayout">';
+
+        echo '<br/> <table class="tableLayout">';
         
         echo  // Create the table titles
         '<tr>
             <td>ID</td>
-            <td>Description</td>
-            <td>Price</td>
-            <td>Type</td>
-            <td>Promotion</td>
-            <td>Enabled</td>
+            <td>First Name</td>
+            <td>Last Name</td>
+            <td>Email</td>
+            <td>Phone</td>           
+           
+             <td>Type</td>
             <td>Edit</td>
+            
          </tr>';  
                  
         // Generate the table from the results
@@ -77,82 +64,37 @@ if($_SERVER["REQUEST_METHOD"] == "GET") // If it the first time the page is load
             echo // Generate the table rows
             '<tr align="center">
                   <td>'.pg_fetch_result($result, $i, 0).'</td>
-                <td>'.pg_fetch_result($result, $i, 1).'</td>
-                <td>'.pg_fetch_result($result, $i, 2).'$</td>';
-                
-                
-                // display the real names of the type
-                if(pg_fetch_result($result, $i, 3) == 'r')
-                {
-                    echo '<td>Roll</td>';
-                }
-                else if(pg_fetch_result($result, $i, 3) == 's')
-                {
-                    echo '<td>Sashima</td>';
-                }
-                else if(pg_fetch_result($result, $i, 3) == 'sr')
-                {
-                    echo '<td>Special Roll</td>';
-                }
-                else if(pg_fetch_result($result, $i, 3) == 'a')
-                {
-                    echo '<td>Appetizer</td>';
-                }
-                else if(pg_fetch_result($result, $i, 3) == 'c')
-                {
-                    echo '<td>Combo</td>';
-                }
-                else
-                {
-                    echo '<td></td>';
-                }
-                
-                
-                 
-                 
-                 // Checks if there is a promotion
-                 if(pg_fetch_result($result, $i, 7) != null)
+                <td>'.pg_fetch_result($result, $i, 2).'</td>
+                <td>'.pg_fetch_result($result, $i, 3).'</td>
+                 <td>'.pg_fetch_result($result, $i, 4).'</td>
+                <td>'.pg_fetch_result($result, $i, 5).'</td>
+           ';
+                  // Check item status
+                 if(pg_fetch_result($result, $i, 6) == 'a')
                  {
-                    echo '<td>'.pg_fetch_result($result, $i, 6).' = ';
-                    if(pg_fetch_result($result, $i, 7) <= 1)
-                    {
-                        echo (pg_fetch_result($result, $i, 7) * 100).'%</td>';
-                    }
-                    else
-                    {
-                        echo pg_fetch_result($result, $i, 7).'$</td>';
-                    }
+                   echo '<td>Administrator</td>';
                  }
-                 else
+                 else if(pg_fetch_result($result, $i, 6) == 'c')
                  {
-                 
-                    echo '<td></td>';
+                   echo '<td>Customer</td>';
                  }
-                 
-                 // Check item status
-                 if(pg_fetch_result($result, $i, 4) == 'e')
+                 else if(pg_fetch_result($result, $i, 6) == 'd')
                  {
-                   echo '<td><input type="checkbox" name="enabled" checked disabled></td>';
+                   echo '<td>Disabled</td>';
                  }
-                 else
-                 {
-                     echo '<td><input type="checkbox" name="enabled" disabled></td>';
-                 }
-                 
-                 
-              
-                
                 echo "<td><a href=
-                \"./edit_item.php?
-                itemID=".pg_fetch_result($result, $i, 0).
-                "&description=".pg_fetch_result($result, $i, 1).
-                "&price=".pg_fetch_result($result, $i, 2).
-                 "&itemStatus=".pg_fetch_result($result, $i, 4).
-                 "&promotionID=".pg_fetch_result($result, $i, 6).
-                "&type=".pg_fetch_result($result, $i, 3).
-                "\">Edit</a></td>
+                \"./edit_a_customer.php?
+                userID=".pg_fetch_result($result, $i, 0).
+                "&first=".pg_fetch_result($result, $i, 2).
+                "&last=".pg_fetch_result($result, $i, 3).
+                "&email=".pg_fetch_result($result, $i, 4).
+                 "&phone=".pg_fetch_result($result, $i, 5).
+                  "&type=".pg_fetch_result($result, $i, 6).
+                "\">Edit</a></td>'";
                 
-                 </tr>";  
+                
+                
+                 echo "</tr>";  
                // echo '<td><a href=\"\" <input type=\"submit\" value=\"Edit\" />Edit</a></td>               
                 
         }
@@ -242,13 +184,16 @@ WHERE LOWER(\"ItemDescription\") LIKE LOWER('$description') OR
                 "&description=".pg_fetch_result($result, $i, 1).
                 "&price=".pg_fetch_result($result, $i, 2).
                 "&type=".pg_fetch_result($result, $i, 3).
-                "\">Edit</a></td>
+                ">Edit</a></td>
                  </tr>";  
                // echo '<td><a href=\"\" <input type=\"submit\" value=\"Edit\" />Edit</a></td>               
                 
         }
         
-        echo "</table>"; // Closing table tag
+        echo "</table><br/>"; // Closing table tag
+        
+      
+        
     }
     // If no query results
     else 
@@ -258,61 +203,22 @@ WHERE LOWER(\"ItemDescription\") LIKE LOWER('$description') OR
 }#end of post
 
 
-
-
-// old stuff///////////////////////////////////////////////////
-// $test =0;
-// echo '<br/><table class="tableLayout">';
-            // echo '<tr>';
-                // echo '<td>ID</td>';
-                // echo '<td>Description</td>';
-                // echo '<td>Price</td>';
-                // echo '<td>Type</td>';
-                // echo '<td>Edit</td>';
-            // echo '</tr>';
-
-
-            // while ($test < 30){
-
-            // echo '<tr align="center">
-                    // <td>ID here</td>
-                    // <td>Description Here</td>
-                    // <td>Type Here</td>
-                    // <td></td>';
-                
-     
-
-            // echo "<td><a href=\"\" <input type=\"submit\" value=\"Edit\" />Edit</a></td>";
-
-            // echo '</tr>';
-// $test +=1;
-
-                // }#end of while
-
-
-         
-
-
-
-// echo '</table>';
-
 ?>
 
 
 
-<section id="MainContent">         
+<section id="MainContent">      
+
+
 <br/>   
-
-
-
 <form method="post" action="<?php echo $_SERVER['PHP_SELF']; ?>">
     <table class="center">
         <th colspan="2" class="t_c">
-        Search for a Menu Item
+        Search for User
         </th>
     <tr>
         <td>
-        Item Description:
+        User Name
         </td>
         <td>
         <input type="textbox"/ name="description" value="<?php echo $description;?>">
@@ -325,7 +231,7 @@ WHERE LOWER(\"ItemDescription\") LIKE LOWER('$description') OR
     </tr>
     <tr>
         <td>
-        Item Type:
+        Email Address
         </td>
         <td>
         <input type="textbox"/ name="type" value="<?php echo $type;?>"> 

@@ -102,6 +102,12 @@ text-align:center;
 {
 text-align:center;
 }
+.message
+{
+text-align:center;
+color:red;
+font-size:200%
+}
 
 #menu {
     width: 75%;
