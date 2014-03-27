@@ -65,7 +65,8 @@ if($_SERVER["REQUEST_METHOD"] == "POST") // If the page has been submitted
     echo '</p>';
    }
 ?>
-        <section id="MainContent">            
+        <section id="MainContent">   
+ <a href="./admin.php">Back</a>        
         <br/>
         <form method="post" action="<?php echo $_SERVER['PHP_SELF']; ?>">
              <table class="center">
@@ -85,7 +86,7 @@ if($_SERVER["REQUEST_METHOD"] == "POST") // If the page has been submitted
                     Date
                     </td>
                     <td>
-                    <input type="date"/ name="date">
+                    <input type="date"/ name="date" value="<?php echo date('Y-m-d'); ?>">
                     </td> 
                 </tr>
                  <tr>
@@ -105,11 +106,15 @@ if($_SERVER["REQUEST_METHOD"] == "POST") // If the page has been submitted
                     </td> 
                 </tr>
                 <tr>
-                    <td>
-                    Supply Status <!--this needs to be either L M or H -->
+                  <td>
+                    Supply Status
                     </td>
                     <td>
-                    <input type="textbox" name="supplyStatus" size="4" maxlength="1">
+                    <select name="supplyStatus">
+                        <option value="l" >Low</option>
+                        <option value="m" >Medium</option>
+                        <option value="h">High</option>                        
+                    </select>
                     </td> 
                 </tr>
                   <tr>

@@ -25,6 +25,9 @@ $description = $_GET["description"];
 $price = $_GET["price"];
 $type = $_GET["type"];
 $promotionID = $_GET["promotionID"];
+$itemStatus = $_GET["itemStatus"];
+
+
 
 
 /*
@@ -52,26 +55,41 @@ if($_SERVER["REQUEST_METHOD"] == "POST") // If the page has been submitted
     $price = trim ($_POST["price"]);
     $type =trim ( $_POST["type"]);
     $promotion =trim ( $_POST["promotion"]);
-
+   
+$itemID = $_GET["itemID"];
+$itemStatus = $_POST["itemStatus"];
     
     // Set the SQL statement
     // Check if there is just one search field
 
 
     $sql = "UPDATE \"tblMenuItems\"
-        SET \"ItemDescription\"='$description', \ItemPrice\"='$price', \"ItemType\"='$type', \"PromotionID\"='$promotion'
-        WHERE ItemID='$itemID'";
+        SET \"ItemDescription\"='$description', \"ItemPrice\"='$price', \"ItemType\"='$type' , \"ItemStatus\"='$itemStatus', \"PromotionID\"=$promotion
+        WHERE \"ItemID\"='$itemID'";
 
+
+      // connect to the database
+    //$conn = db_connect();
+    $conn = pg_connect("host=localhost port=5432 dbname=sb user=postgres password=vdragon");
+    //issue the query       
+    $result = pg_query($conn, $sql);
+    // set records variable to number of found results
+    $records = pg_num_rows($result);    
+    
+    if (!$result)
+    {
+        $message = "An error occurred"; 
+        
+    }
+    else
+    {
+        $_SESSION['message'] = "Change Made to ".$description."!";
+        header("Location: ./edit_menu_items.php");
+    }
+    
     
    
-    echo $sql;
-
-    // connect to the database
-    //$conn = db_connect();
-    //issue the query       
-    //$result = pg_query($conn, $sql);
-    // set records variable to number of found results
-    //$records = pg_num_rows($result);    
+   
 }#end of post
 ?>
 
@@ -79,11 +97,11 @@ if($_SERVER["REQUEST_METHOD"] == "POST") // If the page has been submitted
 
     <section id="MainContent">            
     <p class="t_c">
-    Make Changes to your profile here.
+    Make Changes to "<?php echo $description ?>".
     </p>
     <hr/>
 <form action="" method="post">
-
+<a href="./edit_menu_items.php">Back</a>
     <table id="customerinfo">
         <th colspan="2" class="t_c">
         Edit Information
@@ -109,7 +127,13 @@ if($_SERVER["REQUEST_METHOD"] == "POST") // If the page has been submitted
             Type
             </td>
             <td>
-            <input type="textbox"/ name="type" value="<?php echo $type ?>">
+            <select name="type">
+              <option value="r" >Roll</option>
+              <option value="s">Sashimi</option>
+              <option value="sr">Special Roll</option>
+              <option value="a">Appetizer</option>
+                <option value="c">Combo</option>
+            </select>
             </td> 
         </tr>
          <tr>
@@ -118,10 +142,24 @@ if($_SERVER["REQUEST_METHOD"] == "POST") // If the page has been submitted
             </td>
             <td>
             <select name="promotion">
-              <option value="none">None</option>
-              <option value="saab">Saab</option>
-              <option value="mercedes">Mercedes</option>
-              <option value="audi">Audi</option>
+            <option value=null >None</option>
+              <option value="1" >Salmon Sale</option>
+              <option value="2">Tuna Sale</option>
+              <option value="3">Unagi Sale</option>
+              <option value="4">Crab Sale</option>
+                <option value="5">Red Snapper</option>
+            </select>
+            </td> 
+        </tr>
+          <tr>
+            <td>
+            Item Status
+            </td>
+            <td>
+            <select name="itemStatus">
+              <option value="e" >Enable</option>
+              <option value="d">Disable</option>
+              
             </select>
             </td> 
         </tr>
@@ -138,11 +176,7 @@ if($_SERVER["REQUEST_METHOD"] == "POST") // If the page has been submitted
     <br/>
     <br/>
     
-    
-    
-
-    
-    <br>
+   
 
 </section>
 <?php include 'footer.php'; ?>

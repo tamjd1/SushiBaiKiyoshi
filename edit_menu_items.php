@@ -20,30 +20,26 @@ if ($_SESSION['usertype'] != 'a') // If not an administrator redirect to main pa
     header('Location:./index.php');
 }
     */
-
+    
+$message = $_SESSION['message'];
+echo $_SESSION['message'];
 if($_SERVER["REQUEST_METHOD"] == "GET") // If it the first time the page is loaded
 {
+if($message!="")
+{
+    echo $message;
+}
     $description = "";
     $type = "";
-    $sql="SELECT 
-              \"tblMenuItems\".\"ItemID\", 
-              \"tblMenuItems\".\"ItemDescription\", 
-              \"tblMenuItems\".\"ItemPrice\", 
-              \"tblMenuItems\".\"ItemType\", 
-              \"tblMenuItems\".\"PromotionID\", 
+    $sql= "SELECT \"tblMenuItems\".\"ItemID\", \"tblMenuItems\".\"ItemDescription\", \"tblMenuItems\".\"ItemPrice\", \"tblMenuItems\".\"ItemType\", \"tblMenuItems\".\"ItemStatus\", \"tblMenuItems\".\"PromotionID\", \"tblPromotions\".\"PromotionDescription\", \"tblPromotions\".\"PromotionValue\", \"tblPromotions\".\"IsPercent\", \"tblPromotions\".\"StartDate\", \"tblPromotions\".\"EndDate\" 
+            FROM \"tblMenuItems\" 
+            left JOIN \"tblPromotions\"
+            ON \"tblMenuItems\".\"PromotionID\" = \"tblPromotions\".\"PromotionID\"
+            ORDER BY \"ItemDescription\" ASC";
               
-              \"tblPromotions\".\"PromotionID\", 
-              \"tblPromotions\".\"PromotionDescription\", 
-              \"tblPromotions\".\"PromotionValue\", 
-              \"tblPromotions\".\"IsPercent\", 
-              \"tblPromotions\".\"StartDate\", 
-              \"tblPromotions\".\"EndDate\"
-            FROM 
-              \"tblPromotions\", 
-              \"tblMenuItems\"
-            WHERE 
-              \"tblPromotions\".\"PromotionID\" = \"tblMenuItems\".\"PromotionID\";
-";
+              
+
+
     /*
     $sql =  "SELECT \"ItemID\", \"ItemDescription\", \"ItemPrice\", \"ItemType\", \"PromotionID\"
                         FROM \"tblMenuItems\" 
@@ -81,15 +77,45 @@ if($_SERVER["REQUEST_METHOD"] == "GET") // If it the first time the page is load
             '<tr align="center">
                   <td>'.pg_fetch_result($result, $i, 0).'</td>
                 <td>'.pg_fetch_result($result, $i, 1).'</td>
-                <td>'.pg_fetch_result($result, $i, 2).'$</td>
-                 <td>'.pg_fetch_result($result, $i, 4).'</td>';
+                <td>'.pg_fetch_result($result, $i, 2).'$</td>';
+                
+                
+                // display the real names of the type
+                if(pg_fetch_result($result, $i, 3) == 'r')
+                {
+                    echo '<td>Roll</td>';
+                }
+                else if(pg_fetch_result($result, $i, 3) == 's')
+                {
+                    echo '<td>Sashima</td>';
+                }
+                else if(pg_fetch_result($result, $i, 3) == 'sr')
+                {
+                    echo '<td>Special Roll</td>';
+                }
+                else if(pg_fetch_result($result, $i, 3) == 'a')
+                {
+                    echo '<td>Appetizer</td>';
+                }
+                else if(pg_fetch_result($result, $i, 3) == 'c')
+                {
+                    echo '<td>Combo</td>';
+                }
+                else
+                {
+                    echo '<td></td>';
+                }
+                
+                
                  
-                 if(pg_fetch_result($result, $i, 5) != null)
+                 
+                 // Checks if there is a promotion
+                 if(pg_fetch_result($result, $i, 7) != null)
                  {
                     echo '<td>'.pg_fetch_result($result, $i, 6).' = ';
-                    if(pg_fetch_result($result, $i, 8))
+                    if(pg_fetch_result($result, $i, 7) <= 1)
                     {
-                        echo pg_fetch_result($result, $i, 7).'%</td>';
+                        echo (pg_fetch_result($result, $i, 7) * 100).'%</td>';
                     }
                     else
                     {
@@ -99,16 +125,29 @@ if($_SERVER["REQUEST_METHOD"] == "GET") // If it the first time the page is load
                  else
                  {
                  
-                    echo '<td>'.pg_fetch_result($result, $i, 7).'%</td>';
+                    echo '<td></td>';
                  }
-                echo '<td><input type="checkbox" name="vehicle" ></td>';
+                 
+                 // Check item status
+                 if(pg_fetch_result($result, $i, 4) == 'e')
+                 {
+                   echo '<td><input type="checkbox" name="enabled" checked disabled></td>';
+                 }
+                 else
+                 {
+                     echo '<td><input type="checkbox" name="enabled" disabled></td>';
+                 }
+                 
+                 
+              
                 
                 echo "<td><a href=
                 \"./edit_item.php?
                 itemID=".pg_fetch_result($result, $i, 0).
                 "&description=".pg_fetch_result($result, $i, 1).
                 "&price=".pg_fetch_result($result, $i, 2).
-                 "promotionID=".pg_fetch_result($result, $i, 5).
+                 "&itemStatus=".pg_fetch_result($result, $i, 4).
+                 "&promotionID=".pg_fetch_result($result, $i, 6).
                 "&type=".pg_fetch_result($result, $i, 3).
                 "\">Edit</a></td>
                 
@@ -262,6 +301,7 @@ WHERE LOWER(\"ItemDescription\") LIKE LOWER('$description') OR
 
 <section id="MainContent">         
 <br/>   
+
 <form method="post" action="<?php echo $_SERVER['PHP_SELF']; ?>">
     <table class="center">
         <th colspan="2" class="t_c">
