@@ -174,7 +174,7 @@
         <form id="loginForm" action="" method="post">
             <?php
             
-            if (!isset($_SESSION) {
+            if (!isset($_SESSION)) {
                 //echo "<input id='register' type='button' class='float-left button' value='Register' onclick='' />";
                 echo "<input id='go' type='button' class='float-right button' value='Login' onclick='submit()'/>";
                 echo "<input id='password' name='password' type='password' class='float-right textbox' value='$password' />"; 
