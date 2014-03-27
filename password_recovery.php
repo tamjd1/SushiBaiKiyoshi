@@ -19,14 +19,19 @@ else if($_SERVER["REQUEST_METHOD"] == "POST")
 	$userName = trim($_POST["userName"]);
 	$emailAddress = trim($_POST["emailAddress"]);
 	
-    
+    $sql ="SELECT \"UserID\", \"UserEmail\", \"Password\"
+            FROM \"tblUsers\"
+            WHERE \"UserEmail\" = '$emailAddress'";
+  
+  /*
     $sql = "SELECT UserID, UserEmail, UserPassword 
 				FROM tblUsers
-				WHERE UserID ='$userName' AND emailAddress = '$emailAddress'";
+				WHERE UserID ='$userName' AND emailAddress = '$emailAddress'";*/
     
-    
-	$conn = db_connect();
-	$result = pg_query($conn, $sql);			
+    echo $sql;
+	//$conn = db_connect();
+    $conn = pg_connect("host=localhost port=5432 dbname=sb user=postgres password=vdragon");
+	$result = pg_query($conn, $sql);
 	$records = pg_num_rows($result);
 	
 	//$password = pg_fetch_result($result, 'password');
@@ -36,21 +41,21 @@ else if($_SERVER["REQUEST_METHOD"] == "POST")
 	{		
 		
 	
-		echo "email: " . pg_fetch_result($result, 0, 'emailAddress')."</br>";
-		echo "password: " . pg_fetch_result($result, 0, 'password')."</br>";
+		echo "email: " . pg_fetch_result($result, 0, 1)."</br>";
+		echo "password: " . pg_fetch_result($result, 0, 2)."</br>";
 		
 		
-		$to = pg_fetch_result($result, 0, 'emailAddress');
+		$to = '$emailAddress';
 		$subject = 'Forgotten Password';
-		$message = 'Your password is: '.pg_fetch_result($result, 0, 'password');
-		$headers = 'From: admin@mkt2.ca' . "\r\n" .
-			'Cc: admin@mtk2.ca\r\n';
-			'Reply-To: admin@mtk2.ca' . "\r\n" .
+		$message = 'Your password is: '.pg_fetch_result($result, 0, 2);
+		$headers = 'From: admin@sushi.ca' . "\r\n" .
+			'Cc: admin@sushi.ca\r\n';
+			'Reply-To: admin@sushi.ca' . "\r\n" .
 			'X-Mailer: PHP/' . phpversion();
 
 		if( mail($to,$subject,$message,$headers))  
 		{
-		  echo "Message sent successfully.";
+		  echo "Email has been sent with your forgotten password.";
 		}
 		else
 		{
@@ -80,7 +85,7 @@ else
  <br/>
     <form action="" method="post">
         <table id="recovery">  
-        <th class="t_c">Password Recovery</th>
+        <th class="t_c" colspan="2">Password Recovery</th>
         <tr>
             <td>User-name</td> 
             <td> <input type="text" name="userName" value="<?php $userName;?>" size="25"/> </td>
