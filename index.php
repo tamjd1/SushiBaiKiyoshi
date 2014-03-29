@@ -7,7 +7,9 @@ $date = "05/03/2014";
 
 require 'header.php';
 ?>
-        <section id="MainContent">            
+        <section id="MainContent">  
+            <p class="message">
+<?php echo  $_SESSION['message']; ?></p>
             <script>
                 
                 /**

@@ -8,21 +8,22 @@ $date = "20/03/2014";
 require 'header.php';
 
 
-/*
-if (!isset($_SESSION['id'])) // Non login in users to be sent back to index
+if (!isset($_SESSION['UserID'])) // Non login in users to be sent back to index
 {
     $_SESSION['message'] = "You must login into access this page.";
     header('Location:./index.php');
 }
 
-*/ 
-
 
 if($_SERVER["REQUEST_METHOD"] == "GET") // If it the first time the page is loaded
 {
 
-$userName = "Tom";
-$emailAddress = "tomDaison12@hotmail.com";
+$userName =  $_SESSION['UserID'];
+$firstName =  $_SESSION['UserFirst'];
+$lastName =  $_SESSION['UserLast'];
+$email =  $_SESSION['UserEmail'];
+$phoneNumber =  $_SESSION['UserPhone'];
+$emailAddress = $_SESSION['UserEmail'];
 
 /*
     $sql = "SELECT users.id, users.usertype, agents.first_name, agents.last_name
@@ -87,7 +88,7 @@ if($_SERVER["REQUEST_METHOD"] == "POST") // If the page has been submitted
             Username
             </td>
             <td>
-            <input type="textbox"/ name="name" value="<? echo $userName; ?>">
+            <input type="textbox"/ name="userName" value="<?php echo $userName; ?>">
             </td> 
         </tr>
         <tr>
@@ -95,7 +96,7 @@ if($_SERVER["REQUEST_METHOD"] == "POST") // If the page has been submitted
             First Name
             </td>
             <td>
-            <input type="textbox"/ name="name" value="<? echo $firstName; ?>">
+            <input type="textbox"/ name="firstName" value="<?php echo $firstName; ?>">
             </td> 
         </tr>
         <tr>
@@ -103,7 +104,7 @@ if($_SERVER["REQUEST_METHOD"] == "POST") // If the page has been submitted
             Last Name
             </td>
             <td>
-            <input type="textbox"/ name="name" value="<? echo $lastName; ?>">
+            <input type="textbox"/ name="lastName" value="<?php echo $lastName; ?>">
             </td> 
         </tr>
         <tr>
@@ -111,7 +112,7 @@ if($_SERVER["REQUEST_METHOD"] == "POST") // If the page has been submitted
             Email
             </td>
             <td>
-            <input type="email" name="email" value="<? echo $email; ?>"/>
+            <input type="email" name="email" value="<?php echo $email; ?>"/>
             </td>
         </tr>
         <tr>
@@ -119,7 +120,7 @@ if($_SERVER["REQUEST_METHOD"] == "POST") // If the page has been submitted
             Phone Number
             </td>
             <td>
-            <input type="textbox" name="phoneNumber" value="<? echo $phoneNumber; ?>"/>
+            <input type="textbox" name="phoneNumber" value="<?php echo $phoneNumber; ?>"/>
             </td>
         </tr>            
     </table>

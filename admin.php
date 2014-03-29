@@ -7,8 +7,20 @@ $date = "05/03/2014";
 
 require 'header.php';
 
+if (!isset($_SESSION['UserID'])) // Non login in users to be sent back to index
+{
+    $_SESSION['message'] = "You must login into access this page.";
+    header('Location:./index.php');
+}
 
-$_SESSION['message'] = "";
+if ($_SESSION['UserType'] != 'a') // If not an administrator redirect to main page
+{
+    $_SESSION['message'] = "You are not authorized to access the admin page.";
+    header('Location:./index.php');
+}
+
+
+
 ?>
 
 

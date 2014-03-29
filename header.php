@@ -1,60 +1,92 @@
 <?php
+    require 'includes/functions.php';
     //error_reporting(E_ALL ^ E_NOTICE ^ E_WARNING);
-    if(session_id() == "")
-    {
-        session_start();
-        //$_SESSION['user_type'] = "a";
-        //$_SESSION['id'] = "a";
-    }
     
-    if(isset($_SESSION['message']) && $_SESSION['message'] != "")
-		{
-			$message = ($_SESSION['message']);
-			unset($_SESSION['message']);
-		}	
+    session_start();
     
+
     $login = '';
     $password = '';
-    $message = '';
-    $error = '';
+   
+  
     
-    /*
-    if($_SERVER['REQUEST_METHOD'] == 'POST')
-    {           
-        $login = trim($_POST['login']);
-        $password = trim($_POST['password']);
-        
-        if(!isset($login) || $login == '' || !isset($password) || $password == '')
-        {
-            $error = 'Must enter a login and password.';
+// The login submit
+if (!empty($_POST['login_submit'])) {
+    $login = trim($_POST["login"]);
+    $password = trim($_POST["password"]);
+    
+    //let's do some data validation
+    if(!isset($login) || $login == "" || !isset($password) || $password == "" )
+    {
+        //means the user did not enter anything
+        $message = "Nothing entered";
+        $login = "";
+    }    
+    else
+    {
+        $sql = "SELECT \"UserID\", \"Password\", \"UserFirst\", \"UserLast\", \"UserEmail\", \"UserPhone\", 
+                        \"UserType\"
+                FROM \"tblUsers\"
+                WHERE \"UserID\" = '".$login."' AND \"Password\" = '".$password."'";
+
+$conn = db_connect();
+        $result = pg_query($conn, $sql);
+        //Checks how many records result from the query
+        $records = pg_num_rows($result);
+
+        if ($records > 0)
+        {           
+          
+        $_SESSION['UserID'] = $login;                   
+        $_SESSION['UserFirst'] = pg_fetch_result($result, 0, 2);
+        $_SESSION['UserLast'] = pg_fetch_result($result, 0, 3);
+        $_SESSION['UserEmail'] = pg_fetch_result($result, 0, 4);
+        $_SESSION['UserPhone'] = pg_fetch_result($result, 0, 5);
+        $_SESSION['UserType'] = pg_fetch_result($result, 0, 6);
+        $_SESSION['message'] = "Welcome ".$_SESSION['UserFirst']."!";
+        $results = pg_query($conn, $sql);
+
+
+        /*
+        if (!isset($_COOKIE["loginID"]))
+        {               
+        setcookie("loginID", $loginID, time() + 60*60*24*30); // Expire in 30 days
+        }*/
+    }       
+    else // no results
+    {
+        //lets check to see if the username is real!
+        $sql = "SELECT * FROM \"tblUsers\"
+                WHERE \"UserID\" = '".$login."'";
+                $conn = db_connect();
+        //Runs the select query
+        $result = pg_query($conn, $sql);
+        //Checks how many records result from the query
+        $records = pg_num_rows($result);
+        //If the information entered results in a resulting record (ie. the username&password are legit) then do this stuff
+        if ($records > 0)
+        {   
+        $message = "Login/password combination not found in the database";
         }
         else
         {
-            $conn = pg_connect('host=localhost port=5432 dbname= user=postgres password=');
-            $sql = "SELECT \"UserID\", \"UserType\" FROM \"tblUsers\" WHERE \"UserID\" = '$login' AND \"Password\" = '$password'";
-            //echo $sql;
-            $result = pg_query($conn, $sql);
-            $record = pg_num_rows($result);
-            
-            if ($record > 0)
-            {
-                session_start();
-                $_SESSION['user'] = pg_fetch_result($result, 0, 0);
-                $_SESSION['user_type'] = pg_fetch_result($result, 0, 1);
-                $_SESSION['cart'] = array();
-            }
-            else 
-            {
-                $error = 'Login information not found.';
-            }   
-        }
-        
-        if ($error != '')
-        {
-            $message = $error;
+            $message = "Login/password not found in the database";
+            $login = ""; //clears the sticky form if we cant find the desired id in the database
+            $password = ""; //no need to clear password, because it is not a sticky form
         }
     }
-    */
+    }
+}
+
+if (!empty($_POST['logout_submit'])) 
+{
+    session_destroy();
+    session_start();
+    $_SESSION['message'] = "Logged out";
+    header("Location: ./index.php");
+}
+
+    
 ?>
 <!DOCTYPE html>
 
@@ -78,128 +110,49 @@
     <title><?php echo $title ?></title>
 </head>
 <body>
-    <script>
-        $(document).ready(function () {
-            $("#body").css("min-height", ($(window).height() - $("footer").height() - $("header").height() - $("#top").height()) - 50);
-            /*
-            // slide navigation 
-            $('.slidePanel').click(function () {
 
-                // set active item link
-                //$('.slidePanel').removeClass('selected');
-                //$(this).addClass('selected');
-
-                // get current slide, for resizePanel() function
-                var current = $(this);
-
-                // scroll page to selected slide
-                $('.slide-window').scrollTo($(this).attr('data-slide'), 600);
-
-                //$(this).siblings('.toggleOptions').find('.toggleContent').slideUp(400);
-                //slide(current);
-
-                // cancel the link default behaviour
-                return false;
-            });
-            */
-
-            
-            /*
-            function slide(current) {
-                // scroll page to selected slide
-                $('.slide-window').scrollTo($(this).attr('data-slide'), 600);
-            }
-            */
-
-            // toggle visibility of radio button (accordion) options
-            $('ul.toggleOptions > li > input[type="radio"]').click(function () {
-                // toggle (show/hide) clicked radio button option 
-                $(this).siblings('.toggleContent').slideToggle(400);
-
-                // hide other options
-                $(this).parent().siblings().children('.toggleContent').slideUp(400);
-            });
-
-
-            // set height of content wrapper
-            //var contentWrapperHeight = $(window).height() - 100;
-            //$('.content-wrapper').css('height', contentWrapperHeight);
-
-            /*
-            // set max height of scrollbox div
-            var scrollHeight = $(window).height() - 280;
-            $('.scrollbox').css('max-height', scrollHeight);
-
-            // set max height of paging div
-            var pagingHeight = $('.slide-window').height() - 20;
-            $('#paging-wrapper').css('max-height', pagingHeight);
-
-            // set width of slide paging container
-            var pagingWidth = $('.content-wrapper').width() - $('.slide-window').width() - 30;
-            $('#paging-wrapper').css('width', pagingWidth);
-            */
-
-            /*
-            function resizePanel() {
-                //get the browser width and height
-                width = $(window).width();
-                height = $(window).height();
-                //get the mask width: width * total of items
-                mask_width = width * $('.slide').length;
-
-                //set the dimension    
-                $('.slide-window, .slide').css({ width: width, height: height });
-                $('.slide-wrapper').css({ width: mask_width, height: height });
-
-                //if the item is displayed incorrectly, set it to the corrent pos
-                $('.slide-window').scrollTo($('.selected').attr('href'), 0);
-
-            }*/
-
-
-            /*
-            // window resize events
-            $(window).resize(function () {
-                //call the resizePanel function
-                //resizePanel();
-
-                // set height of content wrapper
-                //var contentWrapperHeight = $(window).height() - 100;
-                //$('.content-wrapper').css('height', contentWrapperHeight);
-
-                // set max height of scrollbox div
-                var scrollHeight = $(window).height() - 280;
-                $('.scrollbox').css('max-height', scrollHeight);
-
-                // set max height of paging div
-                var pagingHeight = $('.slide-window').height() - 20;
-                $('#paging-wrapper').css('max-height', pagingHeight);
-
-                // set width of slide paging container
-                var pagingWidth = $('.content-wrapper').width() - $('.slide-window').width() - 30;
-                $('#paging-wrapper').css('width', pagingWidth);
-            });
-            */
-
-        });
-    </script>
-    
     <div id="top" class="login-bar" style="text-align:center"> 
-        <form id="loginForm" action="" method="post">
+        <form id="login" name="login" action="" method="post">
             <?php
             
-            //if not signed in
-            if (!isset($_SESSION['id'])) {
-                //echo "<input id='register' type='button' class='float-left button' value='Register' onclick='' />";
-                echo "<input id='go' type='submit' class='float-right button' value='Login' onclick='login()'/>";
-                echo "<input id='password' name='password' type='password' class='float-right textbox' value='$password' />"; 
-                echo "<input id='login' name='login' type='text' class='float-right textbox' value='$login' />";
-            }
-            else // if signed in
+            
+            
+            // If not logged in show 
+            if (!isset($_SESSION['UserID']))
             {
-                echo "<p style='margin:0; text-align:center'>Welcome, $login</p>"; 
-                echo "<input id='go' type='submit' style='position:relative; bottom:20px;' class='float-right button' value='Logout' onclick='logout()'/>";
+                echo "<input id='register' name='login_submit' type='button' class='float-left button' value='Register' onclick='' />";
+                echo "Password<input id='password' name='password' type='password' class='float-right textbox' value='$password' />"; 
+                echo "Login<input id='login' name='login' type='text' class='float-right textbox' value='$login' />";
+                echo "<input id='login_submit' name='login_submit' type='submit' class='float-right button' value='Login' onclick='login()'/>";
+                
             }
+            else
+            {
+                echo "Welcome <a href=\"edit_profile.php\">".$_SESSION['UserFirst']." ".$_SESSION['UserLast']."!</a>";
+                echo "<input id='logout_submit' name='logout_submit' type='submit' class='float-right button' value='Logout' onclick='logout()'/>";
+                
+                if($_SESSION['UserType'] != 'u')
+                {
+                    //echo "<li><a href=\"logout.php\">Logout</li></a>";
+                    //echo "<li><a href=\"welcome.php\">Account Page</li></a>";       
+                }
+                else if ($_SESSION['UserType'] == 'a')
+                {
+                    //echo "<li><a href=\"admin.php\">Admin Panel</a></li>";
+                }
+                
+            //echo "<li>Welcome " . $_SESSION['id'] . ", <a href href=\"welcome.php\">Account Page</a>";
+
+           }
+            
+            //if not signed in
+            
+                //echo "<input id='password' name='password' type='password' class='float-right textbox' value='$password' />"; 
+                //echo "<input id='login' name='login' type='text' class='float-right textbox' value='$login' />";
+           
+                //echo "<p style='margin:0; text-align:center'>Welcome, $login</p>"; 
+                //echo "<input id='go' type='submit' style='position:relative; bottom:20px;' class='float-right button' value='Logout' onclick='logout()'/>";
+            
 
             ?>
         </form>
@@ -216,35 +169,18 @@
                 <li><a href="./order.php">Order Online</a></li>           
                 <?php
                 //if not signed in
-                if (!isset($_SESSION['user_type']))
-                    {
-                        echo "<li><a href=\"register.php\">Register</a></li>";                                 
-                    }
-                else// if signed in
-                {
-                    if (isset($_SESSION['user_type']))
-                    {
-                        if($_SESSION['user_type'] == 'c')
-                        {
+          
                             
                             echo "<li><a href=\"edit_profile.php\">Edit Profile</li></a>";       
-                        }
-                    }                          
-                    if (isset($_SESSION['user_type']))
-                    {
-                        if ($_SESSION['user_type'] == 'a')
-                        {
+                 
                             echo "<li><a href=\"admin.php\">Admin Panel</a></li>";
-                        }
-                    };
-                }
-                            
+                       
                 ?>
             </ul>
         </nav>
     </header>
         
     <div id="messageArea" style="text-align:center; width:100%; color:red;">
-        <p id="message"><?php echo $message; ?></p>
+       
     </div>
         

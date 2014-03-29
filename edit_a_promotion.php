@@ -7,22 +7,22 @@ $date = "20/03/2014";
 
 require 'header.php';
 
-/*
-if (!isset($_SESSION['id'])) // Non administrators to be sent back to index
+
+if (!isset($_SESSION['UserID'])) // Non login in users to be sent back to index
 {
-    $_SESSION['message'] = "You must login into access the admin page.";
+    $_SESSION['message'] = "You must login into access this page.";
     header('Location:./index.php');
 }
 
-if ($_SESSION['usertype'] != 'a') // If not an administrator redirect to main page
+if ($_SESSION['UserType'] != 'a') // If not an administrator redirect to main page
 {
     $_SESSION['message'] = "You are not authorized to access the admin page.";
     header('Location:./index.php');
 }
-    */
 
 if($_SERVER["REQUEST_METHOD"] == "GET") // If it the first time the page is loaded
 {
+
 $promotionID = trim ($_GET["promotionID"]);
  $description = trim ($_GET["description"]);
     $value = trim ($_GET["value"]);

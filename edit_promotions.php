@@ -7,24 +7,105 @@ $date = "20/03/2014";
 
 require 'header.php';
 
-/*
-if (!isset($_SESSION['id'])) // Non administrators to be sent back to index
+
+if (!isset($_SESSION['UserID'])) // Non login in users to be sent back to index
 {
-    $_SESSION['message'] = "You must login into access the admin page.";
+    $_SESSION['message'] = "You must login into access this page.";
     header('Location:./index.php');
 }
 
-if ($_SESSION['usertype'] != 'a') // If not an administrator redirect to main page
+if ($_SESSION['UserType'] != 'a') // If not an administrator redirect to main page
 {
     $_SESSION['message'] = "You are not authorized to access the admin page.";
     header('Location:./index.php');
 }
-    */
 
 
 if($_SERVER["REQUEST_METHOD"] == "GET") // If it the first time the page is loaded
 {
 
+ $table = "";
+ $sql = "SELECT *
+            FROM \"tblPromotions\"
+            ORDER BY \"StartDate\"";    
+        
+       
+    
+  
+
+    // connect to the database
+    //$conn = db_connect();
+    $conn = pg_connect("host=localhost port=5432 dbname=sb user=postgres password=vdragon");
+    //issue the query       
+    $result = pg_query($conn, $sql);
+    // set records variable to number of found results
+    $records = pg_num_rows($result);    
+    
+    if ($records > 0) // If there are results from the query
+    {       
+        
+        
+        $table .= '<table class="tableLayout">';
+   
+         $table .=   // Create the table titles
+        '<tr>
+            <td>ID</td>
+            <td>Description</td>
+            <td>Value</td>
+            <td>Start Date</td>
+            <td>End Date</td>
+           
+            <td>Edit</td>
+         </tr>';  
+                 
+        // Generate the table from the results
+        for($i = 0; $i < $records; $i++)
+        {
+             $table .=  // Generate the table rows
+            '<tr align="center">
+                  <td>'.pg_fetch_result($result, $i, 0).'</td>
+                <td>'.pg_fetch_result($result, $i, 1).'</td>';
+                
+                 $table .=  '<td>';
+                if(pg_fetch_result($result, $i, 2) <= 1) // hard coded check for if a percent cause database messed up
+                {
+                     $table .=  (pg_fetch_result($result, $i, 2) * 100).'%</td>';
+                }
+                else
+                {
+                     $table .=  pg_fetch_result($result, $i, 2).'$</td>';
+                }
+               $table .=  '</td>';
+                
+            
+               // show dates
+                 $table .=  '<td>'.pg_fetch_result($result, $i, 4).'</td>
+                <td>'.pg_fetch_result($result, $i, 5).'</td>';
+             
+                
+             
+                  
+   
+                   $table .=  "<td><a href=
+                \"./edit_a_promotion.php?
+                promotionID=".pg_fetch_result($result, $i, 0).
+                "&description=".pg_fetch_result($result, $i, 1).
+                "&value=".pg_fetch_result($result, $i, 2).
+                 "&isPercent=".pg_fetch_result($result, $i, 3).
+                 "&startDate=".pg_fetch_result($result, $i, 4).
+                "&endDate=".pg_fetch_result($result, $i, 5).
+                "\">Edit</a></td>
+                
+                 </tr>";  
+        }
+        
+         $table .=  "</table>"; // Closing table tag
+    }
+    // If no query results
+    else 
+    {
+        echo "<br/>No search results";    
+    }   
 }
 if($_SERVER["REQUEST_METHOD"] == "POST") 
 {
@@ -138,91 +219,7 @@ if($_SERVER["REQUEST_METHOD"] == "POST")
     </table>
     </form>
 <br/>
-<?php
- $sql = "SELECT *
-            FROM \"tblPromotions\"
-            ORDER BY \"StartDate\"";    
-        
-       
-    
-  
-
-    // connect to the database
-    //$conn = db_connect();
-    $conn = pg_connect("host=localhost port=5432 dbname=sb user=postgres password=vdragon");
-    //issue the query       
-    $result = pg_query($conn, $sql);
-    // set records variable to number of found results
-    $records = pg_num_rows($result);    
-    
-    if ($records > 0) // If there are results from the query
-    {       
-        
-        
-        echo '<table class="tableLayout">';
-   
-        echo  // Create the table titles
-        '<tr>
-            <td>ID</td>
-            <td>Description</td>
-            <td>Value</td>
-            <td>Start Date</td>
-            <td>End Date</td>
-           
-            <td>Edit</td>
-         </tr>';  
-                 
-        // Generate the table from the results
-        for($i = 0; $i < $records; $i++)
-        {
-            echo // Generate the table rows
-            '<tr align="center">
-                  <td>'.pg_fetch_result($result, $i, 0).'</td>
-                <td>'.pg_fetch_result($result, $i, 1).'</td>';
-                
-                echo '<td>';
-                if(pg_fetch_result($result, $i, 2) <= 1) // hard coded check for if a percent cause database messed up
-                {
-                    echo (pg_fetch_result($result, $i, 2) * 100).'%</td>';
-                }
-                else
-                {
-                    echo pg_fetch_result($result, $i, 2).'$</td>';
-                }
-              echo '</td>';
-                
-            
-               // show dates
-                echo '<td>'.pg_fetch_result($result, $i, 4).'</td>
-                <td>'.pg_fetch_result($result, $i, 5).'</td>';
-             
-                
-             
-                  
-   
-                  echo "<td><a href=
-                \"./edit_a_promotion.php?
-                promotionID=".pg_fetch_result($result, $i, 0).
-                "&description=".pg_fetch_result($result, $i, 1).
-                "&value=".pg_fetch_result($result, $i, 2).
-                 "&isPercent=".pg_fetch_result($result, $i, 3).
-                 "&startDate=".pg_fetch_result($result, $i, 4).
-                "&endDate=".pg_fetch_result($result, $i, 5).
-                "\">Edit</a></td>
-                
-                 </tr>";  
-        }
-        
-        echo "</table>"; // Closing table tag
-    }
-    // If no query results
-    else 
-    {
-        echo "<br/>No search results";    
-    }   
-
-
-?>
+<?php echo $table?>
 <br/>
 </section>
             

@@ -2,8 +2,9 @@
 
 
 function db_connect() {
-	$conn = pg_connect("host=" .HOST. " dbname=" .DB_NAME . " user=" .DB_USERID. " password=" .DB_PASS."");
-	return $conn;
+	//$conn = pg_connect("host=" .HOST. " dbname=" .DB_NAME . " user=" .DB_USERID. " password=" .DB_PASS."");
+	 $conn = pg_connect("host=localhost port=5432 dbname=sb user=postgres password=vdragon");
+    return $conn;
 }
 
 function isValidEmail($email) {
@@ -29,8 +30,8 @@ option, pass in "All" or "all" as a string, else pass in an empty string
 */
 function create_sticky_dropdown($dbname, $sticky = "", $string = "") {
 	$conn = db_connect();
-	$sql = "SELECT * FROM ";
-	$sql .= $dbname;
+	$sql = "SELECT * FROM \"";
+	$sql .= $dbname."\""; //added literal quotes for postgres
 	$result = pg_query($conn, $sql);
 	
 	$html = "";
@@ -50,9 +51,44 @@ function create_sticky_dropdown($dbname, $sticky = "", $string = "") {
 			$html .= "selected=\"".$sticky."\"";
 		}
 		$html .= ">".$row[1]."</option>";
+        
 	}
 	$html .= "</select>";
-	return $html;
+	echo $html;
+    
+}
+
+// Selects all values of a column given its name in a table
+function create_sticky_dropdown_Field($table, $field, $sticky = "", $string = "") {
+	$conn = db_connect();
+	$sql = "SELECT  '$field' 
+            FROM \"$table\"
+            group by \"$field\"" ;
+   
+	$result = pg_query($conn, $sql);
+	echo $sql;
+	$html = "";
+	if ($string != "")
+	{
+		$html .= "<select name='".$field."'><option value='0'>". $string."</option>";
+	}
+	else
+	{
+		$html .= "<select name='$field'>";
+	}
+	
+	while ($row = pg_fetch_row($result))
+	{
+		$html .= "<option value='$row[0]' ";
+		if($sticky == $row[0]){
+			$html .= "selected=\"".$sticky."\"";
+		}
+		$html .= ">".$row[1]."</option>";
+        
+	}
+	$html .= "</select>";
+	echo $html;
+    
 }
 
 function get_dropdown_name($table, $value) {
