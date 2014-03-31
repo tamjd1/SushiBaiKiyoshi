@@ -32,6 +32,8 @@ if($_SERVER["REQUEST_METHOD"] == "GET") // If it the first time the page is load
     $promotionID = $_GET["promotionID"];
     $itemStatus = $_GET["itemStatus"];
     $table="";
+    $_SESSION['promotionEmails'] = "";
+         $_SESSION['promotionEmailMessage'] ="";
 
 }
 
@@ -42,7 +44,7 @@ if($_SERVER["REQUEST_METHOD"] == "POST") // If the page has been submitted
     $price = trim ($_POST["price"]);
     $type =trim ( $_POST["type"]);
     $promotion =trim ( $_POST["tblPromotions"]);
-    echo "promotion".$promotion;
+    
     
     $promotionID = trim($_POST["tblPromotions"]);
     $itemID = $_GET["itemID"];
@@ -53,12 +55,13 @@ if($_SERVER["REQUEST_METHOD"] == "POST") // If the page has been submitted
     // Check if there is just one search field
 if($promotion == 0){
     $promotion='null';}
-
+    $emails = "";
+    $emailMessage ="";
     $sql = "UPDATE \"tblMenuItems\"
         SET \"ItemDescription\"='$description', \"ItemPrice\"='$price', \"ItemType\"='$type' , \"ItemStatus\"='$itemStatus', \"PromotionID\"=$promotion
         WHERE \"ItemID\"='$itemID'";
 
-echo $sql;
+
       // connect to the database
     //$conn = db_connect();
     $conn = pg_connect("host=localhost port=5432 dbname=sb user=postgres password=vdragon");
@@ -74,6 +77,7 @@ echo $sql;
     }
     else 
     {
+        
         $_SESSION['message'] = "Change Made to ".$description."!";
         //header("Location: ./edit_menu_items.php");
         
@@ -101,7 +105,8 @@ echo $sql;
 
     if($records > 0)
     {
-         $table .= '<p class="t_c">Customers who favourited that item</p>';
+        
+         $table .= "<p class=\"t_c\">Customers who favourited  '".$description."'</p>";
              $table .= '<table class="tableLayout">';
         $table .=  // Create the table titles
         '
@@ -118,9 +123,33 @@ echo $sql;
             <td>'.pg_fetch_result($result, $i, 0).'</td>
             <td>'.pg_fetch_result($result, $i, 1).'</td>         
         </tr>';  
-         
+        $emails .= pg_fetch_result($result, $i, 1).", ";
          }
-        $table .= '</table><br/>';
+        $table .= "</table><br/>";
+        
+         $sql="SELECT \"PromotionDescription\", \"PromotionValue\", \"IsPercent\", 
+       \"StartDate\", \"EndDate\"
+  FROM \"tblPromotions\"
+  WHERE \"PromotionID\" = '$promotionID'";
+  
+   $result = pg_query($conn, $sql);
+    // set records variable to number of found results
+    $records = pg_num_rows($result);  
+  
+        $emailMessage .= pg_fetch_result($result, 0, 0)."<br/>There is a new \"".pg_fetch_result($result, 0, 0)."\" on the '$description'!!! ";
+        
+        
+        if(pg_fetch_result($result, 0, 1) <= 1) // hard coded check for if a percent cause database messed up
+                {
+                     $emailMessage .= (pg_fetch_result($result, 0, 1) * 100).'%';
+                     }
+                else
+                {
+                    $emailMessage.= pg_fetch_result($result, 0, 1).'$</td>';
+                }
+        $emailMessage .= " off the '$description' starting ".pg_fetch_result($result, 0, 3)." until ".pg_fetch_result($result, 0, 4).". </p>";
+         $_SESSION['promotionEmails'] = $emails;
+         $_SESSION['promotionEmailMessage'] = $emailMessage;
     }    
     else 
     {
@@ -212,10 +241,23 @@ echo $sql;
     </form>
     
     <br/>
-    <?php echo $table;?>
-    <br/>
     
-   
+   <?php  echo $_SESSION['promotionEmails'] ?>
+   <?php  echo $_SESSION['promotionEmailMessage'] ?>
+ 
+    <?php echo $table;?>
+    <br/><!--
+    ?
+    
+    <table class="tableLayout">
+    <tr><td colspan="2">Email</td></tr>
+    <tr><td>To:</td><td></td></tr>
+    <tr><td>Subject:</td><td><?php  echo $_SESSION['promotionEmails'] ?></td></tr>
+    <tr><td>Message:</td><td><?php  echo $_SESSION['promotionEmailMessage']?></td></tr>
+    </table>
+    <?php  ?>
+    -->
+    <br/>
 
 </section>
 <?php include 'footer.php'; ?>

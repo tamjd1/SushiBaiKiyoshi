@@ -8,19 +8,20 @@
     $login = '';
     $password = '';
    
-  
-    
+
+   
 // The login submit
 if (!empty($_POST['login_submit'])) {
     $login = trim($_POST["login"]);
     $password = trim($_POST["password"]);
     
     //let's do some data validation
-    if(!isset($login) || $login == "" || !isset($password) || $password == "" )
+    if($login == "")
     {
         //means the user did not enter anything
-        $message = "Nothing entered";
+        $_SESSION['message'] = "You did not enter a user name";
         $login = "";
+        $password = "";
     }    
     else
     {
@@ -66,11 +67,12 @@ $conn = db_connect();
         //If the information entered results in a resulting record (ie. the username&password are legit) then do this stuff
         if ($records > 0)
         {   
-        $message = "Login/password combination not found in the database";
+            $_SESSION['message'] = "Login/password combination not found in the database";
+            $password = "";
         }
         else
         {
-            $message = "Login/password not found in the database";
+            $_SESSION['message'] = "Login/password not found in the database";
             $login = ""; //clears the sticky form if we cant find the desired id in the database
             $password = ""; //no need to clear password, because it is not a sticky form
         }
@@ -80,10 +82,11 @@ $conn = db_connect();
 
 if (!empty($_POST['logout_submit'])) 
 {
+ header("Location: ./index.php");
     session_destroy();
     session_start();
     $_SESSION['message'] = "Logged out";
-    header("Location: ./index.php");
+   
 }
 
     
@@ -180,7 +183,9 @@ if (!empty($_POST['logout_submit']))
         </nav>
     </header>
         
-    <div id="messageArea" style="text-align:center; width:100%; color:red;">
+    <div id="messageArea" class="message"">
+       <?php echo $_SESSION['message'];
+       $_SESSION['message'] = "";?>
        
     </div>
         

@@ -24,13 +24,12 @@ if ($_SESSION['usertype'] != 'a') // If not an administrator redirect to main pa
 if($_SERVER["REQUEST_METHOD"] == "GET") // If it the first time the page is loaded
 {?>
 <a href="./admin.php">Back</a>
- <p class="message">
-<?php echo  $_SESSION['message']; ?></p>
 
 <?php
     $description = "";
     $type = "";
-    $sql =  "SELECT * FROM \"tblUsers\"";
+    $sql =  "SELECT * FROM \"tblUsers\"
+    ORDER BY \"UserType\" ASC";
                         
      
      //$conn = db_connect();

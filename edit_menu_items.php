@@ -173,7 +173,7 @@ if($_SERVER["REQUEST_METHOD"] == "POST") // If the page has been submitted
     // Trim the inputs
     $description = trim ($_POST ["description"]); 
             
-    
+    $_SESSION['message'] = "Results for '".$description."'";
     // Set the SQL statement
     // Check if there is just one search field
   
@@ -205,7 +205,7 @@ if($_SERVER["REQUEST_METHOD"] == "POST") // If the page has been submitted
    if ($records > 0) // If there are results from the query
     {       
        
-        $_SESSION['message'] = "Results for '".$description."'";
+        
         $table .= '<br/><table class="tableLayout">';
         
          $table .=   // Create the table titles
@@ -321,25 +321,20 @@ if($_SERVER["REQUEST_METHOD"] == "POST") // If the page has been submitted
 <section id="MainContent">         
 <br/>   
 <a href="./admin.php">Back</a>
-<p class="message">
-<?php echo  $_SESSION['message']; ?></p>
+
 
 
 <form method="post" action="<?php echo $_SERVER['PHP_SELF']; ?>">
     <table class="center">
         <th colspan="2" class="t_c">
-        Search for a Menu Item
+        Menu Item Search
         </th>
     <tr>
-        <td>
-        Item Description:
-        </td>
+       
         <td>
         <input type="textbox"/ name="description" value="<?php echo $description;?>">
         </td> 
-    </tr>
-   
-    <tr>
+    
         <td colspan="2" style="text-align:center;">
       
         <input type="submit" value="Search"/>

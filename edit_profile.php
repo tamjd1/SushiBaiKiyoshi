@@ -10,7 +10,7 @@ require 'header.php';
 
 if (!isset($_SESSION['UserID'])) // Non login in users to be sent back to index
 {
-    $_SESSION['message'] = "You must login into access this page.";
+    $_SESSION['message'] = "You must logged in to access this page.";
     header('Location:./index.php');
 }
 
@@ -25,14 +25,19 @@ $email =  $_SESSION['UserEmail'];
 $phoneNumber =  $_SESSION['UserPhone'];
 $emailAddress = $_SESSION['UserEmail'];
 
-/*
-    $sql = "SELECT users.id, users.usertype, agents.first_name, agents.last_name
-            FROM users, agents 
-            WHERE users.id=agents.user_id AND ( LOWER(agents.first_name) LIKE LOWER('$firstname') OR LOWER(agents.last_name) LIKE LOWER('$lastname') )
-            ORDER BY users.enroll_date ASC";    
-       
-    
 
+    $sql = "SELECT \"UserID\", \"CreditCardNumber\", \"CreditCardExpiryDate\", 
+       \"CreditCardType\", \"CardHolder\", \"BillingAddress\", \"BillingCity\", 
+       \"BillingProvince\", \"BillingPostalCode\"
+  FROM \"tblCreditCards\"
+  WHERE \"UserID\" = '$userName'";    
+       /*
+        $billingAddress
+        $CardHolder
+        $CreditCardNumber
+        $CreditCardExpiryDate
+        $CreditCardSecurityCode
+*/
     // connect to the database
     $conn = db_connect();
     //issue the query       
@@ -40,7 +45,52 @@ $emailAddress = $_SESSION['UserEmail'];
     // set records variable to number of found results
     $records = pg_num_rows($result);    
     
-    */
+    $creditTable ="";
+    
+    if ($records > 0) // If there are results from the query
+    {       
+        
+        
+        $creditTable .= '<table class="tableLayout">';
+   
+         $creditTable .=   // Create the table titles
+        '<tr>
+        <td>Card Holder Name</td>
+            <td>Billing Address</td>
+            
+            <td>Credit Card Number</td>
+            <td>Expiry Date</td>
+            <td>Security Code</td>
+           
+            <td>Delete</td>
+         </tr>';  
+                 
+        // Generate the table from the results
+        for($i = 0; $i < $records; $i++)
+        {
+        $CreditCardNumber = substr(pg_fetch_result($result, $i, 1), -4);
+             $creditTable .=  // Generate the table rows
+            '<tr align="center">
+            <td>'.pg_fetch_result($result, $i, 4).'</td>
+                  <td>'.pg_fetch_result($result, $i, 5).'</td>
+                  
+                  <td>**** **** **** '.$CreditCardNumber.'</td>
+                  <td>'.pg_fetch_result($result, $i, 2).'</td>
+                  <td>***</td>
+                  <td><input id=\'delete\' name=\'delete\' type=\'submit\' value=\'delete\'></td>
+                
+                 </tr>';  
+        }
+        
+         $creditTable .=  "</table>"; // Closing table tag
+    }
+    // If no query results
+    else 
+    {
+        echo "<br/>No search results";    
+    }   
+    
+    
 }
 
 if($_SERVER["REQUEST_METHOD"] == "POST") // If the page has been submitted
@@ -172,68 +222,7 @@ if($_SERVER["REQUEST_METHOD"] == "POST") // If the page has been submitted
         </table>   
 -->
         <!-- There should be the option to just delete the credit card not change it-->
-        <table id="creditcardinfo">
-        <th colspan="2" class="t_c">
-        Credit Card(s)
-        </th>
-        <tr>
-        <th>
-        Address
-        </th>
-        <th>
-        Name on Card
-        </th>
-        <th>
-        Card number
-        </th>
-        <th>
-        Expiration Date
-        </th>
-        <th>
-        Security Code
-        </th>
-        <th>
-        Delete
-        </th>
-        </tr>
-
-        <tr>
-        <td>
-        1303 Country RD 2
-        </td>
-        <td>
-        Thom Davison
-        </td>
-        <td>
-        ************4474
-        </td>
-        <td>
-        09/14
-        </td>
-        <td>
-        913
-        </td>               
-        <td>
-        <a href="edit_profile.php" <input type=\"submit\" value=\"Edit\" />Delete</a>
-        </td>
-        </tr>
-        <tr>
-        <td colspan="5" style="text-align:right;">
-        <input type="button" value="Add Another Card"/>
-        </td>
-        </tr>
-        </tr>
-        <tr>
-        <td colspan="5" style="text-align:center;">
-        <br>
-        <br>
-        <br>
-        <br>
-        <input type="submit" value="Submit Changes"/>
-
-        </td>
-        </tr>
-        </table>  
+       <?php echo $creditTable; ?>
 
     
     <br>
