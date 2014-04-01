@@ -15,6 +15,8 @@ require 'functions.php';
 $error = ""; //initialize error variable to nothing.
 $outputError = "";
 
+//$conn = pg_connect("host=localhost port:5432 dbname:sushi user=postgres password=mercymott");  
+
 //when the website/webpage first loaded, initialize all the variable except $user_type to nothing. 
 //Initialize $user_type to "u" meaning unregistered.
 if($_SERVER["REQUEST_METHOD"] == "GET")
@@ -72,197 +74,142 @@ else if($_SERVER["REQUEST_METHOD"] == "POST"){
 
 	//USERNAME VALIDATION
 	//function for id validation. this will return the value of $error.
-	$error = validate_Username($userName);
-	if (!$error == "")
+    
+    if (!isset ($userName) || $userName == "")
 	{
-		$outputError .= $error;
-		echo $username = "";
-		$requiredIsInvalid = true;
-	}	
+		$error .= "You did not enter a user id <br/>";
+		echo $userName = "";
+	}
+	else if (strlen($userName) < 1)
+	{
+		$error .= "A username must be at least " . 3 . " characters. <em>$userName</em> is not enough<br/>";
+		echo $userName = "";
+	}
+	else if (strlen($userName) > 5)
+	{
+		$error .= "A username must not be longer than " . 5 . " characters. <em>$userName</em> is too long<br/>";
+		echo $userName = "";
+	}
+	
 	else
 	{
-		$sql = "Select id FROM users WHERE id='".$userName."'";
-		$result = pg_query($conn,$sql);
-		$records = pg_num_rows($result);
+		//$sql = "Select id FROM users WHERE id='".$userName."'";
+		//$result = pg_query($conn,$sql);
+		//$records = pg_num_rows($result);
 			
-		if ($records != 0)//if there's record
-		{
-			$outputError .= "Username <em>$id</em> already exists. Enter another username <br/>";
-			echo $login = "";
-			$requiredIsInvalid = true;
-		}
-	}
+		//if ($records != 0)//if there's record
+		//{
+		//	$error .= "Username <em>$userName</em> already exists. Enter another username <br/>";
+		//	echo $login = "";
+		//	$requiredIsInvalid = true;
+    }
+	
 
 	//PASSWORD VALIDATION
-	$error = validate_Pass($pass1, $pass2);
-	if (!$error == "")
+	$error = "";
+	if ((!isset($pass1) || $pass1 == "") && (!isset($pass2) || $pass2 == "")) //if user did not entered anything
 	{
-		$outputError .= $error;
-		$requiredIsInvalid = true;
+		$error .= "You did not enter a password <br/>";//display error message
 	}
-
+	else 
+	{
+		$match = strcmp($pass1, $pass2);	//compare if both variable $pass1 & $pass2 are the same	
+		
+		if (($match < 0) || ($match > 0))
+		{
+			$error .= "The password and confirm password were not the same <br/>";//error message if not the same
+			 
+		}
+		else if (strlen($pass1) < 6)//if the password is less than 6 characters
+		{
+			$error .= "Your password must be at least " . 6 . " characters <br/>";	 
+		}
+		else if (strlen($pass1) > 8)//if password is more than 8 characters
+		{
+			$error .= "Your password must be less than " . 8 . " characters <br/>"; 
+		}
+	}
+    
+    
+    
 	//EMAIL VALIDATION
 	
-	$error = validate_Email($email);
-	if (!$error == "")
+	$error = "";
+	if (!isset($email) || $email == "")//if user did not entered anything
 	{
-		$outputError .= $error;
-		echo $email = "";
-		$requiredIsInvalid = true;
+		//return $error .= "You did not enter an email address <br/>";//display error message
+		$error .= "You did not enter an email address <br/>";//display error message
+		echo $email = "";//don't display the entered data
 	}
+	else if (!filter_var($email, FILTER_VALIDATE_EMAIL))//check if it is a valid email
+	{
+		//return $error .= "The email address <em>$email</em> is not valid <br/>";
+		$error .= "The email address <em>$email</em> is not valid <br/>";
+		echo $email = "";
+	}	
 		
 	//FIRSTNAME VALIDATION	
 	
-	$error = validate_First_Name($fname);
-	if (!$error == "")
+	$error = "";
+	if (!isset($fname) || $fname == "")//if user did not entered anything
 	{
-		$outputError .= $error;
-		echo $fname = "";
-		$requiredIsInvalid = true;
+		$error .= "You did not enter your first name <br/>";//display error message
+		echo $fname = "";//don't display the entered data
+	}	
+	else if(is_numeric($fname))//if user entered numeric value
+	{
+		$error .= "Your first name cannot be a number, you entered: <em>$firstname</em> <br/>";	//display error message
+		echo $fname = "";//display nothing in the firstname textbox	
 	}
+	else if (strlen($fname) > 35)//if the length of firstname is more than 20 characters
+	{
+		$error .= "Your first name needs to be less than " . 35 . " characters. <em>$firstname</em> is too long <br/>";//display error
+		echo $fname = "";//display nothing in the firstname textbox
+	}
+	
 
 	//LASTNAME VALIDATION
-	$error = validate_Last_Name($lname);
-	if (!$error == "")
+	$error = "";
+	if (!isset($lname) || $lname == "")//if user did not entered anything
 	{
-		$outputError .= $error;
-		echo $lname = "";
-		$requiredIsInvalid = true;
+		$error .=  "You did not enter your last name <br/>";//display error message
+		echo $lname = "";//don't display the entered data
 	}
 	
+	else if(is_numeric($lname))//if user entered numeric value
+	{
+		$error .= "Your last name cannot be a number, you entered: <em>$lastname</em> <br/>";
+		echo $lname = "";
+	}
+	else if (strlen($lname) > 35)//if lastname is more than the maximum value of 30 characters
+	{
+		$error .= "Your last name needs to be less than " . 35 . " characters. <em>$lastname</em> is too long <br/>";
+		echo $lname = "";
+	}	
+    
+    
 	//PHONE NUMBER VALIDATION
 	
-	$error = validate_Phone($phoneNumber);
-	if (!$error == "")
+	$error = "";
+	$phoneNumber = preg_replace ('/\D/', '', $phoneNumber);//removes spaces and characters in phone numbers
+	if (!isset($phoneNumber) || $phoneNumber == "")//if user did not entered anything
 	{
-		$outputError .= $error;
-		echo $phoneNumber = "";
-		$requiredIsInvalid = true;
-	}	
+		$error .= "You did not enter your phone number <br/>";//display error message
+		echo $phoneNumber = "";//don't display the entered data
+	}
+	else if (strlen($phoneNumber) != 10)//if phone number is more than the maximum value 
+	{
+		$error .= "Your phone number needs to be less than " . 10 . " characters & numbers. <em>$phone</em> is too long <br/>";
+		echo $phoneNumber= "";
+	}
 
-	$error = validate_CardType($cardType);
-	if (!$error == "")
-	{
-		$outputError .= $error;
-		echo $cardType = "";
-		$requiredIsInvalid = true;
-	}		
-    
-	//NAME ON CARD HOLDER VALIDATION
-    if ($nameOnCard != ""){
-        $error = validate_NameOnCard($nameOnCard);
-        if (!$error == "")
-        {
-            $outputError .= $error;
-            echo $nameOnCard = "";
-            $requiredIsInvalid = true;
-        }  
-    }
-    
-	//CARD NUMBER VALIDATION
-    
-    if($cardNumber != ""){
-        $error = validate_CardNumber($cardNumber);
-        if (!$error == "")
-        {
-            $outputError .= $error;
-            echo $nameOnCard = "";
-            $requiredIsInvalid = true;
-        }     
-    }
-    
- 	//Expiration Date VALIDATION
-    
-    if ($month != "")
-    {
-        if (($month < 0) || ($month > 12)){
-            $error = "month must be between 1 - 12 <br/>";
-            $output .= $error;
-            echo $month = "";
-            $requiredIsInvalid = true;
-            }
-    }
-    
-    if ($year != "")
-    {
-        if (($year < 14) ){
-            $error = "year must not be less than 2014 <br/>";
-            $output .= $error;
-            echo $year = "";
-            $requiredIsInvalid = true;
-        }
-    } 
-    
-    $expirationDate = $month ."/". $year;
-    
- 	$error = validate_ExpirationDate($expirationDate);
-	if (!$error == "")
-	{
-		$outputError .= $error;
-		echo $nameOnCard = "";
-		$requiredIsInvalid = true;
-	}  
- 
-	//CARD NUMBER VALIDATION
- 	$error = validate_CardNumber($cardNumber);
-	if (!$error == "")
-	{
-		$outputError .= $error;
-		echo $nameOnCard = "";
-		$requiredIsInvalid = true;
-	}  
-        
-	//ADDRESS VALIDATION
-	
-	if ($address != "")
-	{
-		$error = validate_Address($address);
-		if (!$error == "")
-		{
-			$outputError .= $error;
-			echo $address = "";	
-		}	
-	}
-    	//CITY VALIDATION
-	
-	if ($city != "")
-	{
-		$error = validate_City($city);
-		if (!$error == "")
-		{
-			$outputError .= $error;
-			echo $city = "";
-		}	
-	}
-        //PROVINCE VALIDATION
-	
-	if ($province != "")
-	{
-		$error = validate_Province($province);
-		if (!$error == "")
-		{
-			$outputError .= $error;
-			echo $province = "";
-		}	
-	}
-    
-	
-	//POSTAL CODE VALIDATION
-	if ($postalCode != "")
-	{
-		$error = validate_PostalCode($postalCode);
-		if (!$error == "")
-		{
-			$outputError .= $error;
-			echo $postalCode = "";	
-		}	
-	}
+
 
 	//USER TYPE
 	//set user type to "u" by default;
 	$user_type = "u";
 
-	if($outputError == "")
+	if($error == "")
 	{
 		$requiredIsInvalid = false;
 	}
@@ -270,24 +217,8 @@ else if($_SERVER["REQUEST_METHOD"] == "POST"){
 	//INSERT VALID DATA TO THE USERS AND AGENTS DATABASE 
 	if ($error == "" && $requiredIsInvalid == false)		
 	{
-		$conn = pg_connect("host=localhost port:5432 dbname:sushi user=postgres password=mercymott");  
-		//sql statement to insert the valid data to the credit card database 
 		
-        $sql = "INSERT INTO tblCreditCards(UserID, CreditCardNumber, CreditCardExpiryDate, CreditCardSecurityCode, CreditCardType, CardHolder, 
-        BillingAddress, BillingCity,BillingProvince, BillingPostalCode)
-        VALUES(
-            '".$userName."',
-            '".$cardType."',
-            '".$nameOnCard."',
-            '".$cardNumber."',
-            '".$expirationDate."',
-            '".$securityCode."', 
-            '".$address."',
-            '".$city."',
-            '".$province."',
-            '".$postalCode."')";
-        
-		pg_query($conn,$sql);//connect to the credit card database and execute the sql statement
+		//sql statement to insert the valid data to the credit card database 
 		
 		//sql statement to insert the valid data to the users database 
 		$sql = "INSERT INTO tblUsers(UserID, UserFirst, UserLast, UserEmail, UserPhone, UserType)
@@ -303,15 +234,13 @@ else if($_SERVER["REQUEST_METHOD"] == "POST"){
 	}
 	else
 	{
-		$outputError .= "Please try again";
+		$error .= "Please try again";
 	}	
 		
-   //echo $error; 
-}   
-#end of post
-?>
 
-<?php echo $outputError;?>
+}   
+
+?>
 
 
 
@@ -326,6 +255,14 @@ else if($_SERVER["REQUEST_METHOD"] == "POST"){
             <th colspan="2" class="t_c">
                 Personal Information
             </th>
+            <tr>
+                <td>
+                    <?php echo $error;?>
+                </td>
+                <td>
+                </td>
+            </tr>
+            
             <tr>
                 <td>
                     Username
@@ -381,130 +318,12 @@ else if($_SERVER["REQUEST_METHOD"] == "POST"){
                     <input type="text" name="<?php echo $phoneNumber;?>"/>
                 </td>
             </tr>            
-        </table>
-        
-        <br/>
-        
-        <table id="creditcardinfo">
-            <th colspan="2" class="t_c">
-                Credit Card Information
-            </th>
+  
             <tr>
-                <td>
-                    Card Type
-                </td>
-                <td>
-                    <select name="<?php echo $cardType;?>">
-                        <option value="Visa">Visa</option>
-                        <option value="Mastercard">Mastercard</option>
-                    </select>
-                </td>
-            </tr>
-            <tr>
-                <td>
-                    Name on Card
-                </td>
-                <td>
-                    <input type="text" name="<?php echo $nameOnCard;?>"/>
-                </td>
-            </tr>    
-            <tr>
-                <td>
-                    Card Number
-                </td>
-                <td>
-                    <input type="text" name="<?php echo $cardNumber;?>"/>
-                </td> 
-            </tr>
-            <tr>
-                <td>
-                    Expiration Date
-                </td>
-                <td>
-                    <table>
-                        <tr>
-                            <td>Month
-                            </td>
-                            <td>
-                            <select name="<?php echo $month;?>">
-                                <option value="01">01</option>
-                                <option value="02">02</option>
-                                <option value="03">03</option>
-                                <option value="04">04</option>
-                                <option value="05">05</option>
-                                <option value="06">06</option>
-                                <option value="07">07</option>
-                                <option value="08">08</option>
-                                <option value="09">09</option>
-                                <option value="10">10</option>
-                                <option value="11">11</option>
-                                <option value="12">12</option>
-                            </select>
-                            </td>
-                            <td>Year
-                            </td>
-                            <td>
-                            <select name="<?php echo $year;?>">
-                                <option value="14">14</option>
-                                <option value="15">15</option>
-                                <option value="16">16</option>
-                                <option value="17">17</option>
-                                <option value="18">18</option>
-                                <option value="19">19</option>
-                                <option value="20">20</option>
-                            </select>
-                            </td>
-                        </tr>
-                    </table>
-                  
-                </td>
-            </tr>
-            <tr>
-                <td>
-                    Security Code
-                </td>
-                <td>
-                    <input type="text" name="<?php echo $securityCode;?>"/>
-                </td>
-            </tr>            
-            <tr>
-                <td>
-                    Address
-                </td>
-                <td>
-                    <input type="text" name="<?php echo $address;?>"/>
-                </td> 
+                <td style="text-align:center;">
 
-            </tr>
-            <tr>
-                <td>
-                    City
-                </td>
-                <td>
-                    <input type="text" name="<?php echo $city;?>"/>
-                </td>
-            </tr>
-            <tr>
-                <td>
-                    Province
-                </td>
-                <td>
-                    <input type="text" name="<?php echo $province;?>"/>
-                </td>
-            </tr>            
-            <tr>
-                <td>
-                    Postal Code
-                </td>
-                <td>
-                    <input type="text" name="<?php echo $postalCode;?>"/>
-                </td>
-            </tr>
-            <tr>
-                <td colspan="2" style="text-align:center;">
-                    <br/>
                     <input type="button" value="Register"/>
-                    
+                    <input type="reset" value="Clear"/></td>
                 </td>
             </tr>
         </table>        
