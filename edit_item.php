@@ -34,6 +34,7 @@ if($_SERVER["REQUEST_METHOD"] == "GET") // If it the first time the page is load
     $table="";
     $_SESSION['promotionEmails'] = "";
          $_SESSION['promotionEmailMessage'] ="";
+        
 
 }
 
@@ -50,13 +51,36 @@ if($_SERVER["REQUEST_METHOD"] == "POST") // If the page has been submitted
     $itemID = $_GET["itemID"];
     $itemStatus = $_POST["itemStatus"];
     $table="";
+     
+     if (!isset($description) || $description == "")//if user did not entered anything
+	{
+		
+		 $errorMessage .= "You must enter a description<br/>";
+	}
     
+     if (!isset($price) || $price == "")
+	{
+		
+		$errorMessage .=  "You must enter a price<br/>";
+	}
+    else if(!is_numeric($price))//if user entered numeric value
+	{
+		$errorMessage .=  "Price must be numeric<br/>";
+	}
+     if (!isset($type) || $type == "")//if user did not entered anything
+	{
+		
+		$errorMessage .=  "You must enter a type<br/>";//don't display the entered data
+	}
     // Set the SQL statement
     // Check if there is just one search field
 if($promotion == 0){
     $promotion='null';}
     $emails = "";
     $emailMessage ="";
+    
+    if($errorMessage== "")
+    {
     $sql = "UPDATE \"tblMenuItems\"
         SET \"ItemDescription\"='$description', \"ItemPrice\"='$price', \"ItemType\"='$type' , \"ItemStatus\"='$itemStatus', \"PromotionID\"=$promotion
         WHERE \"ItemID\"='$itemID'";
@@ -64,7 +88,7 @@ if($promotion == 0){
 
       // connect to the database
     //$conn = db_connect();
-    $conn = pg_connect("host=localhost port=5432 dbname=sb user=postgres password=vdragon");
+    $conn = db_connect();
     //issue the query       
     $result = pg_query($conn, $sql);
     // set records variable to number of found results
@@ -97,7 +121,7 @@ if($promotion == 0){
             GROUP BY \"tblUsers\".\"UserID\", \"tblUsers\".\"UserEmail\"";
 
  //$conn = db_connect();
-    $conn = pg_connect("host=localhost port=5432 dbname=sb user=postgres password=vdragon");
+    $conn = db_connect();
     //issue the query       
     $result = pg_query($conn, $sql);
     // set records variable to number of found results
@@ -118,14 +142,14 @@ if($promotion == 0){
          
         for($i = 0; $i < $records; $i++)
         {
-        $table .=   
-        '<tr>
-            <td>'.pg_fetch_result($result, $i, 0).'</td>
-            <td>'.pg_fetch_result($result, $i, 1).'</td>         
-        </tr>';  
-        $emails .= pg_fetch_result($result, $i, 1).", ";
+            $table .=   
+            '<tr>
+                <td>'.pg_fetch_result($result, $i, 0).'</td>
+                <td>'.pg_fetch_result($result, $i, 1).'</td>         
+            </tr>';  
+            $emails .= pg_fetch_result($result, $i, 1).", ";
          }
-        $table .= "</table><br/>";
+        
         
          $sql="SELECT \"PromotionDescription\", \"PromotionValue\", \"IsPercent\", 
        \"StartDate\", \"EndDate\"
@@ -136,30 +160,30 @@ if($promotion == 0){
     // set records variable to number of found results
     $records = pg_num_rows($result);  
   
-        $emailMessage .= pg_fetch_result($result, 0, 0)."<br/>There is a new \"".pg_fetch_result($result, 0, 0)."\" on the '$description'!!! ";
+        $emailMessage .= "Hello valued customer! There is a new \"".pg_fetch_result($result, 0, 0)."\" on the '$description'!!! Thats ";
         
         
         if(pg_fetch_result($result, 0, 1) <= 1) // hard coded check for if a percent cause database messed up
-                {
-                     $emailMessage .= (pg_fetch_result($result, 0, 1) * 100).'%';
-                     }
-                else
-                {
-                    $emailMessage.= pg_fetch_result($result, 0, 1).'$</td>';
-                }
-        $emailMessage .= " off the '$description' starting ".pg_fetch_result($result, 0, 3)." until ".pg_fetch_result($result, 0, 4).". </p>";
-         $_SESSION['promotionEmails'] = $emails;
-         $_SESSION['promotionEmailMessage'] = $emailMessage;
+        {
+            $emailMessage .= (pg_fetch_result($result, 0, 1) * 100).'%';
+         }
+        else
+        {
+            $emailMessage.= pg_fetch_result($result, 0, 1);
+        }
+        
+        $emailMessage .= " off the '$description' starting ".pg_fetch_result($result, 0, 3)." until ".pg_fetch_result($result, 0, 4);
+         $table .= "<tr><td>$emails</td><td>$emailMessage</td></tr>";
+        $_SESSION['promotionEmails'] = $emails;
+        $_SESSION['promotionEmailMessage'] = $emailMessage;
     }    
     else 
     {
         header("Location: ./edit_menu_items.php");
     }
     }
-    
-
-   
-   
+    $table .= "</table><br/>";
+    }
 }#end of post
 ?>
 
@@ -241,22 +265,16 @@ if($promotion == 0){
     </form>
     
     <br/>
-    
-   <?php  echo $_SESSION['promotionEmails'] ?>
-   <?php  echo $_SESSION['promotionEmailMessage'] ?>
+
+   
+   <br/>
+  
  
     <?php echo $table;?>
-    <br/><!--
-    ?
-    
-    <table class="tableLayout">
-    <tr><td colspan="2">Email</td></tr>
-    <tr><td>To:</td><td></td></tr>
-    <tr><td>Subject:</td><td><?php  echo $_SESSION['promotionEmails'] ?></td></tr>
-    <tr><td>Message:</td><td><?php  echo $_SESSION['promotionEmailMessage']?></td></tr>
-    </table>
-    <?php  ?>
-    -->
+    <br/>
+
+ 
+
     <br/>
 
 </section>

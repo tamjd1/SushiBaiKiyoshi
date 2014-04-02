@@ -8,8 +8,8 @@ $date = "20/03/2014";
 require 'header.php';
 
 
-/*
-if (!isset($_SESSION['id'])) // Non administrators to be sent back to index
+
+if (!isset($_SESSION['UserID'])) // Non login in users to be sent back to index
 {
     $_SESSION['message'] = "You must login into access this page.";
     header('Location:./index.php');
@@ -17,22 +17,28 @@ if (!isset($_SESSION['id'])) // Non administrators to be sent back to index
 
 if ($_SESSION['UserType'] != 'a') // If not an administrator redirect to main page
 {
-    $_SESSION['message'] = "You are not authorized to access this page.";
+    $_SESSION['message'] = "You are not authorized to access the admin page.";
     header('Location:./index.php');
 }
-*/
 
-
-//if (isset($_POST['submit']) alternate way
+if($_SERVER["REQUEST_METHOD"] == "GET") // If the page has been submitted
+{   
+ $type = "";
+    $date = "";
+    $location = "";
+    $supplyStatus = "";
+    $price = "";
+    $errorMessage=  "";
+}
 if($_SERVER["REQUEST_METHOD"] == "POST") // If the page has been submitted
 {      
-    // Clear out the forms
+    // Clear out the vars
     $type = "";
     $date = "";
     $location = "";
     $supplyStatus = "";
     $price = "";
-    
+    $errorMessage=  "";
     // Trim the inputs
     $type = trim ($_POST ["type"]); 
     $date = trim ($_POST ["date"]); 
@@ -40,6 +46,29 @@ if($_SERVER["REQUEST_METHOD"] == "POST") // If the page has been submitted
     $supplyStatus = trim ($_POST ["supplyStatus"]); 
      $price = trim ($_POST ["price"]); 
   
+    if (!isset($type) || $type == "")//if user did not entered anything
+	{
+		
+		 $errorMessage .= "You must enter a type<br/>";
+	}
+    
+     if (!isset($price) || $price == "")
+	{
+		
+		$errorMessage .=  "You must enter a price<br/>";
+	}
+    else if(!is_numeric($price))//if user entered numeric value
+	{
+		$errorMessage .=  "Price must be numeric<br/>";
+	}
+     if (!isset($location) || $location == "")//if user did not entered anything
+	{
+		
+		$errorMessage .=  "You must enter a location<br/>";//don't display the entered data
+	}
+	
+	if($errorMessage== "")
+    {
     $sql = "INSERT INTO \"tblFishMarket\"(\"Type\", \"Date\", \"Price\", \"Location\", \"SupplyStatus\")
             VALUES ('$type', '$date', '$price', '$location' , '$supplyStatus')";
 
@@ -47,27 +76,34 @@ if($_SERVER["REQUEST_METHOD"] == "POST") // If the page has been submitted
     //$conn = db_connect();
     
    
-    $conn = pg_connect("host=localhost port=5432 dbname=sb user=postgres password=vdragon");
+    $conn = db_connect();
     //issue the query       
     $result = pg_query($conn, $sql);
       
-    echo '<p class="t_c">';
-      
+   
     if (!$result)
     {
-        echo "An error occurred"; 
+        $errorMessage .= "Pricing not added"; 
     }
     else
     {
-        echo "Pricing added!";
-        
+        $errorMessage .= "Pricing added!";
+             $type = "";
+        $date = "";
+        $location = "";
+        $supplyStatus = "";
+        $price = "";
+       
     }
-    echo '</p>';
+    }
    }
 ?>
         <section id="MainContent">   
- <a href="./admin.php">Back</a>        
-        <br/>
+ <a href="./admin.php">Back</a>   
+<p class="t_c">
+<?php echo $errorMessage ;?>
+<p> 
+       
         <form method="post" action="<?php echo $_SERVER['PHP_SELF']; ?>">
              <table class="center">
                 <th colspan="2" class="t_c">
@@ -78,7 +114,7 @@ if($_SERVER["REQUEST_METHOD"] == "POST") // If the page has been submitted
                     Type
                     </td>
                     <td>
-                    <input type="textbox"/ name="type">
+                    <input type="textbox"/ name="type" value="<?php echo $type;?>" >
                     </td> 
                 </tr>
                 <tr>
@@ -94,7 +130,7 @@ if($_SERVER["REQUEST_METHOD"] == "POST") // If the page has been submitted
                     Price
                     </td>
                     <td>
-                    <input type="number"/ name="price">
+                    <input type="number"/ name="price" value="<?php echo $price;?>">
                     </td> 
                 </tr>
                 <tr>
@@ -102,7 +138,7 @@ if($_SERVER["REQUEST_METHOD"] == "POST") // If the page has been submitted
                     Location
                     </td>
                     <td>
-                    <input type="textbox"/ name="location">
+                    <input type="textbox"/ name="location" value="<?php echo $location;?>">
                     </td> 
                 </tr>
                 <tr>

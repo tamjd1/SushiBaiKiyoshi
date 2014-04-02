@@ -26,7 +26,7 @@ if ($_SESSION['UserType'] != 'a') // If not an administrator redirect to main pa
 
 
         <section id="MainContent">            
-          <p class="t_c">This is where the administrator can make changes to customers, menu items, promotions, and enter pricing pricing information.</p>
+          <p class="t_c">This is where the administrator can make changes to customers, menu items, promotions, and enter fish pricing information.</p>
 <hr/>          
           <div class="t_c">
            

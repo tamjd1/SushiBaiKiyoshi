@@ -69,16 +69,20 @@ require 'header.php';
                     //$("#favourites").click();
                 });
             </script>
+            <div id="register">
+                <p class="message">
+                    You are now REGISTERED!!!<br/>
+                    To order, login now!!!<br/>
+                </p>
+            </div>
+
             
             <div id="banner">
                 <img id="SlideShow" width="701px" src="banner (1).jpg" alt="banner" />
             </div>
 
             <h1 id="greeting" class="float-center"></h1>
-            <p> 
-                Lorem ipsum dolor sit amet, consectetuer adipiscing elit, sed diam nonummy nibh euismod tincidunt ut laoreet dolore magna aliquam erat volutpat. Ut wisi enim ad minim veniam, quis nostrud exerci tation ullamcorper suscipit lobortis nisl ut aliquip ex ea commodo consequat.
-            </p>
-
+           
                 
             
             
