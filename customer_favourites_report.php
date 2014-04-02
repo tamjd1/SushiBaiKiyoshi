@@ -83,7 +83,7 @@ while ($row = pg_fetch_row($result))
     console.log(favourites);
     
     for (var i = 0; i < favourites.length; i++) {
-        items[i] = favourites[i].Item.substring(0, favourites[i].Item.length - 8);
+        items[i] = favourites[i].Item;
     }
     
     names = items.unique();
@@ -93,7 +93,7 @@ while ($row = pg_fetch_row($result))
     for (var i = 0; i < names.length; i++) {
         var count = 0;
         for (var j = 0; j < favourites.length; j++) {
-            if (names[i] === favourites[j].Item.substring(0, favourites[i].Item.length - 8)) {
+            if (names[i] === favourites[j].Item) {
                 count += parseFloat(favourites[j].Quantity);
             }
         }
@@ -108,15 +108,11 @@ while ($row = pg_fetch_row($result))
     }
     console.log(data);
     
-    
-    /////////////////////////HERE
-    
-    
     names.push(" ");
-    for(var i = 0; i < items.length; i++) {
-        names.push(items[i].FullName); //
-        orders.push(items[i].OrderCount);
-    }
+    //for(var i = 0; i < items.length; i++) {
+    //    names.push(items[i].FullName); //
+    //    orders.push(items[i].OrderCount);
+    //}
     //names.push(" ");
     
     MAX_ORDER = parseFloat(d3.max(orders)) + parseFloat(5); //get max price
@@ -227,65 +223,65 @@ while ($row = pg_fetch_row($result))
     function drawBars() {
           var g = graph.append("g");
           g.selectAll("rect")
-              .data(items)
+              .data(data)
               .enter()
               .append("svg:rect")
               .attr("x", function(d, i) { return xScale(parseFloat(i)+parseFloat(1)); })
-              .attr("y", function(d) { return -yScale(d.OrderCount); })
-              .attr("height", function(d) { return yScale(d.OrderCount); })
+              .attr("y", function(d) { return -yScale(d.Quantity); })
+              .attr("height", function(d) { return yScale(d.Quantity); })
               .attr("width", xScale(0.5))
-              .style("cursor", "pointer")
-              .on("click", function(d){ document.location.href = "http://localhost/SushiBaiKiyoshi/index.php?" + d.UserID; })
+              //.style("cursor", "pointer")
+              //.on("click", function(d){ document.location.href = "http://localhost/SushiBaiKiyoshi/index.php?" + d.UserID; })
               .attr("fill", "#2d578b");
            
-           var g2 = graph.append("g");   
-           g2.selectAll("rect")
-              .data(items)
-              .enter()
-              .append("svg:rect")
-              .attr("x", function(d, i) { return xScale(parseFloat(i)+parseFloat(1)); })
-              .attr("y", function(d) { return -yScale(d.CancelCount); })
-              .attr("height", function(d) { return yScale(d.CancelCount); })
-              .attr("width", xScale(0.5))
-              .style("cursor", "pointer")
-              .on("click", function(d){ document.location.href = "http://localhost/SushiBaiKiyoshi/index.php?" + d.UserID; })
-              .attr("fill", "red");
+           //var g2 = graph.append("g");   
+           //g2.selectAll("rect")
+           //   .data(data)
+           //   .enter()
+           //   .append("svg:rect")
+           //   .attr("x", function(d, i) { return xScale(parseFloat(i)+parseFloat(1)); })
+           //   .attr("y", function(d) { return -yScale(d.CancelCount); })
+           //   .attr("height", function(d) { return yScale(d.CancelCount); })
+           //   .attr("width", xScale(0.5))
+           //   .style("cursor", "pointer")
+           //   .on("click", function(d){ document.location.href = "http://localhost/SushiBaiKiyoshi/index.php?" + d.UserID; })
+           //   .attr("fill", "red");
           
           g.selectAll("text")
-              .data(items)
+              .data(data)
               .enter()
               .append("svg:text")
               .attr("x", function(d, i) { return xScale(parseFloat(i)+parseFloat(1)) + xScale(0.5); })
-              .attr("y", function(d) { return -yScale(d.OrderCount); })
+              .attr("y", function(d) { return -yScale(d.Quantity); })
               .attr("dx", -(xScale(0.5)/2))
               .attr("dy", "1.2em")
               .attr("text-anchor", "middle")
-              .text(function(d) { return d.OrderCount;})
+              .text(function(d) { return d.Quantity;})
               .attr("fill", "white");
           
-          g2.selectAll("text")
-              .data(items)
-              .enter()
-              .append("svg:text")
-              .attr("x", function(d, i) { return xScale(parseFloat(i)+parseFloat(1)) + xScale(0.5); })
-              .attr("y", function(d) { return -yScale(d.CancelCount); })
-              .attr("dx", -(xScale(0.5)/2))
-              .attr("dy", "1.2em")
-              .attr("text-anchor", "middle")
-              .text(function(d) { return d.CancelCount;})
-              .attr("fill", "white");
+          //g2.selectAll("text")
+          //    .data(data)
+          //    .enter()
+          //    .append("svg:text")
+          //    .attr("x", function(d, i) { return xScale(parseFloat(i)+parseFloat(1)) + xScale(0.5); })
+          //    .attr("y", function(d) { return -yScale(d.CancelCount); })
+          //    .attr("dx", -(xScale(0.5)/2))
+          //    .attr("dy", "1.2em")
+          //    .attr("text-anchor", "middle")
+          //    .text(function(d) { return d.CancelCount;})
+          //    .attr("fill", "white");
               
           g.selectAll("text.yAxis")
-              .data(items)
+              .data(data)
               .enter().append("svg:text")
               .attr("x", function(d, i) { return xScale(parseFloat(i)+parseFloat(1)) + xScale(0.5); })
               .attr("y", 5)
               .attr("dx", -(xScale(0.5)/2))
               .attr("text-anchor", "middle")
               .attr("style", "font-size: 12; font-family: Helvetica, sans-serif")
-              .text(function(d) { return d.FullName;})
-              .style("cursor", "pointer")
-              .on("click", function(d){ document.location.href = "http://localhost/SushiBaiKiyoshi/index.php?" + d.UserID; })
+              .text(function(d) { return d.Item;})
+              //.style("cursor", "pointer")
+              //.on("click", function(d){ document.location.href = "http://localhost/SushiBaiKiyoshi/index.php?" + d.UserID; })
               .attr("transform", "translate(0, 18)")
               .attr("class", "yAxis");
     }
