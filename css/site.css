@@ -222,7 +222,7 @@ footer a {
 
 .toggleContent {
     padding: 10px 0 10px 35px;
-    display: none;
+    /*display: none;*/
 }
 
 .toggleContent li {
