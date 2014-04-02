@@ -7,12 +7,6 @@ $date = "05/03/2014";
 
 require 'header.php';
 
-
-function db_connect() {
-	$conn = pg_connect("host=127.0.0.1 port=5432 dbname=sushi user=postgres password=100338841");
-	return $conn;
-}
-
 $menu_items_detailed = array();
 $items = array();
 //$prices = array();
