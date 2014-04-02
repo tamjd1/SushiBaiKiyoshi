@@ -7,17 +7,15 @@ $date = "05/03/2014";
 
 require 'header.php';
 
-
-function db_connect() {
-	$conn = pg_connect("host=127.0.0.1 port=5432 dbname=sushi user=postgres password=100338841");
-	return $conn;
-}
+//$str_json = file_get_contents('php://input');
+//echo "Hello" . $str_json;
+$array = json_decode($_POST['jsondata']);
+echo "Goodbye ".$array;
 
 $menu_items_detailed = array();
 $items = array();
 //$prices = array();
 $types = array();
-
 
 $conn = db_connect();
 $sql = "SELECT \"ItemDescription\", \"ItemPrice\", \"ItemType\", \"PromotionID\" FROM \"tblMenuItems\" WHERE \"ItemStatus\" = 'e'";
@@ -27,7 +25,6 @@ $i = 0;
 
 while ($row = pg_fetch_row($result))
 {
-
     $price = $row[1];
     if($row[3] != null) {
         $sql2 = "SELECT \"PromotionDescription\", \"PromotionValue\", \"IsPercent\" FROM \"tblPromotions\" WHERE \"PromotionID\" = " . $row[3];
@@ -35,14 +32,13 @@ while ($row = pg_fetch_row($result))
         $result2 = pg_query($conn, $sql);
         $row2 = pg_fetch_row($result2);
         $price = ($row2[2] == 't') ? $price * $row2[1] : $price - $row2[1];
-    }
-    
+    }   
     //$types[$i] = $row[2];
-    $menu_items[$i] = array('ID'=>$i,'Item'=>$row[0],'Price'=>$price,'Type'=>$row[2],'PromotionID'=>$row[3]);
+    $menu_items[$i] = array('ID'=>$i,'Item'=>$row[0],'Price'=>$price,'Type'=>$row[2],'PromotionID'=>$row[3],'Quantity'=>0);
     $i++;
 }
 
-$sql = "SELECT DISTINCT \"ItemType\"FROM \"tblMenuItems\" WHERE \"ItemStatus\" = 'e'";
+$sql = "SELECT DISTINCT \"ItemType\" FROM \"tblMenuItems\" WHERE \"ItemStatus\" = 'e'";
 //echo $sql;
 $result = pg_query($conn, $sql);
 //$type_string;
@@ -50,7 +46,6 @@ $i = 0;
 
 while ($row = pg_fetch_row($result))
 {
-    
     $types[$i] = $row[0];
     $i++;
 }
@@ -59,7 +54,6 @@ while ($row = pg_fetch_row($result))
 $menu_list_html = "";
 //$unique_count = 0;
 for($j = 0; $j < sizeof($types); $j++) {
-
 //echo "HEREJHLKEHJRKE" . getMenuType($types[$j]);
 
 $menu_list_html .= '<li><input type="radio" id="rad'.$types[$j].'" name="menuItemTypes"  />
@@ -68,8 +62,8 @@ $menu_list_html .= '<li><input type="radio" id="rad'.$types[$j].'" name="menuIte
                 <div class="toggleContent">
                     <ul>
                         <li>
-                            <table id="'.$types[$j].'_list" class="menu">
-                                <tr>
+                            <table id="'.$types[$j].'_list" class="menu">                               
+                               <tr>
                                     <td class="menu_item_img">
                                          <img src="./images/menu/1.png" />
                                     </td>
@@ -77,11 +71,16 @@ $menu_list_html .= '<li><input type="radio" id="rad'.$types[$j].'" name="menuIte
                                     <table>';
                                             for($k = 0; $k < sizeof($menu_items) - 1; $k++) {
                                                 if($menu_items[$k]['Type'] == $types[$j]) {
-                                                    $menu_list_html .= '<tr><td><input id="'.$menu_items[$k]['ID'].'" onblur="updateCart(this.id)" type="textbox" style="width:18px" value="0"/>'.$menu_items[$k]['Item'].'</td>';
-                                                    $menu_list_html .= '<td> $'.$menu_items[$k]['Price'].'</td></tr>';
+                                                    //$menu_list_html .= '<tr><td><input id="'.$menu_items[$k]['ID'].'" onblur="updateCart(this.id)" type="textbox" style="width:18px" value="0"/> ';
+                                                    $menu_list_html .= '';
+                                                    $menu_list_html .= '<tr><td>'.$menu_items[$k]['Item'].'</td>';
+                                                    $menu_list_html .= '<td> $'.$menu_items[$k]['Price'].'</td>';
+                                                    $menu_list_html .= '<td><input id="a'.$menu_items[$k]['ID'].'" type="button" value="+" onclick="addToCart(this.id)" /></td>';
+                                                    $menu_list_html .= '<td><input id="r'.$menu_items[$k]['ID'].'" type="button" value="-" onclick="removeFromCart(this.id)" disabled="disabled" /></td>';
+                                                    $menu_list_html .= '</tr>';
                                                 }
                                             }
-                    $menu_list_html .= '</table></td><tr><td></td><td><br/><input type="button" value="Add to Order"/></td></tr></tr>
+                                    $menu_list_html .= '</table></td>
                                 </tr>
                             </table>
                         </li>
@@ -90,18 +89,15 @@ $menu_list_html .= '<li><input type="radio" id="rad'.$types[$j].'" name="menuIte
             </li>';             
 }
 
-function getMenuType($val) {
-    return ($val == 'r') ? 'Rolls' : ($val == 's') ? 'Sashimi' : ($val == 'sr') ? 'Special Rolls' : ($val == 'a') ? 'Appetizers' : 'Combos';
-}
-
 ?>
-
+    
         <section id="MainContent">
 
         <p style="padding-left:30px">Click on a category and start adding items to the menu to create your order.</p>
 
-            <div id="menu" class="float-left">
+            <div id="menud" class="float-left">
             <ul class="toggleOptions">
+            <!--
             <li>
                 <input type="radio" id="radMenuItemType1" name="menuItemTypes"  />
                 <label id="lblMenuItem1Radio" for="radMenuItemType1" ></label>
@@ -158,7 +154,9 @@ function getMenuType($val) {
                     </ul>            
                 </div>
             </li>
-            
+                        
+            -->            
+                        
             <?php echo $menu_list_html; ?>
             
          </ul>
@@ -201,28 +199,109 @@ function getMenuType($val) {
 //this is all for debugging purposes
 var data = <?php print json_encode($menu_items); ?>; 
 console.log(data);
-
-    function updateCart(id) {
-        var quantity = $("#"+id).val();
-        if (quantity > 0) {
-            var price = Math.round((data[id].Price * quantity) * 100) / 100;
-            var html = "<tr id='item"+id+"'><td>"+data[id].Item+"</td><td id='quantity"+id+"'>"+quantity+"</td><td style='text-align:right;'>$"+price+"</td></tr>";
+var json_cart = new Array();
+    function addToCart(id) {
+    
+        var index = id.substring(1,id.length);
+        var quantity = $("#quantity"+index).html();
+        
+        if (typeof quantity === 'undefined')
+        {
+            //console.log("quantity: "+parseInt($("#quantity"+index).html()));
+            quantity = 1;
+            data[index].Quantity = quantity;
+            json_cart = JSON.stringify(data);
+            ajax();
+            console.log(json_cart);
+            //console.log("quantity: "+quantity);
+            var price = data[index].Price * quantity;
+            price = price.toFixed(2);
+            var html = "<tr id='item"+index+"'><td>"+data[index].Item+"</td><td id='quantity"+index+"'>"+quantity+"</td><td id='price"+index+"' style='text-align:right;'>$"+price+"</td></tr>";
             $("#cart").append(html);
+                $("#r"+index).removeAttr('disabled');
             var subtotal = $("#subtotal").html();
             console.log(subtotal);
             subtotal = parseFloat(subtotal) + parseFloat(price);
             console.log(subtotal);
             $("#subtotal").html(subtotal);
         }
-        else {
-            $("#item"+id).remove();
+        else
+        {
+            quantity++;
+            data[index].Quantity = quantity;
+            json_cart = JSON.stringify(data);
+            ajax();
+            console.log(json_cart);
+            //console.log("quantity: "+quantity);
+            var price = data[index].Price * quantity;
+            price = price.toFixed(2);
+            //var html = "<tr id='item"+index+"'><td>"+data[index].Item+"</td><td id='quantity"+index+"'>"+quantity+"</td><td style='text-align:right;'>$"+price+"</td></tr>";
+            $("#quantity"+index).html(quantity);
+            $("#price"+index).html(price);
+            //$("#cart").append(html);
             var subtotal = $("#subtotal").html();
-            subtotal = parseFloat(subtotal) - (Math.round((parseFloat(data[id].Price) * parseFloat($("#quantity"+id).html())) * 100) / 100);
-            $("#subtotal").html(subtotal);
-            
+            console.log(subtotal);
+            subtotal = parseFloat(subtotal) + parseFloat(price);
+            console.log(subtotal);
+            $("#subtotal").html(subtotal);        
         }
+        
     }
 
+    function removeFromCart(id) {
+        var index = id.substring(1,id.length);
+        var quantity = $("#quantity"+index).html();
+        //console.log("quantity: "+quantity);
+        quantity--;
+        data[index].Quantity = quantity;
+        json_cart = JSON.stringify(data);
+        ajax();
+        //console.log("quantity: "+quantity);
+        //console.log(json_cart);
+        if (quantity !== 0)
+        {
+            //console.log("quantity: "+quantity);
+            var price = data[index].Price * quantity;
+            price = price.toFixed(2);
+            //var html = "<tr id='item"+index+"'><td>"+data[index].Item+"</td><td id='quantity"+index+"'>"+quantity+"</td><td style='text-align:right;'>$"+price+"</td></tr>";
+            $("#quantity"+index).html(quantity);
+            $("#price"+index).html(price);
+        }
+        else if (quantity == 0)
+        {
+            //console.log("yes");          
+            $("#r"+index).attr('disabled','disabled');  // disabling '-' button
+            $("#item"+index).remove();
+            var subtotal = $("#subtotal").html();
+            subtotal = parseFloat(subtotal) - (Math.round((parseFloat(data[index].Price) * parseFloat($("#quantity"+index).html())) * 100) / 100);
+            $("#subtotal").html(subtotal);   
+        }
+    }
+    
+    function setCart() {
+        //for ( var i = 0; i < 
+    }
+    
+    function jsonify(data2) {
+        json_cart = JSON.stringify(data2);
+        request = new XMLHttpRequestObject();
+        request.open("POST", "JSON_Handler.php", true);
+        request.setRequestHeader("Content-type", "application/json");
+        request.send(json_cart);
+    }
+    
+    function ajax() {
+        $.ajax({
+            url: '<?php echo site_url(); ?>',
+            type: 'POST',
+            data: json_cart,
+            success: function(){
+            alert("Success!")
+            }
+            });
+    }    
+    
+    
 //data = <?php print json_encode($types); ?>; 
 //console.log(data);
 //data = <?php print json_encode($menu_list_html); ?>; 
