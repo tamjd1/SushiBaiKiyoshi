@@ -105,8 +105,13 @@ text-align:center;
 .message
 {
 text-align:center;
-color:red;
 font-size:200%
+}
+.errmsg
+{
+text-align:center;
+color:red;
+font-size:12pts;
 }
 
 #menu {

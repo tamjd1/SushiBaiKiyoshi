@@ -113,7 +113,7 @@ if (!empty($_POST['logout_submit']))
     <title><?php echo $title ?></title>
 </head>
 <body>
-
+                
     <div id="top" class="login-bar" style="text-align:center"> 
         <form id="login" name="login" action="" method="post">
             <?php
@@ -183,7 +183,7 @@ if (!empty($_POST['logout_submit']))
         </nav>
     </header>
         
-    <div id="messageArea" class="message"">
+    <div id="messageArea" class="message">
        <?php echo $_SESSION['message'];
        $_SESSION['message'] = "";?>
        

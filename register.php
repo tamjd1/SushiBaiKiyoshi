@@ -8,198 +8,174 @@ $date = "05/03/2014";
 require 'header.php';
 require 'functions.php';
 ?>
-        <section id="MainContent">            
+<section id="MainContent">            
 
 <?php
 
 $error = ""; //initialize error variable to nothing.
 $outputError = "";
 
-//$conn = pg_connect("host=localhost port:5432 dbname:sushi user=postgres password=mercymott");  
-
 //when the website/webpage first loaded, initialize all the variable except $user_type to nothing. 
 //Initialize $user_type to "u" meaning unregistered.
 if($_SERVER["REQUEST_METHOD"] == "GET")
 {
-
-	$userName = "";
-	$pass1 = "";
-	$pass2 = "";
-	$fname = "";  
-	$lname = "";    
-	$email = "";
+    $error = "";
+	$id = "";
+	$password = "";
+	$conf_password = "";
+	$first_name = "";  
+	$last_name = "";    
+	$email_address = "";
 	$phoneNumber = "";
-    
-    $cardType = ""; 
-    $nameOnCard = "";  
-    $cardNumber = "";   
-    $month = "";
-    $year = "";
-    $expirationDate = "";   
-    $securityCode = "";  
-    
-	$address = "";
-	$city = "";
-	$province = "";
-	$postalCode = "";
-
-    $user_type = "";
-	$requiredIsInvalid = false;
+    //$user_type = "";
+	//$requiredIsInvalid = false;
 } 
 
 //once form is submitted, remove all whitespaces before and after each variable, 
 //and do the validation before saving it to the database.
 else if($_SERVER["REQUEST_METHOD"] == "POST"){
 
-	$userName = trim ($_POST ["userName"]);
-	$pass1 = trim ($_POST ["pass1"]);
-	$pass2 = trim ($_POST ["pass2"]);   
-	$fname = trim ($_POST ["fname"]);
-	$lname = trim ($_POST ["lname"]);
-    $email = trim ($_POST ["email"]);
+	$id = trim ($_POST ["id"]);
+	$password = trim ($_POST ["password"]);
+	$conf_password = trim ($_POST ["conf_password"]);   
+	$first_name = trim ($_POST ["first_name"]);
+	$last_name = trim ($_POST ["last_name"]);
+    $email_address = trim ($_POST ["email_address"]);
 	$phoneNumber = trim ($_POST ["phoneNumber"]);  
     
-    $cardType = trim ($_POST ["cardType"]);   
-    $nameOnCard = trim ($_POST ["nameOnCard"]);   
-    $cardNumber = trim ($_POST ["cardNumber"]);   
-    $expirationDate = trim ($_POST ["expirationDate"]);    
-    $securityCode = trim ($_POST ["email"]);  
+    define("MAX_PHONE_NUMBER_LENGTH", 10);
+    define("MIN_ID_LENGTH", 3);
+    define("MAX_ID_LENGTH", 20);
+    define("MIN_PASSWORD_LENGTH", 6);
+    define("MAX_PASSWORD_LENGTH", 15);
 
-	$address = trim ($_POST ["address"]);
-	$city = ($_POST ["cities"]);
-	$province = ($_POST ["provinces"]);
-	$postal_code = trim ($_POST ["postal_code"]);
 
 	$requiredIsInvalid = false;
 
-	//USERNAME VALIDATION
+	//id VALIDATION
 	//function for id validation. this will return the value of $error.
     
-    if (!isset ($userName) || $userName == "")
+    if (!isset ($id) || $id == "")
 	{
 		$error .= "You did not enter a user id <br/>";
-		echo $userName = "";
+		echo $id = "";
 	}
-	else if (strlen($userName) < 1)
+	else if (strlen($id) < MIN_ID_LENGTH)
 	{
-		$error .= "A username must be at least " . 3 . " characters. <em>$userName</em> is not enough<br/>";
-		echo $userName = "";
+		$error .= "A id must be at least " . MIN_ID_LENGTH . " characters. <em>$id</em> is not enough<br/>";
+		echo $id = "";
 	}
-	else if (strlen($userName) > 5)
+	else if (strlen($id) > MAX_ID_LENGTH)
 	{
-		$error .= "A username must not be longer than " . 5 . " characters. <em>$userName</em> is too long<br/>";
-		echo $userName = "";
+		$error .= "A id must not be longer than " . MAX_ID_LENGTH . " characters. <em>$id</em> is too long<br/>";
+		echo $id = "";
 	}
 	
 	else
 	{
-		//$sql = "Select id FROM users WHERE id='".$userName."'";
-		//$result = pg_query($conn,$sql);
-		//$records = pg_num_rows($result);
-			
-		//if ($records != 0)//if there's record
-		//{
-		//	$error .= "Username <em>$userName</em> already exists. Enter another username <br/>";
-		//	echo $login = "";
-		//	$requiredIsInvalid = true;
+    
+        $conn = db_connect();
+        $sql = "SELECT \"UserID\" FROM \"tblUsers\" WHERE \"UserID\" = '".$id."'";
+		$result = pg_query($conn,$sql);
+		$records = pg_num_rows($result);
+     			
+		if ($records != 0)//if there's record
+		{
+			$error .= "UserID <em>$id</em> already exists. Enter another User ID <br/>";
+			echo $id = "";
+			//$requiredIsInvalid = false;
+        }
     }
 	
 
 	//PASSWORD VALIDATION
-	$error = "";
-	if ((!isset($pass1) || $pass1 == "") && (!isset($pass2) || $pass2 == "")) //if user did not entered anything
-	{
-		$error .= "You did not enter a password <br/>";//display error message
-	}
-	else 
-	{
-		$match = strcmp($pass1, $pass2);	//compare if both variable $pass1 & $pass2 are the same	
-		
-		if (($match < 0) || ($match > 0))
-		{
-			$error .= "The password and confirm password were not the same <br/>";//error message if not the same
-			 
-		}
-		else if (strlen($pass1) < 6)//if the password is less than 6 characters
-		{
-			$error .= "Your password must be at least " . 6 . " characters <br/>";	 
-		}
-		else if (strlen($pass1) > 8)//if password is more than 8 characters
-		{
-			$error .= "Your password must be less than " . 8 . " characters <br/>"; 
-		}
-	}
+
+    if($password != $conf_password)
+    {
+        $error .= "Your password and confirm password MUST be the same<br/>";
+        $password = "";
+    }else if($password == "" || !isset($password))
+    {
+        $error .= "You must provide password and confirm password.<br/>";//error message if not the same
+         
+    }
+    else if (strlen($password) < MIN_PASSWORD_LENGTH)//if the password is less than 6 characters
+    {
+        $error .= "Your password must be at least " . MIN_PASSWORD_LENGTH . " characters <br/>";	 
+        $password = "";
+    }
+    else if (strlen($password) > MAX_PASSWORD_LENGTH)//if password is more than 8 characters
+    {
+        $error .= "Your password must be less than " . MAX_PASSWORD_LENGTH . " characters <br/>"; 
+        $password = "";
+    }
+	
     
     
     
 	//EMAIL VALIDATION
 	
-	$error = "";
-	if (!isset($email) || $email == "")//if user did not entered anything
+	if (!isset($email_address) || $email_address == "")//if user did not entered anything
 	{
-		//return $error .= "You did not enter an email address <br/>";//display error message
+		
 		$error .= "You did not enter an email address <br/>";//display error message
-		echo $email = "";//don't display the entered data
+		echo $email_address = "";//don't display the entered data
 	}
-	else if (!filter_var($email, FILTER_VALIDATE_EMAIL))//check if it is a valid email
+	else if (!filter_var($email_address, FILTER_VALIDATE_EMAIL))//check if it is a valid email
 	{
-		//return $error .= "The email address <em>$email</em> is not valid <br/>";
-		$error .= "The email address <em>$email</em> is not valid <br/>";
-		echo $email = "";
+		$error .= "The email address <em>$email_address</em> is not valid <br/>";
+		echo $email_address = "";
 	}	
 		
 	//FIRSTNAME VALIDATION	
 	
-	$error = "";
-	if (!isset($fname) || $fname == "")//if user did not entered anything
+	if (!isset($first_name) || $first_name == "")//if user did not entered anything
 	{
 		$error .= "You did not enter your first name <br/>";//display error message
-		echo $fname = "";//don't display the entered data
+		echo $first_name = "";//don't display the entered data
 	}	
-	else if(is_numeric($fname))//if user entered numeric value
+	else if(is_numeric($first_name))//if user entered numeric value
 	{
 		$error .= "Your first name cannot be a number, you entered: <em>$firstname</em> <br/>";	//display error message
-		echo $fname = "";//display nothing in the firstname textbox	
+		echo $first_name = "";//display nothing in the firstname textbox	
 	}
-	else if (strlen($fname) > 35)//if the length of firstname is more than 20 characters
+	else if (strlen($first_name) > 35)//if the length of firstname is more than 20 characters
 	{
 		$error .= "Your first name needs to be less than " . 35 . " characters. <em>$firstname</em> is too long <br/>";//display error
-		echo $fname = "";//display nothing in the firstname textbox
+		echo $first_name = "";//display nothing in the firstname textbox
 	}
 	
 
 	//LASTNAME VALIDATION
-	$error = "";
-	if (!isset($lname) || $lname == "")//if user did not entered anything
+	if (!isset($last_name) || $last_name == "")//if user did not entered anything
 	{
 		$error .=  "You did not enter your last name <br/>";//display error message
-		echo $lname = "";//don't display the entered data
+		echo $last_name = "";//don't display the entered data
 	}
 	
-	else if(is_numeric($lname))//if user entered numeric value
+	else if(is_numeric($last_name))//if user entered numeric value
 	{
 		$error .= "Your last name cannot be a number, you entered: <em>$lastname</em> <br/>";
-		echo $lname = "";
+		echo $last_name = "";
 	}
-	else if (strlen($lname) > 35)//if lastname is more than the maximum value of 30 characters
+	else if (strlen($last_name) > 35)//if lastname is more than the maximum value of 30 characters
 	{
 		$error .= "Your last name needs to be less than " . 35 . " characters. <em>$lastname</em> is too long <br/>";
-		echo $lname = "";
+		echo $last_name = "";
 	}	
     
     
 	//PHONE NUMBER VALIDATION
 	
-	$error = "";
 	$phoneNumber = preg_replace ('/\D/', '', $phoneNumber);//removes spaces and characters in phone numbers
 	if (!isset($phoneNumber) || $phoneNumber == "")//if user did not entered anything
 	{
 		$error .= "You did not enter your phone number <br/>";//display error message
 		echo $phoneNumber = "";//don't display the entered data
 	}
-	else if (strlen($phoneNumber) != 10)//if phone number is more than the maximum value 
+	else if (strlen($phoneNumber) != MAX_PHONE_NUMBER_LENGTH)//if phone number is more than the maximum value 
 	{
-		$error .= "Your phone number needs to be less than " . 10 . " characters & numbers. <em>$phone</em> is too long <br/>";
+		$error .= "Your phone number needs to be less than " . MAX_PHONE_NUMBER_LENGTH . " characters & numbers. <em>$phone</em> is too long <br/>";
 		echo $phoneNumber= "";
 	}
 
@@ -207,30 +183,31 @@ else if($_SERVER["REQUEST_METHOD"] == "POST"){
 
 	//USER TYPE
 	//set user type to "u" by default;
-	$user_type = "u";
+	$user_type = "c";
 
-	if($error == "")
-	{
-		$requiredIsInvalid = false;
-	}
+	//if($error == "")
+	//{
+	//	$requiredIsInvalid = false;
+	//}
 	
 	//INSERT VALID DATA TO THE USERS AND AGENTS DATABASE 
-	if ($error == "" && $requiredIsInvalid == false)		
+	//if ($error == "" && $requiredIsInvalid == false)
+    if ($error == "")    
 	{
 		
-		//sql statement to insert the valid data to the credit card database 
-		
-		//sql statement to insert the valid data to the users database 
-		$sql = "INSERT INTO tblUsers(UserID, UserFirst, UserLast, UserEmail, UserPhone, UserType)
+
+		$sql = "INSERT INTO \"tblUsers\" 
 		VALUES(
-        	'".$userName."',
-            '".$pass1."',
-            '".$fname."',
-            '".$lname."',  
-            '".$email."',
-            '".$phoneNumber."')";
-		pg_query($conn,$sql);//connect to the username database and execute the sql statement
-		header ("location: login.php");//redirects to login.php which is the login process		
+        	'".$id."',
+            '".$password."',
+            '".$first_name."',
+            '".$last_name."',  
+            '".$email_address."',
+            '".$phoneNumber."',
+            '".$user_type."')";
+          
+		pg_query($conn,$sql);//connect to the id database and execute the sql statement
+		header ("location: welcome.php");//redirects to login.php which is the login process		
 	}
 	else
 	{
@@ -241,8 +218,6 @@ else if($_SERVER["REQUEST_METHOD"] == "POST"){
 }   
 
 ?>
-
-
 
 <form method="post" action="<?php echo $_SERVER['PHP_SELF']; ?>">
 
@@ -255,20 +230,18 @@ else if($_SERVER["REQUEST_METHOD"] == "POST"){
             <th colspan="2" class="t_c">
                 Personal Information
             </th>
-            <tr>
-                <td>
+             <tr>
+                <td colspan="2" class="errmsg">
                     <?php echo $error;?>
-                </td>
-                <td>
                 </td>
             </tr>
             
             <tr>
                 <td>
-                    Username
+                    User ID
                 </td>
                 <td>
-                    <input type="text" name="<?php echo $userName;?>"/>
+                    <input type="text" name="id" value="<?php echo $id;?>"/>
                 </td>
             </tr>
             <tr>
@@ -276,7 +249,7 @@ else if($_SERVER["REQUEST_METHOD"] == "POST"){
                     Password
                 </td>
                 <td>
-                    <input type="Password1" name="<?php echo $pass1;?>"/>
+                    <input type="password" name="password" value="<?php echo $password;?>"/>
                 </td>
             </tr>
             <tr>
@@ -284,7 +257,7 @@ else if($_SERVER["REQUEST_METHOD"] == "POST"){
                     Confirm Password
                 </td>
                 <td>
-                    <input type="Password2" name="<?php echo $pass2;?>"/>
+                    <input type="password" name="conf_password" value="<?php echo $password;?>"/>
                 </td>
             </tr>
             <tr>
@@ -292,14 +265,14 @@ else if($_SERVER["REQUEST_METHOD"] == "POST"){
                     First Name
                 </td>
                 <td>
-                    <input type="text" name="<?php echo $fname;?>"/>
+                    <input type="text" name="first_name" value="<?php echo $first_name;?>"/>
                 </td> 
             </tr>
             <td>
                     Last Name
                 </td>
                 <td>
-                    <input type="text" name="<?php echo $lname;?>"/>
+                    <input type="text" name="last_name" value="<?php echo $last_name;?>"/>
                 </td> 
             </tr>
             <tr>
@@ -307,7 +280,7 @@ else if($_SERVER["REQUEST_METHOD"] == "POST"){
                     Email
                 </td>
                 <td>
-                    <input type="email" name="<?php echo $email;?>"/>
+                    <input type="email" name="email_address" value="<?php echo $email_address;?>"/>
                 </td>
             </tr>
             <tr>
@@ -315,15 +288,16 @@ else if($_SERVER["REQUEST_METHOD"] == "POST"){
                     Phone Number
                 </td>
                 <td>
-                    <input type="text" name="<?php echo $phoneNumber;?>"/>
+                    <input type="text" name="phoneNumber" value="<?php echo $phoneNumber;?>"/>
                 </td>
             </tr>            
   
             <tr>
-                <td style="text-align:center;">
+                <td style="text-align:right;">
 
-                    <input type="button" value="Register"/>
-                    <input type="reset" value="Clear"/></td>
+                    <input type="submit" value="Register"/></td>
+                <td>
+                    <input type="reset" value="Clear"/>
                 </td>
             </tr>
         </table>        

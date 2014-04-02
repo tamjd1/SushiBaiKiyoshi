@@ -2,9 +2,8 @@
 
 
 function db_connect() {
-	//$conn = pg_connect("host=" .HOST. " dbname=" .DB_NAME . " user=" .DB_USERID. " password=" .DB_PASS."");
-	 $conn = pg_connect("host=localhost port=5432 dbname=sb user=postgres password=vdragon");
-    return $conn;
+	$conn = pg_connect("host=localhost dbname=sushibaikiyoshi user=kiyoshi_admin password=Kiyoshi_p@ssw0rd");
+	return $conn;
 }
 
 function isValidEmail($email) {
