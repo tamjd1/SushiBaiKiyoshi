@@ -31,6 +31,7 @@
                 &copy; 2014 All rights reserved.
             </p>
         </div>
+
     </footer>
     <div id="top" class="login-bar"> </div>
 </body>
