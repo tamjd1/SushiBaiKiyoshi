@@ -124,9 +124,10 @@ if (!empty($_POST['logout_submit']))
             if (!isset($_SESSION['UserID']))
             {
                 echo "<input id='register' name='login_submit' type='button' class='float-left button' value='Register' onclick='' />";
-                echo "Password<input id='password' name='password' type='password' class='float-right textbox' value='$password' />"; 
-                echo "Login<input id='login' name='login' type='text' class='float-right textbox' value='$login' />";
-                echo "<input id='login_submit' name='login_submit' type='submit' class='float-right button' value='Login' onclick='login()'/>";
+                echo "<input id='login_submit' name='login_submit' type='submit' class='float-right button' value='Login' onclick='login()'  />";
+              
+                echo "<input id='password' name='password' type='password' class='float-right textbox' value='$password' placeholder='Password'/>"; 
+                  echo "<input id='login' name='login' type='text' class='float-right textbox' value='$login' placeholder='Username'/>";
                 
             }
             else
@@ -172,11 +173,19 @@ if (!empty($_POST['logout_submit']))
                 <li><a href="./order.php">Order Online</a></li>           
                 <?php
                 //if not signed in
-          
+               
+                if (isset($_SESSION['UserID']))
+                {
+                     echo "<li><a href=\"edit_profile.php\">Edit Profile</li></a>"; 
+                     if ($_SESSION['UserType'] == 'a')
+                    {
+                        echo "<li><a href=\"admin.php\">Admin Panel</a></li>";
+                    }
+                }
                             
-                            echo "<li><a href=\"edit_profile.php\">Edit Profile</li></a>";       
+                                 
                  
-                            echo "<li><a href=\"admin.php\">Admin Panel</a></li>";
+                           
                        
                 ?>
             </ul>

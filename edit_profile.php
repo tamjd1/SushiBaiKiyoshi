@@ -77,7 +77,7 @@ $emailAddress = $_SESSION['UserEmail'];
                   <td>**** **** **** '.$CreditCardNumber.'</td>
                   <td>'.pg_fetch_result($result, $i, 2).'</td>
                   <td>***</td>
-                  <td><input id=\'delete\' name=\'delete\' type=\'submit\' value=\'delete\'></td>
+                  <td><input id=\'delete_submit\' name=\'delete_submit\' type=\'submit\' value=\'delete\'></td>
                 
                  </tr>';  
         }
@@ -93,6 +93,10 @@ $emailAddress = $_SESSION['UserEmail'];
     
 }
 
+if (!empty($_POST['delete_submit'])) {
+
+echo "asasasasas";  
+}
 if($_SERVER["REQUEST_METHOD"] == "POST") // If the page has been submitted
 {      
     // Clear out the forms
