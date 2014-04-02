@@ -1,37 +1,41 @@
 <?php
-$file = "regular_customers_report.php";
-$title = "Sushi Bai Kiyoshi - Regular Customers";
-$banner = "Sushi Bai Kiyoshi - Regular Customers";
-$description = "This page generates and displays a report of regular customers";
-$date = "25/03/2014";
+$file = "customer_favourites_report.php";
+$title = "Sushi Bai Kiyoshi - Customer Favourites";
+$banner = "Sushi Bai Kiyoshi - Customer Favourites";
+$description = "This page generates and displays a report of most frequently bought items for a particular customer";
+$date = "01/04/2014";
 
 require 'header.php';
 
 
-
-function db_connect() {
-	$conn = pg_connect("host=127.0.0.1 port=5432 dbname=sushi user=postgres password=100338841");
-	return $conn;
-}
-
 $id = $_GET['id'];
 $favourites = array();
-//$cancels = array();
 
 $conn = db_connect();
-$sql = "SELECT \"tblUsers\".\"UserFirst\", \"tblUsers\".\"UserLast\", COUNT(\"tblInvoices\".\"InvoiceID\")
+$sql =  "SELECT \"tblUsers\".\"UserFirst\", \"tblUsers\".\"UserLast\", \"tblInvoices\".\"InvoiceID\"
   FROM \"tblUsers\" JOIN \"tblInvoices\" ON \"tblUsers\".\"UserID\" = \"tblInvoices\".\"UserID\"
-  GROUP BY \"tblUsers\".\"UserID\", \"tblUsers\".\"UserFirst\", \"tblUsers\".\"UserLast\"
-  ORDER BY COUNT(\"tblInvoices\".\"InvoiceID\") DESC LIMIT 10";
+  WHERE \"tblUsers\".\"UserID\" = '" . $id . "'";// AND \"tblInvoices\".\"InvoiceStatus\" = 'c'";
+
 $result = pg_query($conn, $sql);
+$row = pg_fetch_row($result);
+$firstName;
+$lastName;
 
 $i = 0;
 while ($row = pg_fetch_row($result))
 {
-    //$sql = "SELECT COUNT(\"InvoiceStatus\") FROM \"tblInvoices\" WHERE \"UserID\" = '".$row[0]."' AND \"InvoiceStatus\" = 'x'";
-    //$result2 = pg_query($conn, $sql);
-    //$row2 = pg_fetch_row($result2);
-    $customers[$i] = array('UserID'=>$row[0],'FullName'=>$row[1].' '.$row[2],'FirstName'=>$row[1],'LastName'=>$row[2],'OrderCount'=>$row[3], 'CancelCount'=>$row2[0]);
+    $firstName = $row[0];
+    $lastName = $row[1];
+
+    $sql2 = "SELECT \"tblMenuItems\".\"ItemDescription\", \"tblInvoiceItems\".\"ItemQuantity\" 
+                FROM \"tblInvoiceItems\" JOIN \"tblMenuItems\" 
+                ON \"tblInvoiceItems\".\"ItemID\" = \"tblMenuItems\".\"ItemID\"   
+                WHERE \"tblInvoiceItems\".\"InvoiceID\" = " . $row[2];
+    $result2 = pg_query($conn, $sql2);
+    $row2 = pg_fetch_row($result2);
+    
+    $favourites[$i] = array('Item'=>$row2[0], 'Quantity'=>$row2[1]);
+    echo "<br/>".$sql2;
     $i++;
 }
 
@@ -59,26 +63,59 @@ while ($row = pg_fetch_row($result))
 </style>
 
 <section class="center">
-    <h1 class="center">Customer Favourites Report</h1>    
+    <h2>Customer Favourites Report</h2>
+    <h3>Most Frequently Bought Items by <?php echo $firstName . " " . $lastName ?></h3>    
     <div style="max-width:95%; max-height:100%; min-width:100px; min-height:100px; margin-left:auto; margin-right:auto; margin-top:20px" id="myCanvas"></div>    
 </section>
 
 
 <script>
-    var customers, MAX_CANVAS_WIDTH, MAX_CANVAS_HEIGHT, CENTRE_X, CENTRE_Y, svg, canvas, graph, MAX_ORDER;
+    var favourites, MAX_CANVAS_WIDTH, MAX_CANVAS_HEIGHT, CENTRE_X, CENTRE_Y, svg, canvas, graph, MAX_ORDER;
     var yScale = d3.scale.linear();        
     var xScale = d3.scale.linear();
+    var items = new Array();
     var names = new Array();
+    //var namesUnique = new Array();
     var orders = new Array();
     var orderDomain = new Array();
     
-    customers = <?php print json_encode($customers); ?>;
-    console.log(customers);
+    favourites = <?php print json_encode($favourites); ?>;
+    console.log(favourites);
+    
+    for (var i = 0; i < favourites.length; i++) {
+        items[i] = favourites[i].Item.substring(0, favourites[i].Item.length - 8);
+    }
+    
+    names = items.unique();
+    
+    var data = new Array();
+    
+    for (var i = 0; i < names.length; i++) {
+        var count = 0;
+        for (var j = 0; j < favourites.length; j++) {
+            if (names[i] === favourites[j].Item.substring(0, favourites[i].Item.length - 8)) {
+                count += parseFloat(favourites[j].Quantity);
+            }
+        }
+        orders[i] = count;
+    }
+    
+    console.log(names);
+    console.log(orders);
+   
+    for (var i = 0; i < names.length; i++) {
+        data.push({"Item": names[i], "Quantity": orders[i]});
+    }
+    console.log(data);
+    
+    
+    /////////////////////////HERE
+    
     
     names.push(" ");
-    for(var i = 0; i < customers.length; i++) {
-        names.push(customers[i].FullName); //
-        orders.push(customers[i].OrderCount);
+    for(var i = 0; i < items.length; i++) {
+        names.push(items[i].FullName); //
+        orders.push(items[i].OrderCount);
     }
     //names.push(" ");
     
@@ -190,7 +227,7 @@ while ($row = pg_fetch_row($result))
     function drawBars() {
           var g = graph.append("g");
           g.selectAll("rect")
-              .data(customers)
+              .data(items)
               .enter()
               .append("svg:rect")
               .attr("x", function(d, i) { return xScale(parseFloat(i)+parseFloat(1)); })
@@ -203,7 +240,7 @@ while ($row = pg_fetch_row($result))
            
            var g2 = graph.append("g");   
            g2.selectAll("rect")
-              .data(customers)
+              .data(items)
               .enter()
               .append("svg:rect")
               .attr("x", function(d, i) { return xScale(parseFloat(i)+parseFloat(1)); })
@@ -215,7 +252,7 @@ while ($row = pg_fetch_row($result))
               .attr("fill", "red");
           
           g.selectAll("text")
-              .data(customers)
+              .data(items)
               .enter()
               .append("svg:text")
               .attr("x", function(d, i) { return xScale(parseFloat(i)+parseFloat(1)) + xScale(0.5); })
@@ -227,7 +264,7 @@ while ($row = pg_fetch_row($result))
               .attr("fill", "white");
           
           g2.selectAll("text")
-              .data(customers)
+              .data(items)
               .enter()
               .append("svg:text")
               .attr("x", function(d, i) { return xScale(parseFloat(i)+parseFloat(1)) + xScale(0.5); })
@@ -239,7 +276,7 @@ while ($row = pg_fetch_row($result))
               .attr("fill", "white");
               
           g.selectAll("text.yAxis")
-              .data(customers)
+              .data(items)
               .enter().append("svg:text")
               .attr("x", function(d, i) { return xScale(parseFloat(i)+parseFloat(1)) + xScale(0.5); })
               .attr("y", 5)

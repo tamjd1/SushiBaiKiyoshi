@@ -6,10 +6,6 @@
     $date = "22/03/2014";
     require 'header.php';
 
-function db_connect() {
-	$conn = pg_connect("host=127.0.0.1 port=5432 dbname=sushi user=postgres password=100338841");
-	return $conn;
-}
 
 $fish_supply_trend = array();
 
@@ -21,10 +17,11 @@ $i = 0;
 $tabular_report = "<table id='tabular_report'><tr><th>Date</th><th>Fish Type</th><th>Status</th></tr>";
 while ($row = pg_fetch_row($result))
 {
-    $status_letter = ($row[2] == "l") ? "Low" : ($row[2] == "m") ? "Medium" : ($row[2] == "h") ? "High" : "None"; 
-    $status_value = ($row[2] == "l") ? 10 : ($row[2] == "m") ? 20 : ($row[2] == "h") ? 30 : 0; 
-    $tabular_report .= "<tr><td>".$row[1]."</td><td>".$row[0]."</td><td>".$status_letter."</td></tr>";
-    $fish_supply_trend[$i] = array('Type'=>$row[0],'Date'=>$row[1],'Status'=>$status_letter, 'StatusValue'=>$status_value);
+    //$status_letter = ($row[2] == 'l') ? "Low" : ($row[2] == 'm') ? "Medium" : ($row[2] == 'h') ? "High" : "None"; 
+    //echo $row[2] . "<br/>";
+    //$status_value = ($row[2] == "l") ? 10 : ($row[2] == "m") ? 20 : ($row[2] == "h") ? 30 : 0; 
+    //$tabular_report .= "<tr id=''><td>".$row[1]."</td><td>".$row[0]."</td><td>".$status_letter."</td></tr>";
+    $fish_supply_trend[$i] = array('Type'=>$row[0],'Date'=>$row[1],'Status'=>$row[2]/*, 'StatusValue'=>$status_value*/);
     $i++;
 }
 $tabular_report .="</table>";
@@ -71,23 +68,33 @@ $tabular_report .="</table>";
     var statusValue = new Array();
     var statusValueDomain = new Array();
     var fishDataByYear = new Array();
+    var fishSupplyValueByYear = new Array();
     
     fishData = <?php print json_encode($fish_supply_trend); ?>;
-    console.log(fishData);
+    //console.log(fishData);
     
     for(var i = 0; i < fishData.length; i++) {
         fishTypes.push(fishData[i].Type); //
         dates.push(fishData[i].Date);
-        statuses.push(fishData[i].Status);
-        statusValue.push(fishData[i].StatusValue);
+        //var status = (fishData[i].Status === "l") ? "Low" : (fishData[i].Status === "m") ? "Medium" : (fishData[i].Status === "h") ? "High" : "0";
+        //statuses.push(status);
+        var value = (fishData[i].Status === "l") ? 10 : (fishData[i].Status === "m") ? 20 : (fishData[i].Status === "h") ? 30 : 0;
+        statusValue.push(value);
         years.push(parseDate(fishData[i].Date).getFullYear());
-        
     }
     
+    //console.log(statuses);
     fishTypesUnique = fishTypes.unique(); //get unique values for fish types and add checkboxes     
-    statusDomain = statuses.unique();
-    statusDomain.sort();
+    //statusDomain = statuses.unique();
+    //statusDomain.sort();
+    statusDomain.push(" ");
+    statusDomain.push("High");
+    statusDomain.push("Medium");
+    statusDomain.push("Low");
+    statusDomain.push("0");
+    
     statusValueDomain = statusValue.unique();
+    statusValueDomain.push(40);
     statusValueDomain.sort();
     yearsUnique = years.unique(); //get unique values for year to add to dropdown.
     yearsUnique.sort();
@@ -98,7 +105,7 @@ $tabular_report .="</table>";
             html +='<tr><td><div style="display:inline-block; background-color:'+getRandomColour(i)+';"><input type="checkbox" id="'+i+'" value="'+fishTypesUnique[i]+'" onchange="plotLineGraph(this.id, this.checked,this.value,getRandomColour(this.id))"/></div></td><td style="text-align:left;">'+fishTypesUnique[i]+'</td></tr>';
         }
         html += "</table>";
-        html += "<a href='./fish_price_trend_tabular.php'>Tabular Report</a>";
+        //html += "<a href='./fish_price_trend_tabular.php'>Tabular Report</a>";
         $('#checkboxes').append(html);
     }
     
@@ -121,10 +128,12 @@ $tabular_report .="</table>";
         for(var i = 0; i < fishData.length; i++) {
             if(parseDate(fishData[i].Date).getFullYear() == yearSelected) {
                 fishDataByYear.push(fishData[i]);
+                fishSupplyValueByYear.push(statusValue[i]);
             }
         }
         console.log(fishDataByYear);
-
+        console.log(fishSupplyValueByYear);
+        
         //MAX_PRICE = getMaxPrice(); //get max price
         //for (var i = MAX_PRICE; i >= 0; i-=5) {
         //    priceDomain.push(i); //set price domain at $5 intervals
@@ -190,10 +199,11 @@ $tabular_report .="</table>";
             .attr("y", 6);
     //end of bottom axis
 
+    //console.log(statusDomain);
         
         var leftScale = d3.scale.ordinal()
             .domain(statusDomain)
-            .rangePoints([0, yScale(d3.max(statusValueDomain))]);
+            .rangePoints([0, yScale(40)]);
 
         var leftAxis = d3.svg.axis()
             .scale(leftScale)
@@ -287,7 +297,7 @@ $tabular_report .="</table>";
     This function sets the scale for x and y axis to optimally draw the graph regardless of the size of the screen
     */
     function setScales() {
-        yScale.domain([0, d3.max(statusValueDomain)])
+        yScale.domain([0, 40])
              .range([0 , MAX_CANVAS_HEIGHT - 100]);
         xScale.domain([0 , daysInAYear]) 
              .range([0 , MAX_CANVAS_WIDTH - 100]);
@@ -352,7 +362,7 @@ $tabular_report .="</table>";
             var points = new Array();
             for (var i = 0; i < fishDataByYear.length; i++) {
                 if (fishDataByYear[i].Type === name) {
-                    points.push({"x": timeScale(parseDate(fishDataByYear[i].Date)), "y": (-yScale(fishDataByYear[i].StatusValue))});
+                    points.push({"x": timeScale(parseDate(fishDataByYear[i].Date)), "y": (-yScale(fishSupplyValueByYear[i]))});
                 }
             }
             //console.log(points);    

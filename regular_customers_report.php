@@ -8,11 +8,6 @@ $date = "25/03/2014";
 require 'header.php';
 
 
-function db_connect() {
-	$conn = pg_connect("host=127.0.0.1 port=5432 dbname=sushi_db user=postgres password=100338841");
-	return $conn;
-}
-
 $customers = array();
 $cancels = array();
 
@@ -200,7 +195,7 @@ while ($row = pg_fetch_row($result))
               .attr("height", function(d) { return yScale(d.OrderCount); })
               .attr("width", xScale(0.5))
               .style("cursor", "pointer")
-              .on("click", function(d){ document.location.href = "http://localhost/SushiBaiKiyoshi/index.php?id=" + d.UserID; })
+              .on("click", function(d){ document.location.href = "http://localhost/SushiBaiKiyoshi/customer_favourites_report.php?id=" + d.UserID; })
               .attr("fill", "#2d578b");
            
            var g2 = graph.append("g");   
@@ -213,7 +208,7 @@ while ($row = pg_fetch_row($result))
               .attr("height", function(d) { return yScale(d.CancelCount); })
               .attr("width", xScale(0.5))
               .style("cursor", "pointer")
-              .on("click", function(d){ document.location.href = "http://localhost/SushiBaiKiyoshi/index.php?" + d.UserID; })
+              .on("click", function(d){ document.location.href = "http://localhost/SushiBaiKiyoshi/customer_favourites_report.php?id=" + d.UserID; })
               .attr("fill", "red");
           
           g.selectAll("text")
@@ -250,7 +245,7 @@ while ($row = pg_fetch_row($result))
               .attr("style", "font-size: 12; font-family: Helvetica, sans-serif")
               .text(function(d) { return d.FullName;})
               .style("cursor", "pointer")
-              .on("click", function(d){ document.location.href = "http://localhost/SushiBaiKiyoshi/index.php?" + d.UserID; })
+              .on("click", function(d){ document.location.href = "http://localhost/SushiBaiKiyoshi/customer_favourites_report.php?id=" + d.UserID; })
               .attr("transform", "translate(0, 18)")
               .attr("class", "yAxis");
     }

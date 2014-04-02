@@ -9,11 +9,6 @@
 
 <?php
 
-function db_connect() {
-	$conn = pg_connect("host=127.0.0.1 port=5432 dbname=sushi user=postgres password=100338841");
-	return $conn;
-}
-
 $fish_prices_trend = array();
 
 $conn = db_connect();
@@ -95,7 +90,7 @@ $tabular_report .="</table>";
             html +='<tr><td><div style="display:inline-block; background-color:'+getRandomColour(i)+';"><input type="checkbox" id="'+i+'" value="'+fishTypesUnique[i]+'" onchange="plotLineGraph(this.id, this.checked,this.value,getRandomColour(this.id))"/></div></td><td style="text-align:left;">'+fishTypesUnique[i]+'</td></tr>';
         }
         html += "</table>";
-        html += "<a href='./fish_price_trend_tabular.php'>Tabular Report</a>";
+        //html += "<a href='./fish_price_trend_tabular.php'>Tabular Report</a>";
         $('#checkboxes').append(html);
     }
     
@@ -110,7 +105,7 @@ $tabular_report .="</table>";
     function yearChanged(value) {
         //var e = document.getElementById("years");
         //var value = e.options[e.selectedIndex].text;
-        alert(value);
+        //alert(value);
         yearSelected = value;
         
         fishDataByYear = new Array();
