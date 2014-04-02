@@ -1,0 +1,238 @@
+/*
+Title: site.css
+Date Created: 24/01/2014
+Author: Taha Amjad
+Description: This css file contains stylings for the Sushi Bai Kiyoshi website
+*/
+
+header {
+	margin-bottom: 0px;
+    background-color:rgb(240, 253, 139);
+    /*-webkit-box-shadow: 0 10px 10px -10px black;
+    -moz-box-shadow: 0 10px 10px -10px black;
+    box-shadow: 0 10px 10px -10px black;*/
+    border-bottom-left-radius: 10px;
+    border-bottom-right-radius: 10px;
+}
+
+#MainContent
+{
+padding: 10px;
+margin-bottom: 20px;
+}
+#banner {
+    margin-left:auto;
+    margin-right:auto;
+    width:701px;
+    box-shadow: 0px 0px 10px 0px #888888;
+}
+
+#logoDiv {
+    /*width:49%;*/
+    width: 350px;
+    height: 130px;
+    margin-left:auto;
+    margin-right:auto;
+    padding-left: 2em;
+
+}
+
+#logo, #text {
+    padding-top:5%;
+    padding-bottom:5%;
+    display:inline;
+    margin-left:auto;
+    margin-right:auto;
+    width: 100px;
+    height: 100px;
+}
+
+#text {
+    width:236px;
+}
+
+nav {
+	color: #FFA07A;
+	background: #FFA07A;
+    /*background: linear-gradient(0deg, #FFA07A, black 80%, #FFA07A);*/
+	height: 50px;
+    width: 100%;
+	-webkit-box-shadow: 0 10px 10px -10px black;
+    -moz-box-shadow: 0 10px 10px -10px black;
+    box-shadow: 0 10px 10px -10px black;
+    border-bottom-left-radius: 10px;
+    border-bottom-right-radius: 10px;
+    border-top:1px solid #FFA07A;
+}
+
+nav ul li a{
+    font-size: 1.5em;
+    text-transform: uppercase;
+    line-height: 1;
+    color: #fff;
+    margin: 0 20px;
+    border: 0;
+    float:left;
+    display: block;
+}
+
+#menu {
+    margin-left:auto;
+    margin-right:auto;
+}
+
+nav ul { 
+    width: 60%;
+    margin-left:auto;
+    margin-right:auto;
+}
+
+nav ul li { 
+    display: inline;  
+}
+
+nav ul li a {
+    text-decoration: none;
+    font-family: Arial, sans-serif;
+    font-size: medium;
+    letter-spacing: 1px;
+}
+
+nav ul li a:hover,
+nav ul li a:focus {
+    color: rgb(240, 253, 139);
+}
+
+nav ul li a:active {
+    color:red;
+}
+
+/*nav ul li:last-child {
+    float: right;
+    padding-right: 2em;
+    padding-left: 15em;
+}*/
+
+footer {
+    background-color:#FFA07A;
+    /*background: linear-gradient(180deg, #FFA07A, black 20%);*/
+    border-top-left-radius: 10px;
+    border-top-right-radius: 10px;
+    clear: both;
+    font-size: .8em;
+    height: 80px;
+}
+
+    footer div {
+        display:inline-block;
+    }
+
+    footer p {
+        color:white;
+    }
+
+.login-bar {
+    /*background-image: url('../Images/chkflag.jpg') ;*/
+    background-color:lightgrey;
+    height: 30px;
+}
+
+
+.float-left {
+    float: left;
+    text-align:left;
+}
+
+.float-right {
+    float: right;
+    text-align:right;
+}
+
+.float-center {
+        margin-left:auto;
+        margin-right:auto;
+        text-align:center;
+}
+
+body {
+    background-color:whitesmoke;
+    width:100%;
+    font-family: Arial, sans-serif;
+    margin-left:auto;
+    margin-right:auto;
+}
+
+.button, .textbox {
+    -webkit-border-radius: 5px;
+    -moz-border-radius: 5px;
+    border-radius: 5px;
+    text-align:left;
+}
+
+.button {
+    background-color: #FFA07A;
+    color: #fff;
+    font-size: medium;
+    text-decoration: none;
+    cursor: pointer;
+    border:none;
+    letter-spacing:1px;
+    text-transform:uppercase;
+}
+
+
+
+.button:hover {
+    border: none;
+    background:rgb(240, 253, 139);
+    box-shadow: 0px 0px 1px #777;
+}
+
+p {
+    margin-left:10px; 
+}
+
+#body {
+    padding-top:20px;
+}
+
+#copyright {
+    padding-right:1em;
+}
+
+#icons {
+    padding-left:1em;
+}
+
+footer a {
+    text-decoration:none;
+}
+
+
+
+.toggleOptions > li:nth-child(even) {
+    background: whitesmoke;
+    padding: 10px;
+}
+
+.toggleOptions > li:nth-child(odd) {
+    background: lightgrey;
+    padding: 10px;
+}
+
+.toggleContent {
+    padding: 10px 0 10px 35px;
+    display: none;
+}
+
+.toggleContent li {
+    list-style-type: none;
+}
+
+.toggleOptions > li {
+    list-style-type: none;
+}
+
+li > .toggleOptions > li {
+    background: transparent !important;
+}
