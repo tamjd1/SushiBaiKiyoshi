@@ -22,8 +22,6 @@ $sql = "SELECT \"ItemDescription\", \"ItemQuantity\"
 
 $result = pg_query($conn, $sql);
 $row = pg_fetch_row($result);
-$firstName;
-$lastName;
 
 $i = 0;
 while ($row = pg_fetch_row($result))
@@ -301,7 +299,7 @@ while ($row = pg_fetch_row($result))
 //              .attr("transform", "translate(0, 18)")
 //              .attr("class", "yAxis");
 
-            var newG = g.append("g").attr("transform", "translate(" + xScale(0.2) + "," + yScale(-5) + ")")
+            var newG = g.append("g").attr("transform", "translate(" + xScale(0.5) + "," + yScale(2) + ")")
           for (var i = 0; i < data.length; i++) {
             //var rotate = (i % 2 == 0) ? "rotate(90)" : "rotate(0)";
             newG = newG.append("g")
@@ -334,8 +332,8 @@ while ($row = pg_fetch_row($result))
         size = typeof size !== 'undefined' ? size : "12px";
         weight = typeof weight !== 'undefined' ? weight : "normal";
         colour = typeof colour !== 'undefined' ? colour : "black";
-        anchor = typeof anchor !== 'undefined' ? anchor : "start";
-        rotate = typeof rotate !== 'undefined' ? rotate : "rotate(90)";
+        anchor = typeof anchor !== 'undefined' ? anchor : "end";
+        rotate = typeof rotate !== 'undefined' ? rotate : "rotate(-20)";
         
         //Add SVG Text Element Attributes
         var text = g.append("text")
