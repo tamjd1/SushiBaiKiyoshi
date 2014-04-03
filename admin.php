@@ -36,9 +36,10 @@ if ($_SESSION['UserType'] != 'a') // If not an administrator redirect to main pa
                   <a href="./edit_fish_prices.php">Add Fish Prices</a> <br/>
                   <a href="./fish_price_trend_report.php">Fish Price Trend Report</a> <br/>
                   <a href="./fish_supply_trend_report.php">Fish Supply Trend Report</a> <br/>
-                  <a href="./regular_customers_report.php">Regular Customers Report</a> <br/>
-                  
-                  
+                  <a href="./regular_customers_report.php">Regular Customers Report</a> <br/><br/>
+                  <a href="./admin_order.php">Active Orders</a> <br/>
+                  <a href="./admin_c_orders.php">Completed Orders</a> <br/>
+                  <a href="./admin_x_orders.php">Cancelled Orders</a> <br/>
                   <br/>
             </ul>
             </div>
