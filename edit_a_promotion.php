@@ -33,7 +33,7 @@ $promotionID = trim ($_GET["promotionID"]);
 if($_SERVER["REQUEST_METHOD"] == "POST") 
 {
     //Trim the inputs
-    
+    $promotionID = trim ($_GET["promotionID"]);
     $description = trim ($_POST["description"]);
     $value = trim ($_POST["value"]);
         $isPercent =trim ( $_POST["isPercent"]);
@@ -45,16 +45,16 @@ if($_SERVER["REQUEST_METHOD"] == "POST")
     // Set the SQL statement
     // Check if there is just one search field
 
-
-    $sql = "INSERT INTO \"tblPromotions\"(
-             \"PromotionDescription\", \"PromotionValue\", \"IsPercent\", 
-            \"StartDate\", \"EndDate\")
-    VALUES ('$description','$value', $isPercent,'$startDate','$endDate');";
+ $sql =  "UPDATE \"tblPromotions\"
+   SET \"PromotionDescription\"='$description', \"PromotionValue\"='$value', 
+       \"IsPercent\"=$isPercent, \"StartDate\"='$startDate', \"EndDate\"='$endDate'
+ WHERE \"PromotionID\"=$promotionID";
+echo $sql;
 
  
       // connect to the database
-    //$conn = db_connect();
-    $conn = pg_connect("host=localhost port=5432 dbname=sb user=postgres password=vdragon");
+    $conn = db_connect();
+   
     //issue the query       
     $result = pg_query($conn, $sql);
     // set records variable to number of found results

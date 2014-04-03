@@ -69,12 +69,13 @@ require 'header.php';
                     //$("#favourites").click();
                 });
             </script>
+            <!--
             <div id="register">
                 <p class="message">
-                    You are now REGISTERED!!!<br/>
-                    To order, login now!!!<br/>
+                    You Are Now REGISTERED!!!<br/>
+                    Login To Order!!!<br/>
                 </p>
-            </div>
+            </div>  -->
 
             
             <div id="banner">

@@ -6,6 +6,7 @@ $description = "This page displays the menu items for Sushi Bai Kiyoshi";
 $date = "05/03/2014";
 
 require 'header.php';
+require 'functions.php';
 
 //$str_json = file_get_contents('php://input');
 //echo "Hello" . $str_json;
@@ -38,7 +39,7 @@ $types = array();
 $conn = db_connect();
 $sql = "SELECT \"ItemDescription\", \"ItemPrice\", \"ItemType\", \"PromotionID\" FROM \"tblMenuItems\" WHERE \"ItemStatus\" = 'e'";
 $result = pg_query($conn, $sql);
-//$type_string;
+$type_string;
 $i = 0;
 
 while ($row = pg_fetch_row($result))

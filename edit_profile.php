@@ -18,6 +18,7 @@ if (!isset($_SESSION['UserID'])) // Non login in users to be sent back to index
 if($_SERVER["REQUEST_METHOD"] == "GET") // If it the first time the page is loaded
 {
 
+
 $userName =  $_SESSION['UserID'];
 $firstName =  $_SESSION['UserFirst'];
 $lastName =  $_SESSION['UserLast'];
@@ -87,7 +88,7 @@ $emailAddress = $_SESSION['UserEmail'];
     // If no query results
     else 
     {
-        echo "<br/>No search results";    
+        $creditTable = " <p class=\"t_c\">No credit cards</p>";    
     }   
     
     
@@ -97,30 +98,55 @@ if (!empty($_POST['delete_submit'])) {
 
 echo "asasasasas";  
 }
+
+
 if($_SERVER["REQUEST_METHOD"] == "POST") // If the page has been submitted
 {      
     // Clear out the forms
-   
+    $userName =  $_POST['userName'];
+    $firstName =  $_POST['firstName'];
+    $lastName =  $_POST['lastName'];
+    $email =  $_POST['email'];
+    $phoneNumber =  $_POST['phoneNumber'];
+ 
     
-    // Trim the inputs
-    $user_id = trim ($_POST ["user_id"]);      
+    $user_id = $_SESSION['UserID']; 
     
     // Set the SQL statement
     // Check if there is just one search field
         
-    $sql = "SELECT users.id, users.usertype, agents.first_name, agents.last_name
-            FROM users, agents 
-            WHERE users.id=agents.user_id AND ( LOWER(agents.first_name) LIKE LOWER('$firstname') OR LOWER(agents.last_name) LIKE LOWER('$lastname') )
-            ORDER BY users.enroll_date ASC";    
+    $sql = "UPDATE \"tblUsers\"
+   SET \"UserFirst\"='$firstName', \"UserLast\"='$lastName', \"UserEmail\"='$email', 
+       \"UserPhone\"='$phoneNumber'
+ WHERE\"UserID\" = '$user_id'";
+
        
     
-
+echo $sql;
     // connect to the database
     $conn = db_connect();
     //issue the query       
     $result = pg_query($conn, $sql);
     // set records variable to number of found results
-    $records = pg_num_rows($result);    
+    $records = pg_num_rows($result);   
+    
+    if ($result)
+    {
+        
+        $userName =  $_POST['userName'];
+        $firstName =  $_POST['firstName'];
+        $lastName =  $_POST['lastName'];
+        $email =  $_POST['email'];
+        $phoneNumber =  $_POST['phoneNumber'];
+
+        $_SESSION['UserID'] =  $userName;
+        $_SESSION['UserFirst'] = $firstName;
+        $_SESSION['UserLast'] = $lastName;
+        $_SESSION['UserEmail'] = $email;
+        $_SESSION['UserPhone'] = $phoneNumber;    
+        $_SESSION['message'] = "Changes saved";
+        header("Location: ./edit_profile.php");    
+}
 }#end of post
 ?>
 
@@ -176,7 +202,12 @@ if($_SERVER["REQUEST_METHOD"] == "POST") // If the page has been submitted
             <td>
             <input type="textbox" name="phoneNumber" value="<?php echo $phoneNumber; ?>"/>
             </td>
-        </tr>            
+        </tr>    
+   <tr>
+        <td colspan="2" style="text-align:center;">
+      
+        <input type="submit" value="Submit Changes"/>
+        </td>        
     </table>
     </form>
     <br/>

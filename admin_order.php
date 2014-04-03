@@ -23,7 +23,7 @@ if ($_SESSION['UserType'] != 'a') // If not an administrator redirect to main pa
 
 $sql= "SELECT \"tblInvoices\".\"InvoiceID\", \"tblInvoices\".\"OrderDateTime\", \"tblInvoices\".\"Comments\", \"tblInvoices\".\"Subtotal\"
             FROM \"tblInvoices\"
-            WHERE \"tblInvoices\".\"InvoiceStatus\" = 'a'";
+            WHERE \"tblInvoices\".\"InvoiceStatus\"='a'";
             //echo $sql;
 $conn = db_connect();
    
@@ -34,7 +34,7 @@ $records1 = pg_num_rows($result1);
 
 if ($records1 > 0) // If there are results from the query
 {       
-	
+	echo "<h3 style=\"text-align:center\">Active Orders</h3>";
     // Generate the table from the results
         for($i = 0; $i < $records1; $i++)
         {
@@ -85,6 +85,7 @@ if ($records1 > 0) // If there are results from the query
             			<td><form action="./process_admin_order.php?id=<?php echo $invoiceid; ?>&letter=c" method="post"><input type="submit" value="Complete" /></form></td>
 				<td><form action="./process_admin_order.php?id=<?php echo $invoiceid; ?>&letter=x" method="post"><input type="submit" value="Cancel" /></form></td>                                      
         		</tr>
+
 
 		
 	   </table><hr/> 

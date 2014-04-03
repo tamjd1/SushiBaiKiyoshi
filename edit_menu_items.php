@@ -79,34 +79,10 @@ $errorMessage=  "";
             '<tr align="center">
                   <td>'.pg_fetch_result($result, $i, 0).'</td>
                 <td>'.pg_fetch_result($result, $i, 1).'</td>
-                <td>'.pg_fetch_result($result, $i, 2).'$</td>';
+                <td>'.pg_fetch_result($result, $i, 2).'$</td>
+                <td>'.pg_fetch_result($result, $i, 3).'</td>';
                 
                 
-                // display the real names of the type
-                if(pg_fetch_result($result, $i, 3) == 'r')
-                {
-                     $table .=  '<td>Roll</td>';
-                }
-                else if(pg_fetch_result($result, $i, 3) == 's')
-                {
-                     $table .=  '<td>Sashima</td>';
-                }
-                else if(pg_fetch_result($result, $i, 3) == 'sr')
-                {
-                     $table .=  '<td>Special Roll</td>';
-                }
-                else if(pg_fetch_result($result, $i, 3) == 'a')
-                {
-                     $table .=  '<td>Appetizer</td>';
-                }
-                else if(pg_fetch_result($result, $i, 3) == 'c')
-                {
-                     $table .=  '<td>Combo</td>';
-                }
-                else
-                {
-                     $table .=  '<td></td>';
-                }
                 
                 
                  
@@ -180,7 +156,8 @@ $errorMessage=  "";
   
     $searchField = "";
     // Trim the inputs
-    //$searchField = trim ($_POST ["searchField"]); 
+     if (isset($_POST ["searchField"]))
+     {$searchField = trim ($_POST ["searchField"]); }
             
     $errorMessage= "Results for '".$searchField."'";
     // Set the SQL statement
@@ -232,34 +209,10 @@ $errorMessage=  "";
             '<tr align="center">
                   <td>'.pg_fetch_result($result, $i, 0).'</td>
                 <td>'.pg_fetch_result($result, $i, 1).'</td>
-                <td>'.pg_fetch_result($result, $i, 2).'$</td>';
+                <td>'.pg_fetch_result($result, $i, 2).'$</td>
+                <td>'.pg_fetch_result($result, $i, 3).'</td>';
                 
                 
-                // display the real names of the type
-                if(pg_fetch_result($result, $i, 3) == 'r')
-                {
-                     $table .=  '<td>Roll</td>';
-                }
-                else if(pg_fetch_result($result, $i, 3) == 's')
-                {
-                     $table .=  '<td>Sashima</td>';
-                }
-                else if(pg_fetch_result($result, $i, 3) == 'sr')
-                {
-                     $table .=  '<td>Special Roll</td>';
-                }
-                else if(pg_fetch_result($result, $i, 3) == 'a')
-                {
-                     $table .=  '<td>Appetizer</td>';
-                }
-                else if(pg_fetch_result($result, $i, 3) == 'c')
-                {
-                     $table .=  '<td>Combo</td>';
-                }
-                else
-                {
-                     $table .=  '<td></td>';
-                }
                 
                 
                  
@@ -361,7 +314,7 @@ $errorMessage=  "";
 
     
       // connect to the database
-    //$conn = db_connect();
+   
     $conn = db_connect();
     //issue the query       
     $result = pg_query($conn, $sql);
@@ -374,7 +327,8 @@ $errorMessage=  "";
     }
     else
     {
-        $errorMessage= "'$description' Added!";
+         $_SESSION['message'] = "'$description' Added!";
+          header("Location: ./edit_profile.php");   
         
     }
     $description = "";
@@ -421,11 +375,11 @@ $errorMessage=  "";
             <select name="type">
                 <option value="" <?php if($type == ''){echo "selected=\"selected\"";}?> >
                 </option>
-                <option value="r" <?php if($type == 'r'){echo "selected=\"selected\"";}?> >Roll</option>
-                <option value="s" <?php if($type == 's'){echo "selected=\"selected\"";}?> >Sashimi</option>
-                <option value="sr" <?php if($type == 'sr'){echo "selected=\"selected\"";}?> >Special Roll</option>   
-                <option value="a" <?php if($type == 'a'){echo "selected=\"selected\"";}?> >Appetizer</option>   
-                <option value="c" <?php if($type == 'c'){echo "selected=\"selected\"";}?> >Combo</option>                   
+                <option value="Rolls" <?php if($type == 'Rolls'){echo "selected=\"selected\"";}?> >Rolls</option>
+                <option value="Sashimi" <?php if($type == 'Sashimi'){echo "selected=\"selected\"";}?> >Sashimi</option>
+                <option value="Special Rolls" <?php if($type == 'Special Rolls'){echo "selected=\"selected\"";}?> >Special Rolls</option>   
+                <option value="Appetizers" <?php if($type == 'Appetizers'){echo "selected=\"selected\"";}?> >Appetizers</option>   
+                <option value="Combos" <?php if($type == 'Combos'){echo "selected=\"selected\"";}?> >Combos</option>                   
             </select>
         </td> 
     </tr>
