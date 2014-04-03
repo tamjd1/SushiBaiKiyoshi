@@ -97,7 +97,7 @@ if ($_SESSION['UserType'] != 'a') // If not an administrator redirect to main pa
             FROM \"tblPromotions\"
             WHERE \"EndDate\" <= current_date
             ORDER BY \"StartDate\"";    
-        
+      
     // connect to the database
     //$conn = db_connect();
     $conn = db_connect();
@@ -213,7 +213,7 @@ if($errorMessage== "")
             \"StartDate\", \"EndDate\")
     VALUES ('$description','$value', $isPercent,'$startDate','$endDate');";
 
- 
+
       // connect to the database
     //$conn = db_connect();
     $conn = db_connect();
@@ -228,12 +228,13 @@ if($errorMessage== "")
     }
     else
     {
-       $errorMessage = "'$description' has been added!";
-        
+       $_SESSION['message'] = "$description' has been added!";
+        header("Location: ./edit_promotions.php");
      
     }
      $description = "";
     $value = "";
+    
     }
 }
 ?>
