@@ -13,8 +13,10 @@ require 'header.php'; ?>
  
  <?php
  //hard coded user id and user type for now.
+ /*
 $_SESSION['id'] = "turning_japanese";
 $_SESSION['usertype'] = "c";
+*/
 
 if (!isset($_SESSION['id']) || ($_SESSION['id']) == "")
 {
@@ -42,7 +44,7 @@ $conn = db_connect();
         <div>
             
             <?php
-            
+             $table = "";
                 if (isset($_SESSION['id']) || ($_SESSION['id']) != "")
                
                 {
@@ -51,7 +53,7 @@ $conn = db_connect();
                     $sql = "SELECT \"UserID\",\"CreditCardNumber\",\"CreditCardType\" FROM \"tblCreditCards\" WHERE \"UserID\" = '".$_SESSION['id']."'";
                     $result = pg_query($conn,$sql);
                     $records = pg_num_rows($result);
-                            
+                          
                     if($records > 0)
                     {
                         
@@ -69,8 +71,8 @@ $conn = db_connect();
                         {
                         $table .=   
                         '<tr>
-                            <td>'.pg_fetch_result($result, $i, 'CreditCardType').'</td>
-                            <td>'.pg_fetch_result($result, $i, 'CreditCardNumber').'</td>         
+                            <td>'.pg_fetch_result($result, $i, 2).'</td>
+                            <td>'.pg_fetch_result($result, $i, 1).'</td>         
                         </tr>';  
                         $table .= "</table><br/>";
                         }
@@ -78,10 +80,11 @@ $conn = db_connect();
                 }                    
                 else 
                 {
+                 $table = "No Results";
                     header("Location: ./credit_card_create.php");
                 }
                 
-            
+            echo $table;
             ?>
         </div>
 
