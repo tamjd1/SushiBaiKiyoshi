@@ -9,7 +9,7 @@
 
 <?php
 
-$fish_prices_trend = array();
+$items = array();
 
 $conn = db_connect();
 $sql = "SELECT \"ItemDescription\", \"ItemQuantity\", \"OrderDateTime\"
@@ -23,7 +23,7 @@ $row = pg_fetch_row($result);
 $i = 0;
 while ($row = pg_fetch_row($result))
 {
-    $favourites[$i] = array('Item'=>$row[0], 'Quantity'=>$row[1]);
+    $items[$i] = array('Item'=>$row[0], 'Quantity'=>$row[1], 'Date'=>$row[2]);
     //echo "<br/>".$sql2;
     $i++;
 }
@@ -60,37 +60,37 @@ while ($row = pg_fetch_row($result))
 <script>
 
     var parseDate = d3.time.format("%Y-%m-%d").parse;
-    var fishData, yearSelected, daysInAYear, MAX_CANVAS_WIDTH, MAX_CANVAS_HEIGHT, CENTRE_X, CENTRE_Y, svg, canvas, graph, MAX_PRICE, timeScale;
+    var itemData, yearSelected, daysInAYear, MAX_CANVAS_WIDTH, MAX_CANVAS_HEIGHT, CENTRE_X, CENTRE_Y, svg, canvas, graph, MAX_PRICE, timeScale;
     var yScale = d3.scale.linear();        
     var xScale = d3.scale.linear();
-    var fishTypes = new Array();
-    var fishTypesUnique = new Array();
+    var itemTypes = new Array();
+    var itemTypesUnique = new Array();
     var years = new Array();
     var yearsUnique = new Array();
     var dates = new Array();
     var prices = new Array();
     var priceDomain = new Array();
-    var fishDataByYear = new Array();
+    var itemDataByYear = new Array();
     
-    fishData = <?php print json_encode($fish_prices_trend); ?>;
-    console.log(fishData);
+    itemData = <?php print json_encode($items); ?>;
+    console.log(itemData);
     
-    for(var i = 0; i < fishData.length; i++) {
-        fishTypes.push(fishData[i].Type); //
-        dates.push(fishData[i].Date);
-        prices.push(fishData[i].Price);
-        years.push(parseDate(fishData[i].Date).getFullYear());
+    for(var i = 0; i < itemData.length; i++) {
+        itemTypes.push(itemData[i].Item); //
+        dates.push(itemData[i].Date);
+        prices.push(itemData[i].Price);
+        years.push(parseDate(itemData[i].Date).getFullYear());
     }
     
-    fishTypesUnique = fishTypes.unique(); //get unique values for fish types and add checkboxes     
+    itemTypesUnique = itemTypes.unique(); //get unique values for fish types and add checkboxes     
     
     yearsUnique = years.unique(); //get unique values for year to add to dropdown.
     yearsUnique.sort();
 
     function createCheckboxList() {
         var html = "<table>";
-        for (var i = 0; i < fishTypesUnique.length; i++) { //add checkbox for each fish type
-            html +='<tr><td><div style="display:inline-block; background-color:'+getRandomColour(i)+';"><input type="checkbox" id="'+i+'" value="'+fishTypesUnique[i]+'" onchange="plotLineGraph(this.id, this.checked,this.value,getRandomColour(this.id))"/></div></td><td style="text-align:left;">'+fishTypesUnique[i]+'</td></tr>';
+        for (var i = 0; i < itemTypesUnique.length; i++) { //add checkbox for each fish type
+            html +='<tr><td><div style="display:inline-block; background-color:'+getRandomColour(i)+';"><input type="checkbox" id="'+i+'" value="'+itemTypesUnique[i]+'" onchange="plotLineGraph(this.id, this.checked,this.value,getRandomColour(this.id))"/></div></td><td style="text-align:left;">'+itemTypesUnique[i]+'</td></tr>';
         }
         html += "</table>";
         //html += "<a href='./fish_price_trend_tabular.php'>Tabular Report</a>";
@@ -111,14 +111,14 @@ while ($row = pg_fetch_row($result))
         //alert(value);
         yearSelected = value;
         
-        fishDataByYear = new Array();
+        itemDataByYear = new Array();
         
-        for(var i = 0; i < fishData.length; i++) {
-            if(parseDate(fishData[i].Date).getFullYear() == yearSelected) {
-                fishDataByYear.push(fishData[i]);
+        for(var i = 0; i < itemData.length; i++) {
+            if(parseDate(itemData[i].Date).getFullYear() == yearSelected) {
+                itemDataByYear.push(itemData[i]);
             }
         }
-        console.log(fishDataByYear);
+        console.log(itemDataByYear);
 
         MAX_PRICE = getMaxPrice(); //get max price
         for (var i = MAX_PRICE; i >= 0; i-=5) {
@@ -293,9 +293,9 @@ while ($row = pg_fetch_row($result))
     */
     function getMaxDate() {
         var maxPrice = 0;
-        for(var i = 0; i < fishDataByYear.length; i++) {
-            if(fishDataByYear[i].Price > maxPrice) 
-                maxPrice = fishDataByYear[i].Price;
+        for(var i = 0; i < itemDataByYear.length; i++) {
+            if(itemDataByYear[i].Price > maxPrice) 
+                maxPrice = itemDataByYear[i].Price;
         }
         return maxPrice;
     }
@@ -305,9 +305,9 @@ while ($row = pg_fetch_row($result))
     */
     function getMaxPrice() {
         var maxPrice = 0;
-        for(var i = 0; i < fishDataByYear.length; i++) {
-            if(fishDataByYear[i].Price > maxPrice) 
-                maxPrice = fishDataByYear[i].Price;
+        for(var i = 0; i < itemDataByYear.length; i++) {
+            if(itemDataByYear[i].Price > maxPrice) 
+                maxPrice = itemDataByYear[i].Price;
         }
         return (Math.round(maxPrice / 10) * 10) + 10;
     }
@@ -345,9 +345,9 @@ while ($row = pg_fetch_row($result))
         if(checked) {
 
             var points = new Array();
-            for (var i = 0; i < fishDataByYear.length; i++) {
-                if (fishDataByYear[i].Type === name) {
-                    points.push({"x": timeScale(parseDate(fishDataByYear[i].Date)), "y": (-yScale(fishDataByYear[i].Price))});
+            for (var i = 0; i < itemDataByYear.length; i++) {
+                if (itemDataByYear[i].Type === name) {
+                    points.push({"x": timeScale(parseDate(itemDataByYear[i].Date)), "y": (-yScale(itemDataByYear[i].Price))});
                 }
             }
             //console.log(points);    
