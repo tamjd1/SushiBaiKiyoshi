@@ -324,147 +324,9 @@ else if($_SERVER["REQUEST_METHOD"] == "POST"){
         </div>        
         
         <br/>
-        
+*/        
         <table id="creditcardinfo">
-            <th colspan="2" class="t_c">
-                Credit Card Information
-            </th>
-            <tr>
-                <td colspan = "2" class="errmsg">
-                    <?php echo $error ?>
-            </tr>
-            <tr>
-                <td>
-                    Card Type
-                </td>
-                <td>
-                    <select name="cardType" value="<?php echo $cardType ?>">
-                        <option value="visa">Visa</option>
-                        <option value="mastercard">Mastercard</option>
-                    </select>
-                </td>
-            </tr>
-            <tr>
-                <td>
-                    Name on Card  
-                </td>
-                <td>
-                    <input type="text" name="nameOnCard" value="<?php echo $nameOnCard ?>"/>
-                </td>
-            </tr>    
-            <tr>
-                <td>
-                    Card Number
-                </td>
-                <td>
-                    <input type="text" name="cardNumber" value="<?php echo $cardNumber ?>"/>
-                </td> 
-            </tr>
-            <tr>
-                <td>
-                    Expiration Date
-                </td>
-                <td>
-                    <table>
-                        <tr>
-                            <td>Month
-                            </td>
-                            <td>
-                            <select name="month" value="<?php echo $month ?>">
-                                <option value="01">January</option>
-                                <option value="02">February</option>
-                                <option value="03">March</option>
-                                <option value="04">April</option>
-                                <option value="05">May</option>
-                                <option value="06">June</option>
-                                <option value="07">July</option>
-                                <option value="08">August</option>
-                                <option value="09">September</option>
-                                <option value="10">October</option>
-                                <option value="11">November</option>
-                                <option value="12">December</option>
-                            </select>
-                            </td>
-                            <td>Year
-                            </td>
-                            <td>
-                            <select name="year" value="<?php echo $year ?>">
-                                <option value="14">2014</option>
-                                <option value="15">2015</option>
-                                <option value="16">2016</option>
-                                <option value="17">2017</option>
-                                <option value="18">2018</option>
-                                <option value="19">2019</option>
-                                <option value="20">2020</option>
-                            </select>
-                            </td>
-                        </tr>
-                    </table>
-                  
-                </td>
-            </tr>
-            <tr>
-                <td>
-                    Security Code
-                </td>
-                <td>
-                    <input type="text" name="securityCode" value="<?php echo $securityCode ?>"/>
-                    
-                    
-                </td>
-            </tr>            
-        </table>
-        <table style="margin:0 auto 0 auto">        
-            <th colspan="2" class="t_c">
-                Billing Information
-            </th>
-            <tr>
-                <td>
-                    Address
-                </td>
-                <td>
-                    <input type="text" name="address" value="<?php echo $address ?>"/>
-                </td> 
 
-            </tr>
-            <tr>
-                <td>
-                    City
-                </td>
-                <td>
-                    <input type="text" name="city" value="<?php echo $city ?>"/>
-                </td>
-            </tr>
-            <tr>
-                <td>
-                    Province
-                </td>
-                <td>
-                    <select name="province" value="<?php echo $province ?>">
-                                <option value="AB">AB</option>
-                                <option value="BC">BC</option>
-                                <option value="MB">MB</option>
-                                <option value="NB">NB</option>
-                                <option value="NB">NL</option>
-                                <option value="NS">NS</option>
-                                <option value="NT">NT</option>
-                                <option value="NU">NU</option>
-                                <option value="ON">ON</option>
-                                <option value="PE">PE</option>
-                                <option value="QC">QC</option>
-                                <option value="SK">SK</option>
-                                <option value="YT">YT</option>
-                            </select>
-                </td>
-            </tr>            
-            <tr>
-                <td>
-                    Postal Code
-                </td>
-                <td>
-                    <input type="text" name="postalCode" value="<?php echo $postalCode ?>"/>
-                </td>
-            </tr>
             <tr>
                 <td style="text-align:center;">                    
                     <input type="submit" value="Confirm Order"/>                    
@@ -481,6 +343,6 @@ else if($_SERVER["REQUEST_METHOD"] == "POST"){
     
 </form>
 
-*/
+
         
 <?php include 'footer.php'; ?>
