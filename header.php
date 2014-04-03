@@ -129,7 +129,7 @@ if (!empty($_POST['logout_submit']))
               
                 echo "<input id='password' name='password' type='password' class='float-right textbox' value='$password' placeholder='Password'/>"; 
                   echo "<input id='login' name='login' type='text' class='float-right textbox' value='$login' placeholder='Username'/>";
-                
+                 echo "<a class='float-right' href='password_recovery.php'>Forgot Password</a>";
             }
             else
             {
