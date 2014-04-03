@@ -35,7 +35,7 @@ while ($row = pg_fetch_row($result))
     $row2 = pg_fetch_row($result2);
     
     $favourites[$i] = array('Item'=>$row2[0], 'Quantity'=>$row2[1]);
-    echo "<br/>".$sql2;
+    //echo "<br/>".$sql2;
     $i++;
 }
 

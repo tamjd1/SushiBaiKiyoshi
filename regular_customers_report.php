@@ -75,7 +75,7 @@ while ($row = pg_fetch_row($result))
     names.push(" ");
     for(var i = 0; i < customers.length; i++) {
         names.push(customers[i].FullName); //
-        orders.push(customers[i].OrderCount);
+        orders.push(parseInt(customers[i].OrderCount));
     }
     //names.push(" ");
     
@@ -83,6 +83,7 @@ while ($row = pg_fetch_row($result))
     for (var i = MAX_ORDER; i >= 0; i--) {
         orderDomain.push(i); //set price domain at $5 intervals
     }
+    
     
     /**
     This function creates the <svg> canvas on which line graph will be drawn
@@ -195,7 +196,7 @@ while ($row = pg_fetch_row($result))
               .attr("height", function(d) { return yScale(d.OrderCount); })
               .attr("width", xScale(0.5))
               .style("cursor", "pointer")
-              .on("click", function(d){ document.location.href = "http://localhost/SushiBaiKiyoshi/customer_favourites_report.php?id=" + d.UserID; })
+              .on("click", function(d){ document.location.href = "./customer_favourites_report.php?id=" + d.UserID; })
               .attr("fill", "#2d578b");
            
            var g2 = graph.append("g");   
@@ -208,7 +209,7 @@ while ($row = pg_fetch_row($result))
               .attr("height", function(d) { return yScale(d.CancelCount); })
               .attr("width", xScale(0.5))
               .style("cursor", "pointer")
-              .on("click", function(d){ document.location.href = "http://localhost/SushiBaiKiyoshi/customer_favourites_report.php?id=" + d.UserID; })
+              .on("click", function(d){ document.location.href = "./customer_favourites_report.php?id=" + d.UserID; })
               .attr("fill", "red");
           
           g.selectAll("text")
@@ -245,7 +246,7 @@ while ($row = pg_fetch_row($result))
               .attr("style", "font-size: 12; font-family: Helvetica, sans-serif")
               .text(function(d) { return d.FullName;})
               .style("cursor", "pointer")
-              .on("click", function(d){ document.location.href = "http://localhost/SushiBaiKiyoshi/customer_favourites_report.php?id=" + d.UserID; })
+              .on("click", function(d){ document.location.href = "./customer_favourites_report.php?id=" + d.UserID; })
               .attr("transform", "translate(0, 18)")
               .attr("class", "yAxis");
     }
