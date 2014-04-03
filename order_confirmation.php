@@ -7,78 +7,40 @@ $date = "05/03/2014";
 
 require 'header.php';
 ?>
-        <section id="MainContent">  
+ <section id="MainContent">  
             <p class="message">
-<?php echo  $_SESSION['message']; ?></p>
-            <script>
+        <?php echo  $_SESSION['message']; ?></p>
+          
+
+<form method="post" action="<?php echo $_SERVER['PHP_SELF']; ?>">
+        <p style="text-align:center; font-size:30px;">Order Confirmation</p>
+        
+        <div id="cartDiv" style="margin:0 auto 0 auto;">
+            <table id="cart">
+                <tr>
+                    <th colspan="2" class="t_c">My Cart</th><hr/>
+                </tr>
                 
-                /**
-                greeting
-                This function sets the appropriate greeting on the home page depending on the time of day.
-                @since 20/01/2014
-                */
-                function greeting() {
-                    var date = new Date(); //get the current date time
-                    var hours = date.getHours(); //get the current hour from the date
-
-                    switch (true) {
-                        case (hours < 6): //earlier than 6 AM, later than midnight
-                            $("#greeting").text("Good Night!");
-                            break;
-                        case (hours < 12): //earlier than 12 PM (noon), later than 6 AM
-                            $("#greeting").text("Good Morning!");
-                            break;
-                        case (hours < 18): //earlier than 6 PM, later than noon
-                            $("#greeting").text("Good Afternoon!");
-                            break;
-                        case (hours <= 23): //earlier than 11 PM, later than 6 PM
-                            $("#greeting").text("Good Evening!");
-                            break;
-                    }
-                }
-            
-                $(function () {
-                    var imgsarray = [
-                            './images/banner (1).jpg',
-                            './images/banner (2).jpg',
-                            './images/banner (3).jpg',
-                            './images/banner (4).jpg',
-                            './images/banner (5).jpg',
-                            './images/banner (6).jpg'
-                            ];
-
-                    var counter = imgsarray.length;
-                    var $SlideShow = $('img[id$=SlideShow]');
-
-                    $SlideShow.attr('src', imgsarray[counter - 1]);
-                    setInterval(Slider, 5000);
-                    function Slider() {
-                        $SlideShow.fadeOut("slow", function () {
-                            $(this).attr('src', imgsarray[(imgsarray.length++) % counter])
-                            .fadeIn("slow");
-                        });
-                    }
-
-                    $("#banner").width(imgsarray[0].clienWidth);
-                    $("#banner").height(imgsarray[0].clienHeight);
-                    //$("#banner").addClass("float-right");
-
-                });
-                $(document).ready(function() {
-                    greeting();
-                    //$("#favourites").click();
-                });
-            </script>
+                <!-- temp -->
+                <tr style="text-align:left">
+                    <td>Spicy Tuna Combo</td>
+                    <td style="text-align:right">$13.99</td>
+                </tr>
+                <tr style="text-align:left">
+                    <td>Avocado Cucumber Combo</td>
+                    <td style="text-align:right">$10.99</td>
+                </tr>
+                <!-- /temp -->
+                
+                <tr>
+                    <td colspan="2"><hr/>Total: $24.98</td>
+                </tr>
+            </table>
+        </div>        
                    
-            <div id="banner">
-                <img id="SlideShow" width="701px" src="banner (1).jpg" alt="banner" />
-            </div>
-
-            <h1 id="greeting" class="float-center"></h1>
-           
-                
-            
-            
+        
         </section>
+        
+</form>
             
 <?php include 'footer.php'; ?>

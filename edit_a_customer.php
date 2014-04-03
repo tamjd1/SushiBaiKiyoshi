@@ -73,10 +73,10 @@ $type = trim ($_POST["type"]);
         SET \"UserFirst\"='$first', \"UserLast\"='$last', \"UserEmail\"='$email' , \"UserPhone\"='$phone', \"UserType\"='$type'
         WHERE \"UserID\"='$userID'";
 
-echo $sql;
+
       // connect to the database
-    //$conn = db_connect();
-    $conn = pg_connect("host=localhost port=5432 dbname=sb user=postgres password=vdragon");
+    $conn = db_connect();
+    //$conn = pg_connect("host=localhost port=5432 dbname=sb user=postgres password=vdragon");
     //issue the query       
     $result = pg_query($conn, $sql);
     // set records variable to number of found results

@@ -44,7 +44,7 @@ if($_SERVER["REQUEST_METHOD"] == "POST") // If the page has been submitted
     $price = trim ($_POST["price"]);
     $type =trim ( $_POST["type"]);
     $promotion =trim ( $_POST["tblPromotions"]);
-    
+    $errorMessage ="";
     
     $promotionID = trim($_POST["tblPromotions"]);
     $itemID = $_GET["itemID"];
@@ -198,12 +198,14 @@ if($promotion == 0){
             Type
             </td>
             <td>
-             <select name="type">
-                <option value="r" <?php if($type == 'r'){echo "selected=\"selected\"";}?> >Roll</option>
-                <option value="s" <?php if($type == 's'){echo "selected=\"selected\"";}?> >Sashimi</option>
-                <option value="sr" <?php if($type == 'sr'){echo "selected=\"selected\"";}?> >Special Roll</option>   
-                <option value="a" <?php if($type == 'a'){echo "selected=\"selected\"";}?> >Appetizer</option>   
-                <option value="c" <?php if($type == 'c'){echo "selected=\"selected\"";}?> >Combo</option>                   
+           <select name="type">
+               
+                
+                <option value="Rolls" <?php if($type == 'Rolls'){echo "selected=\"selected\"";}?> >Rolls</option>
+                <option value="Sashimi" <?php if($type == 'Sashimi'){echo "selected=\"selected\"";}?> >Sashimi</option>
+                <option value="Special Rolls" <?php if($type == 'Special Rolls'){echo "selected=\"selected\"";}?> >Special Rolls</option>   
+                <option value="Appetizers" <?php if($type == 'Appetizers'){echo "selected=\"selected\"";}?> >Appetizers</option>   
+                <option value="Combos" <?php if($type == 'Combos'){echo "selected=\"selected\"";}?> >Combos</option>                   
             </select>
            
             </td> 

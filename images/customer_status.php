@@ -22,10 +22,10 @@ if ($_SESSION['usertype'] != 'a') // If not an administrator redirect to main pa
     */
 
 if($_SERVER["REQUEST_METHOD"] == "GET") // If it the first time the page is loaded
-{?>
+{
 
 
-<?php
+
 $errorMessage=  "";
     $table ="";
     $description = "";

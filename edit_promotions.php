@@ -114,11 +114,15 @@ if($_SERVER["REQUEST_METHOD"] == "GET") // If it the first time the page is load
             FROM \"tblPromotions\"
             WHERE \"EndDate\" <= current_date
             ORDER BY \"StartDate\"";    
+<<<<<<< HEAD
         
        
     
   
 
+=======
+      
+>>>>>>> dd9074fe5d5d5ade4135b238f2fe1b36bfca1e37
     // connect to the database
     //$conn = db_connect();
     $conn = pg_connect("host=localhost port=5432 dbname=sb user=postgres password=vdragon");
@@ -213,7 +217,7 @@ if($_SERVER["REQUEST_METHOD"] == "POST")
             \"StartDate\", \"EndDate\")
     VALUES ('$description','$value', $isPercent,'$startDate','$endDate');";
 
- 
+
       // connect to the database
     //$conn = db_connect();
     $conn = pg_connect("host=localhost port=5432 dbname=sb user=postgres password=vdragon");
@@ -228,10 +232,21 @@ if($_SERVER["REQUEST_METHOD"] == "POST")
     }
     else
     {
+<<<<<<< HEAD
         $_SESSION['message'] = "Promotion Added!";
         
      
     }
+=======
+       $_SESSION['message'] = "$description' has been added!";
+        header("Location: ./edit_promotions.php");
+     
+    }
+     $description = "";
+    $value = "";
+    
+    }
+>>>>>>> dd9074fe5d5d5ade4135b238f2fe1b36bfca1e37
 }
    
 ?>
