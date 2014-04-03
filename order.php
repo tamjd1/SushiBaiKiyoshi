@@ -9,8 +9,14 @@ require 'header.php';
 
 //$str_json = file_get_contents('php://input');
 //echo "Hello" . $str_json;
-$array = json_decode($_POST['jsondata']);
-echo "Goodbye ".$array;
+//$data = json_decode($_GET['data']);
+//echo "Goodbye ".$data;
+//echo "dfjalhf".$_GET['data'];
+
+//session_destroy();
+
+    echo $_SESSION['cart_data'][0]['Item'];
+
 
 $menu_items_detailed = array();
 $items = array();
@@ -207,22 +213,39 @@ var json_cart = new Array();
         
         if (typeof quantity === 'undefined')
         {
-            //console.log("quantity: "+parseInt($("#quantity"+index).html()));
             quantity = 1;
             data[index].Quantity = quantity;
             json_cart = JSON.stringify(data);
-            ajax();
             console.log(json_cart);
-            //console.log("quantity: "+quantity);
+            
+            
+            
+            var request = $.ajax({
+                url: "./ajax_test_2.php",
+                type: "POST",
+                data: {data: json_cart}, // (variable to be passed, variable selected)
+                dataType: "html",
+                success: function() {
+                    alert("success!");
+                }
+            });
+						
+            request.fail(
+                function(jqXHR, textStatus) {
+                    alert( "Request failed: " + textStatus );
+                }
+            );
+            
+            
+            
+            
             var price = data[index].Price * quantity;
             price = price.toFixed(2);
             var html = "<tr id='item"+index+"'><td>"+data[index].Item+"</td><td id='quantity"+index+"'>"+quantity+"</td><td id='price"+index+"' style='text-align:right;'>$"+price+"</td></tr>";
             $("#cart").append(html);
                 $("#r"+index).removeAttr('disabled');
             var subtotal = $("#subtotal").html();
-            console.log(subtotal);
             subtotal = parseFloat(subtotal) + parseFloat(price);
-            console.log(subtotal);
             $("#subtotal").html(subtotal);
         }
         else
@@ -230,19 +253,13 @@ var json_cart = new Array();
             quantity++;
             data[index].Quantity = quantity;
             json_cart = JSON.stringify(data);
-            ajax();
             console.log(json_cart);
-            //console.log("quantity: "+quantity);
             var price = data[index].Price * quantity;
             price = price.toFixed(2);
-            //var html = "<tr id='item"+index+"'><td>"+data[index].Item+"</td><td id='quantity"+index+"'>"+quantity+"</td><td style='text-align:right;'>$"+price+"</td></tr>";
             $("#quantity"+index).html(quantity);
             $("#price"+index).html(price);
-            //$("#cart").append(html);
             var subtotal = $("#subtotal").html();
-            console.log(subtotal);
             subtotal = parseFloat(subtotal) + parseFloat(price);
-            console.log(subtotal);
             $("#subtotal").html(subtotal);        
         }
         
@@ -251,25 +268,19 @@ var json_cart = new Array();
     function removeFromCart(id) {
         var index = id.substring(1,id.length);
         var quantity = $("#quantity"+index).html();
-        //console.log("quantity: "+quantity);
         quantity--;
         data[index].Quantity = quantity;
         json_cart = JSON.stringify(data);
-        ajax();
-        //console.log("quantity: "+quantity);
-        //console.log(json_cart);
+        console.log(json_cart);
         if (quantity !== 0)
         {
-            //console.log("quantity: "+quantity);
             var price = data[index].Price * quantity;
             price = price.toFixed(2);
-            //var html = "<tr id='item"+index+"'><td>"+data[index].Item+"</td><td id='quantity"+index+"'>"+quantity+"</td><td style='text-align:right;'>$"+price+"</td></tr>";
             $("#quantity"+index).html(quantity);
             $("#price"+index).html(price);
         }
         else if (quantity == 0)
         {
-            //console.log("yes");          
             $("#r"+index).attr('disabled','disabled');  // disabling '-' button
             $("#item"+index).remove();
             var subtotal = $("#subtotal").html();
@@ -278,28 +289,19 @@ var json_cart = new Array();
         }
     }
     
-    function setCart() {
-        //for ( var i = 0; i < 
-    }
+    //function setCart() {
+    //    //for ( var i = 0; i < 
+    //}
     
-    function jsonify(data2) {
-        json_cart = JSON.stringify(data2);
-        request = new XMLHttpRequestObject();
-        request.open("POST", "JSON_Handler.php", true);
-        request.setRequestHeader("Content-type", "application/json");
-        request.send(json_cart);
-    }
+    //function jsonify(data2) {
+    //    json_cart = JSON.stringify(data2);
+    //    request = new XMLHttpRequestObject();
+    //    request.open("POST", "JSON_Handler.php", true);
+    //    request.setRequestHeader("Content-type", "application/json");
+    //    request.send(json_cart);
+    //}
     
-    function ajax() {
-        $.ajax({
-            url: '<?php echo site_url(); ?>',
-            type: 'POST',
-            data: json_cart,
-            success: function(){
-            alert("Success!")
-            }
-            });
-    }    
+
     
     
 //data = <?php print json_encode($types); ?>; 
