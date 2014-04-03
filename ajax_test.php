@@ -6,7 +6,6 @@ $description = "This page displays the menu items for Sushi Bai Kiyoshi";
 $date = "05/03/2014";
 
 require 'header.php';
-require 'functions.php';
 
 //$str_json = file_get_contents('php://input');
 //echo "Hello" . $str_json;
@@ -27,7 +26,7 @@ $types = array();
 $conn = db_connect();
 $sql = "SELECT \"ItemDescription\", \"ItemPrice\", \"ItemType\", \"PromotionID\" FROM \"tblMenuItems\" WHERE \"ItemStatus\" = 'e'";
 $result = pg_query($conn, $sql);
-$type_string;
+//$type_string;
 $i = 0;
 
 while ($row = pg_fetch_row($result))
@@ -175,6 +174,21 @@ $menu_list_html .= '<li><input type="radio" id="rad'.$types[$j].'" name="menuIte
                         <th class="t_c">My Cart</th><th class="t_c"></th><th class="t_c"></th><hr/>
                     </tr>
                     <tr><td>Item</td><td>Quantity</td><td style='text-align:right;'>Total</td></tr>
+                    <!-- temp 
+                    <tr style="text-align:left">
+                        <td>Spicy Tuna Combo</td>
+                    </tr>
+                    <tr style="text-align:left">
+                        <td>Avocado Cucumber Combo</td>
+                    </tr>
+                    <!-- /temp 
+                    
+                    <tr>
+                        <td><hr/>Subtotal: $20.00</td>
+                    </tr>
+                    <tr class="t_c">
+                        <td><hr/><input id="checkout" type="button" value="Checkout"/></td>
+                    </tr>-->
                 </table>
                 <table>
                     <tr>
@@ -204,6 +218,8 @@ var json_cart = new Array();
             json_cart = JSON.stringify(data);
             console.log(json_cart);
             
+            
+            
             var request = $.ajax({
                 url: "./ajax_test_2.php",
                 type: "POST",
@@ -219,16 +235,18 @@ var json_cart = new Array();
                     alert( "Request failed: " + textStatus );
                 }
             );
-
             
-            var price = parseFloat(data[index].Price);
-            var total = parseFloat(data[index].Price * quantity);
-            var html = "<tr id='item"+index+"'><td>"+data[index].Item+"</td><td id='quantity"+index+"'>"+quantity+"</td><td id='price"+index+"' style='text-align:right;'>$"+total+"</td></tr>";
+            
+            
+            
+            var price = data[index].Price * quantity;
+            price = price.toFixed(2);
+            var html = "<tr id='item"+index+"'><td>"+data[index].Item+"</td><td id='quantity"+index+"'>"+quantity+"</td><td id='price"+index+"' style='text-align:right;'>$"+price+"</td></tr>";
             $("#cart").append(html);
-            $("#r"+index).removeAttr('disabled');
-            //var subtotal = $("#subtotal").html();
-            //subtotal = parseFloat(subtotal) + parseFloat(price);
-            //$("#subtotal").html(subtotal);
+                $("#r"+index).removeAttr('disabled');
+            var subtotal = $("#subtotal").html();
+            subtotal = parseFloat(subtotal) + parseFloat(price);
+            $("#subtotal").html(subtotal);
         }
         else
         {
@@ -236,20 +254,15 @@ var json_cart = new Array();
             data[index].Quantity = quantity;
             json_cart = JSON.stringify(data);
             console.log(json_cart);
-            
-            var total = parseFloat(data[index].Price * quantity);
-            var price = parseFloat(data[index].Price + price);
+            var price = data[index].Price * quantity;
+            price = price.toFixed(2);
             $("#quantity"+index).html(quantity);
-            $("#price"+index).html("$"+total.toFixed(2));     
-            //var subtotal = $("#subtotal").html();
-            //subtotal = parseFloat(subtotal) + parseFloat(price);
-            //$("#subtotal").html(subtotal);        
+            $("#price"+index).html(price);
+            var subtotal = $("#subtotal").html();
+            subtotal = parseFloat(subtotal) + parseFloat(price);
+            $("#subtotal").html(subtotal);        
         }
         
-        var subtotal = $("#subtotal").html();
-        //console.log("sub: "+subtotal);
-        subtotal = parseFloat(subtotal) + parseFloat(price);
-        $("#subtotal").html(subtotal.toFixed(2));  
     }
 
     function removeFromCart(id) {
@@ -275,6 +288,21 @@ var json_cart = new Array();
             $("#subtotal").html(subtotal);   
         }
     }
+    
+    //function setCart() {
+    //    //for ( var i = 0; i < 
+    //}
+    
+    //function jsonify(data2) {
+    //    json_cart = JSON.stringify(data2);
+    //    request = new XMLHttpRequestObject();
+    //    request.open("POST", "JSON_Handler.php", true);
+    //    request.setRequestHeader("Content-type", "application/json");
+    //    request.send(json_cart);
+    //}
+    
+
+    
     
 //data = <?php print json_encode($types); ?>; 
 //console.log(data);

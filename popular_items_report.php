@@ -22,8 +22,6 @@ $sql = "SELECT \"ItemDescription\", \"ItemQuantity\"
 
 $result = pg_query($conn, $sql);
 $row = pg_fetch_row($result);
-$firstName;
-$lastName;
 
 $i = 0;
 while ($row = pg_fetch_row($result))
@@ -109,7 +107,8 @@ while ($row = pg_fetch_row($result))
     //names.push(" ");
     
     MAX_ORDER = parseFloat(d3.max(orders)) + parseFloat(5); //get max price
-    for (var i = MAX_ORDER; i >= 0; i--) {
+    MAX_ORDER = Math.round(MAX_ORDER / 10) * 10;
+    for (var i = MAX_ORDER; i >= 0; i-= 10) {
         orderDomain.push(i); //set price domain at $5 intervals
     }
     
@@ -205,7 +204,7 @@ while ($row = pg_fetch_row($result))
         var pt1, pt2;
         
         //horizontal grid lines
-        for (var i = yScale(0); i < yScale(d3.max(orderDomain)); i+=yScale(1)) {
+        for (var i = yScale(0); i < yScale(d3.max(orderDomain)); i+=yScale(5)) {
             pt1 = { "x": 0, "y": -i }; //line left coordinates
             pt2 = { "x": xScale(names.length), "y": -i }; //line left coordinates
             drawLine(pt1, pt2, graph, 1, "lightgray"); 
@@ -250,6 +249,21 @@ while ($row = pg_fetch_row($result))
               .attr("dy", "1.2em")
               .attr("text-anchor", "middle")
               .text(function(d) { return d.Quantity;})
+              .attr("font-size", "12px")
+              .attr("fill", "white");
+              
+          g.selectAll("text")
+              .data(data)
+              .enter()
+              .append("svg:text")
+              .attr("x", function(d, i) { return xScale(parseFloat(i)+parseFloat(1)) + xScale(0.5); })
+              .attr("y", function(d) { return yScale(10); })
+              .attr("dx", -(xScale(0.5)/2))
+              .attr("dy", "1.2em")
+              .attr("text-anchor", "middle")
+              .attr("transform", "rotate(90)")
+              .text(function(d) { return d.Item;})
+              .attr("font-size", "12px")
               .attr("fill", "white");
              
           
@@ -285,10 +299,12 @@ while ($row = pg_fetch_row($result))
 //              .attr("transform", "translate(0, 18)")
 //              .attr("class", "yAxis");
 
-
+            var newG = g.append("g").attr("transform", "translate(" + xScale(0.5) + "," + yScale(2) + ")")
           for (var i = 0; i < data.length; i++) {
-          
-            drawText(g, xScale(parseFloat(i)+parseFloat(1)) + xScale(0.5), 5, "", data[i].Item);
+            //var rotate = (i % 2 == 0) ? "rotate(90)" : "rotate(0)";
+            newG = newG.append("g")
+            .attr("transform", "translate(" + (xScale(parseFloat(1))) + "," + 0 + ")")
+            drawText(newG, 0, 0, "", data[i].Item);
           
           }
           
@@ -311,13 +327,14 @@ while ($row = pg_fetch_row($result))
     @param colour - font colour (default: black)
     @param anchor - text alignment (default: middle)
     */
-    function drawText(g, x, y, id, text, size, weight, colour, anchor) {
+    function drawText(g, x, y, id, text, size, weight, colour, anchor, rotate) {
 
         size = typeof size !== 'undefined' ? size : "12px";
         weight = typeof weight !== 'undefined' ? weight : "normal";
         colour = typeof colour !== 'undefined' ? colour : "black";
-        anchor = typeof anchor !== 'undefined' ? anchor : "middle";
-
+        anchor = typeof anchor !== 'undefined' ? anchor : "end";
+        rotate = typeof rotate !== 'undefined' ? rotate : "rotate(-20)";
+        
         //Add SVG Text Element Attributes
         var text = g.append("text")
                          .attr("x", x)
@@ -326,7 +343,7 @@ while ($row = pg_fetch_row($result))
                          .attr("class", "label")
                          .text(text)
                          .style("text-anchor", anchor)
-                         .attr("transform", "rotate(90)")
+                         .attr("transform", rotate)
                          .attr("font-family", "sans-serif")
                          .attr("font-size", size)
                          .attr("font-weight", weight)
