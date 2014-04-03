@@ -159,9 +159,9 @@ $type = trim ($_POST["type"]);
             </td>
             <td>
               <select name="type">
-            <option value="c" >Enabled</option>
-              <option value="d" >Disabled</option>
-              <option value="a">Administrator</option>
+            <option value="c" <?php if($type == 'c'){echo "selected";}?> >Enabled</option>
+              <option value="d" <?php if($type == 'd'){echo "selected";}?> >Disabled</option>
+              <option value="a"<?php if($type == 'a'){echo "selected";}?> >Administrator</option>
              
             </select>
             </td> 
