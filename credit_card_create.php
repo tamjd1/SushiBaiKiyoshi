@@ -1,8 +1,8 @@
 <?php
-$file = "payment.php";
-$title = "Sushi Bai Kiyoshi - Order Payment";
-$banner = "Sushi Bai Kiyoshi - Order Payment";
-$description = "This page displays order payment options and data";
+$file = "credit_card_create.php";
+$title = "Sushi Bai Kiyoshi - Add Credit Card";
+$banner = "Sushi Bai Kiyoshi - Add Credit Card";
+$description = "This page is creating a customer's credit card";
 $date = "05/03/2014";
 
 
@@ -16,65 +16,11 @@ require 'header.php'; ?>
 $_SESSION['id'] = "turning_japanese";
 $_SESSION['usertype'] = "c";
 
-if (!isset($_SESSION['cart_data']) || ($_SESSION['cart_data']) == "")
-{
-	$_SESSION['message'] = "Please add some menu items in your cart before checking out.";
-	header('Location:./order.php');
-}
+//variable declaration
+$error = ""; //variable for errors
+$expiryDate = ""; //variable for expiration date
+$orderDate = ""; //variable for current date
 
-if (!isset($_SESSION['id']) || ($_SESSION['id']) == "")
-{
-	$_SESSION['message'] = "You must login to do payment transaction.";
-	header('Location:./index.php');
-}
-
-else if ($_SESSION['usertype'] != 'c')
-{
-	$_SESSION['message'] = "You are not authorized to access this page.";
-	//header('Location:./index.php');
-}
-
-
- $cart = (isset($_SESSION['cart_data'])) ? $_SESSION['cart_data'] : "";
-   $subtotal = (isset($_SESSION['subtotal'])) ? $_SESSION['subtotal'] : 0.00;
-$tax = $subtotal * 0.13;
-$tax = number_format((float)$tax, 2, '.', '');
-$total = $tax + $subtotal;
-$total = number_format((float)$total, 2, '.', '');
-$cart_html = "";
-    for ($cart_counter = 0; $cart_counter < sizeof($_SESSION['cart_data']); $cart_counter++) {
-        $cart_quantity = $_SESSION['cart_data'][$cart_counter]['Quantity'];
-        if($cart_quantity > 0) {
-            $cart_item = $_SESSION['cart_data'][$cart_counter]['Item'];
-            $cart_price = $_SESSION['cart_data'][$cart_counter]['Price'] * $cart_quantity;
-            $cart_html .= "<tr id='item".$cart_counter."'><td>".$cart_item."</td><td id='quantity".$cart_counter."'>".$cart_quantity."</td><td id='price".$cart_counter."' style='text-align:right;'>$".$cart_price."</td></tr>";
-        }
-    }           $cart_html .=  "<tr><td colspan='3'>---------------------------------------------------</td></tr>";
-              $cart_html .=  "<tr><td></td><td><strong>Subtotal:</strong></td><td><strong>$". $subtotal ."</strong></td></tr>";
-              $cart_html .=  "<tr><td></td><td><strong>Tax:</strong></td><td><strong>$". $tax."</strong></td></tr>";
-              $cart_html .=  "<tr><td></td><td><strong>Total:</strong></td><td><strong>$".$total."</strong></td></tr>";    
-
-
-
-
-
-/*
-$error = "";
-$expiryDate = "";
-//check if customer is in the database
-$conn = db_connect();
-
-        $sql = "SELECT \"UserID\" FROM \"tblUsers\" WHERE \"UserID\" = '".$_SESSION['id']."'";
-		$result = pg_query($conn,$sql);
-		$records = pg_num_rows($result);
-     			
-		if ($records == 0)//if there's no record
-		{
-			$error .= "UserID does not exists. Please login to access payment <br/>";
-			echo $id = "";
-			//$requiredIsInvalid = false;
-        }
-        
 if($_SERVER["REQUEST_METHOD"] == "GET")
 {
     $error = "";
@@ -89,6 +35,18 @@ if($_SERVER["REQUEST_METHOD"] == "GET")
     $province = "";
 	$postalCode = "";
     $expiryDate = "";
+    
+    $sql= "SELECT * FROM \"tblInvoices\" ORDER BY \"OrderDateTime\" limit 1";
+    $result = pg_query($conn,$sql);//connect to the database and execute the sql statement
+    $records = pg_num_rows($result); 
+    if ($records != 0){
+        $invoiceNumber = pg_fetch_result($result, 0, 'InvoiceID');    
+    }
+    else
+    {
+        $error .= "Invoice number not found </br>";
+        $invoiceNumber = "";
+    }
 } 
 
 //once form is submitted, remove all whitespaces before and after each variable, 
@@ -273,7 +231,7 @@ else if($_SERVER["REQUEST_METHOD"] == "POST"){
     
     if ($error == "")    
 	{
-		$sql = "INSERT INTO \"tblCreditCards\" 
+		$sql = "INSERT INTO \"tblInvoices\" 
 		VALUES(
         	'".$_SESSION['id']."',
             '".$cardNumber."',
@@ -285,8 +243,20 @@ else if($_SERVER["REQUEST_METHOD"] == "POST"){
             '".$city."',
             '".$province."',
             '".$postalCode."')";
+            
+         pg_query($conn,$sql);//connect to the id database and execute the sql statement
+            
+         $orderDate = date();
+         
+         /*
+         $sql = "UPDATE \"tblInvoices\"
+        SET \"InvoiceID\"='$invoicesNumber', \"OrderDateTime\"='$orderDate', \"Subtotal\"='$_SESSION['Subtotal']',	
+        , \"Tax\"='$_SESSION['Tax']'
+        WHERE \"ItemID\"='$invoiceNumber'";
           
 		pg_query($conn,$sql);//connect to the id database and execute the sql statement
+        */
+        
         
         //Destroy the current session before recreating the session id variable
 		session_destroy();
@@ -295,11 +265,13 @@ else if($_SERVER["REQUEST_METHOD"] == "POST"){
 		session_start();
 		
 		$_SESSION['id'] = $id;	
-        $_SESSION['message'] = "Order has been placed!<br/> Item will be ready for pick-up in 30 mins!";
+        $_SESSION['IinvoiceID'] = $invoiceNumber;	
+        $_SESSION['message'] .= "Your invoice number is <em> $invoiceNumber</em> <br/>"
+        $_SESSION['message'] .= "Items are ready for pick-up in 30 mins!";
         
         //redirects to the confirmation page
 	
-		header ("location: order_confirmation.php");
+		header ("location: payment_confirm.php");
         }
 	else
 	{
@@ -313,21 +285,10 @@ else if($_SERVER["REQUEST_METHOD"] == "POST"){
  
 
 <form method="post" action="<?php echo $_SERVER['PHP_SELF']; ?>">
-        <p style="text-align:center; font-size:30px;">Order Payment</p>
-        
-        <div id="cartDiv" style="margin:0 auto 0 auto;">
-            <table id="cart">
-                <tr>
-                    <th colspan="2" class="t_c">My Cart</th><hr/>
-                </tr>
-                <?php echo $cart_html; ?>
-        </div>        
-        
-        <br/>
         
         <table id="creditcardinfo">
             <th colspan="2" class="t_c">
-                Credit Card Information
+                Enter Credit Card Information
             </th>
             <tr>
                 <td colspan = "2" class="errmsg">
@@ -467,10 +428,10 @@ else if($_SERVER["REQUEST_METHOD"] == "POST"){
             </tr>
             <tr>
                 <td style="text-align:center;">                    
-                    <input type="submit" value="Confirm Order"/>                    
+                    <input type="submit" value="Submit"/>                    
                 </td>
                 <td style="text-align:center;">                    
-                    <input type="submit" value="Cancel" onclick=""/>                    
+                    <input type="submit" value="Reset"/>                    
                 </td>
             </tr>
         </table>        
@@ -480,7 +441,5 @@ else if($_SERVER["REQUEST_METHOD"] == "POST"){
     </section>
     
 </form>
-
-*/
         
 <?php include 'footer.php'; ?>

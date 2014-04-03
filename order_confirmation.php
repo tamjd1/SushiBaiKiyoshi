@@ -1,19 +1,25 @@
 <?php
-$file = "index.php";
-$title = "Sushi Bai Kiyoshi - Home Page";
-$banner = "Sushi Bai Kiyoshi - Home Page";
-$description = "This page displays the promotions and general information about the business Sushi Bai Kiyoshi";
+$file = "payment.php";
+$title = "Sushi Bai Kiyoshi - Order Payment";
+$banner = "Sushi Bai Kiyoshi - Order Payment";
+$description = "This page displays order payment options and data";
 $date = "05/03/2014";
 
-require 'header.php';
-?>
- <section id="MainContent">  
-            <p class="message">
-        <?php echo  $_SESSION['message']; ?></p>
-          
+require 'header.php'; ?>
+
+<section id="MainContent">
+ 
+ <?php
+ //hard coded user id and user type for now.
+$_SESSION['id'] = "turning_japanese";
+$_SESSION['usertype'] = "c";
+
+ 
+ ?>
+ 
 
 <form method="post" action="<?php echo $_SERVER['PHP_SELF']; ?>">
-        <p style="text-align:center; font-size:30px;">Order Confirmation</p>
+        <p style="text-align:center; font-size:30px;">Order Payment</p>
         
         <div id="cartDiv" style="margin:0 auto 0 auto;">
             <table id="cart">
@@ -37,10 +43,24 @@ require 'header.php';
                 </tr>
             </table>
         </div>        
-                   
         
-        </section>
+        <br/>
         
+        <table id="creditcardinfo">
+            <tr>
+                <td style="text-align:center;">                    
+                    <input type="submit" value="Pay Now" onclick=""/>         
+                </td>
+                <td style="text-align:center;">                    
+                    <input type="submit" value="Cancel Order" onclick=""/>                    
+                </td>
+            </tr>
+        </table>        
+        
+        <br/>
+        
+    </section>
+    
 </form>
-            
+        
 <?php include 'footer.php'; ?>
