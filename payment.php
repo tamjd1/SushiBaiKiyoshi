@@ -16,6 +16,12 @@ require 'header.php'; ?>
 $_SESSION['id'] = "turning_japanese";
 $_SESSION['usertype'] = "c";
 
+if (!isset($_SESSION['cart_data']) || ($_SESSION['cart_data']) == "")
+{
+	$_SESSION['message'] = "Please add some menu items in your cart before checking out.";
+	header('Location:./order.php');
+}
+
 if (!isset($_SESSION['id']) || ($_SESSION['id']) == "")
 {
 	$_SESSION['message'] = "You must login to do payment transaction.";
@@ -27,6 +33,31 @@ else if ($_SESSION['usertype'] != 'c')
 	$_SESSION['message'] = "You are not authorized to access this page.";
 	//header('Location:./index.php');
 }
+
+
+ $cart = (isset($_SESSION['cart_data'])) ? $_SESSION['cart_data'] : "";
+   $subtotal = (isset($_SESSION['subtotal'])) ? $_SESSION['subtotal'] : 0.00;
+$tax = $subtotal * 0.13;
+$tax = number_format((float)$tax, 2, '.', '');
+$total = $tax + $subtotal;
+$total = number_format((float)$total, 2, '.', '');
+$cart_html = "";
+    for ($cart_counter = 0; $cart_counter < sizeof($_SESSION['cart_data']); $cart_counter++) {
+        $cart_quantity = $_SESSION['cart_data'][$cart_counter]['Quantity'];
+        if($cart_quantity > 0) {
+            $cart_item = $_SESSION['cart_data'][$cart_counter]['Item'];
+            $cart_price = $_SESSION['cart_data'][$cart_counter]['Price'] * $cart_quantity;
+            $cart_html .= "<tr id='item".$cart_counter."'><td>".$cart_item."</td><td id='quantity".$cart_counter."'>".$cart_quantity."</td><td id='price".$cart_counter."' style='text-align:right;'>$".$cart_price."</td></tr>";
+        }
+    }           $cart_html .=  "<tr><td colspan='3'>---------------------------------------------------</td></tr>";
+              $cart_html .=  "<tr><td></td><td><strong>Subtotal:</strong></td><td><strong>$". $subtotal ."</strong></td></tr>";
+              $cart_html .=  "<tr><td></td><td><strong>Tax:</strong></td><td><strong>$". $tax."</strong></td></tr>";
+              $cart_html .=  "<tr><td></td><td><strong>Total:</strong></td><td><strong>$".$total."</strong></td></tr>";    
+
+
+
+
+
 
 $error = "";
 $expiryDate = "";
@@ -289,22 +320,7 @@ else if($_SERVER["REQUEST_METHOD"] == "POST"){
                 <tr>
                     <th colspan="2" class="t_c">My Cart</th><hr/>
                 </tr>
-                
-                <!-- temp -->
-                <tr style="text-align:left">
-                    <td>Spicy Tuna Combo</td>
-                    <td style="text-align:right">$13.99</td>
-                </tr>
-                <tr style="text-align:left">
-                    <td>Avocado Cucumber Combo</td>
-                    <td style="text-align:right">$10.99</td>
-                </tr>
-                <!-- /temp -->
-                
-                <tr>
-                    <td colspan="2"><hr/>Total: $24.98</td>
-                </tr>
-            </table>
+                <?php echo $cart_html; ?>
         </div>        
         
         <br/>

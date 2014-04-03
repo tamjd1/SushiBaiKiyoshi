@@ -18,9 +18,9 @@ require 'functions.php';
 
     //echo $_SESSION['cart_data'][0]['Item'];
     //echo $_SESSION['subtotal'];
-    
+    $cart = (isset($_SESSION['cart_data'])) ? $_SESSION['cart_data'] : "";
    $subtotal = (isset($_SESSION['subtotal'])) ? $_SESSION['subtotal'] : 0.00;
-    
+    //echo $subtotal;
 $cart_html = "";
     for ($cart_counter = 0; $cart_counter < sizeof($_SESSION['cart_data']); $cart_counter++) {
         $cart_quantity = $_SESSION['cart_data'][$cart_counter]['Quantity'];
@@ -195,7 +195,7 @@ $menu_list_html .= '<li><input type="radio" id="rad'.$types[$j].'" name="menuIte
                         <td>Subtotal: </td><td id="subtotal"><?php echo $subtotal; ?></td>
                     </tr>
                     <tr class="t_c">
-                        <td colspan="2" style="text-align:center;"><hr/><input id="checkout" type="button" value="Checkout"/></td>
+                        <td colspan="2" style="text-align:center;"><hr/><form method="post" action="./payment.php"> <input id="checkout" type="submit" value="Checkout"/></form></td>
                     </tr>
                 </table>
             </div>
@@ -207,7 +207,9 @@ var data = <?php print json_encode($menu_items); ?>;
 //var session_cart <?php //print json_encode($_SESSION['cart_data']); ?>; 
 //console.log(data);
 //console.log(session_cart);
-var json_cart = new Array();
+var json_cart = <?php print json_encode($cart); ?>
+
+
     function addToCart(id) {
     
         var index = id.substring(1,id.length);
@@ -283,7 +285,8 @@ var json_cart = new Array();
         var subtotal = $("#subtotal").html();
         console.log("sub: "+subtotal);
         subtotal = parseFloat(subtotal) + parseFloat(price);
-        $("#subtotal").html(subtotal.toFixed(2));  
+        subtotal = subtotal.toFixed(2);
+        $("#subtotal").html(subtotal);  
               
            
            var request = $.ajax({
@@ -339,8 +342,8 @@ var json_cart = new Array();
             $("#price"+index).html(price);
             var subtotal = $("#subtotal").html();
             subtotal = parseFloat(subtotal) - parseFloat(data[index].Price);
-            subtotal = (subtotal < 0) ? 0 : subtotal;
-            $("#subtotal").html(subtotal.toFixed(2));   
+            subtotal = (subtotal < 0) ? 0 : subtotal.toFixed(2);
+            $("#subtotal").html(subtotal);   
             
             
            var request = $.ajax({
@@ -366,8 +369,8 @@ var json_cart = new Array();
             $("#r"+index).attr('disabled','disabled');  // disabling '-' button
             var subtotal = $("#subtotal").html();
             subtotal = parseFloat(subtotal) - (Math.round((parseFloat(data[index].Price) * parseFloat($("#quantity"+index).html())) * 100) / 100);
-            subtotal = subtotal < 0 ? 0 : subtotal;
-            $("#subtotal").html(subtotal.toFixed(2));   
+            subtotal = subtotal < 0 ? 0 : subtotal.toFixed(2);
+            $("#subtotal").html(subtotal);   
             $("#item"+index).remove();
            
 
