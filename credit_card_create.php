@@ -35,7 +35,7 @@ if($_SERVER["REQUEST_METHOD"] == "GET")
     $province = "";
 	$postalCode = "";
     $expiryDate = "";
-    
+    /*
     $sql= "SELECT * FROM \"tblInvoices\" ORDER BY \"OrderDateTime\" limit 1";
     $result = pg_query($conn,$sql);//connect to the database and execute the sql statement
     $records = pg_num_rows($result); 
@@ -47,6 +47,7 @@ if($_SERVER["REQUEST_METHOD"] == "GET")
         $error .= "Invoice number not found </br>";
         $invoiceNumber = "";
     }
+    */
 } 
 
 //once form is submitted, remove all whitespaces before and after each variable, 
@@ -231,7 +232,8 @@ else if($_SERVER["REQUEST_METHOD"] == "POST"){
     
     if ($error == "")    
 	{
-		$sql = "INSERT INTO \"tblInvoices\" 
+        
+		$sql = "INSERT INTO \"tblCreditCards\" 
 		VALUES(
         	'".$_SESSION['id']."',
             '".$cardNumber."',
@@ -245,17 +247,23 @@ else if($_SERVER["REQUEST_METHOD"] == "POST"){
             '".$postalCode."')";
             
          pg_query($conn,$sql);//connect to the id database and execute the sql statement
+           
+         $sql = "INSERT INTO \"tblInvoices\" (\"OrderDateTime\", \"Subtotal\",\"Tax\",\"Comments\", \"InvoiceStatus\", \"UserID\") 
+         VALUES ('$orderDate',".$_SESSION['Subtotal'].",".$_SESSION['Tax'].", '','a','".$_SESSION['UserId']."')";
+      
+        	
             
-         $orderDate = date();
+         pg_query($conn,$sql);//connect to the id database and execute the sql statement
+         $orderDate = date('yyyy-MM-dd');
          
          /*
          $sql = "UPDATE \"tblInvoices\"
         SET \"InvoiceID\"='$invoicesNumber', \"OrderDateTime\"='$orderDate', \"Subtotal\"='$_SESSION['Subtotal']',	
         , \"Tax\"='$_SESSION['Tax']'
         WHERE \"ItemID\"='$invoiceNumber'";
-          
-		pg_query($conn,$sql);//connect to the id database and execute the sql statement
         */
+		pg_query($conn,$sql);//connect to the id database and execute the sql statement
+        
         
         
         //Destroy the current session before recreating the session id variable
@@ -266,7 +274,7 @@ else if($_SERVER["REQUEST_METHOD"] == "POST"){
 		
 		$_SESSION['id'] = $id;	
         $_SESSION['IinvoiceID'] = $invoiceNumber;	
-        $_SESSION['message'] .= "Your invoice number is <em> $invoiceNumber</em> <br/>"
+        $_SESSION['message'] .= "Your invoice number is <em> $invoiceNumber</em> <br/>";
         $_SESSION['message'] .= "Items are ready for pick-up in 30 mins!";
         
         //redirects to the confirmation page
