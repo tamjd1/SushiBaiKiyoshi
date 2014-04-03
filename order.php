@@ -15,8 +15,20 @@ require 'header.php';
 
 //session_destroy();
 
-    echo $_SESSION['cart_data'][0]['Item'];
-
+    //echo $_SESSION['cart_data'][0]['Item'];
+    //echo $_SESSION['subtotal'];
+    
+   $subtotal = (isset($_SESSION['subtotal'])) ? $_SESSION['subtotal'] : 0.00;
+    
+$cart_html = "";
+    for ($cart_counter = 0; $cart_counter < sizeof($_SESSION['cart_data']); $cart_counter++) {
+        $cart_quantity = $_SESSION['cart_data'][$cart_counter]['Quantity'];
+        if($cart_quantity > 0) {
+            $cart_item = $_SESSION['cart_data'][$cart_counter]['Item'];
+            $cart_price = $_SESSION['cart_data'][$cart_counter]['Price'] * $cart_quantity;
+            $cart_html .= "<tr id='item".$cart_counter."'><td>".$cart_item."</td><td id='quantity".$cart_counter."'>".$cart_quantity."</td><td id='price".$cart_counter."' style='text-align:right;'>$".$cart_price."</td></tr>";
+        }
+    }
 
 $menu_items_detailed = array();
 $items = array();
@@ -78,11 +90,12 @@ $menu_list_html .= '<li><input type="radio" id="rad'.$types[$j].'" name="menuIte
                                             for($k = 0; $k < sizeof($menu_items) - 1; $k++) {
                                                 if($menu_items[$k]['Type'] == $types[$j]) {
                                                     //$menu_list_html .= '<tr><td><input id="'.$menu_items[$k]['ID'].'" onblur="updateCart(this.id)" type="textbox" style="width:18px" value="0"/> ';
+                                                    $disabled = ($_SESSION['cart_data'][$k]['Quantity'] == 0) ? "disabled='disabled'" : "";
                                                     $menu_list_html .= '';
                                                     $menu_list_html .= '<tr><td>'.$menu_items[$k]['Item'].'</td>';
                                                     $menu_list_html .= '<td> $'.$menu_items[$k]['Price'].'</td>';
                                                     $menu_list_html .= '<td><input id="a'.$menu_items[$k]['ID'].'" type="button" value="+" onclick="addToCart(this.id)" /></td>';
-                                                    $menu_list_html .= '<td><input id="r'.$menu_items[$k]['ID'].'" type="button" value="-" onclick="removeFromCart(this.id)" disabled="disabled" /></td>';
+                                                    $menu_list_html .= '<td><input id="r'.$menu_items[$k]['ID'].'" type="button" value="-" onclick="removeFromCart(this.id)" '. $disabled .' /></td>';
                                                     $menu_list_html .= '</tr>';
                                                 }
                                             }
@@ -174,10 +187,11 @@ $menu_list_html .= '<li><input type="radio" id="rad'.$types[$j].'" name="menuIte
                         <th class="t_c">My Cart</th><th class="t_c"></th><th class="t_c"></th><hr/>
                     </tr>
                     <tr><td>Item</td><td>Quantity</td><td style='text-align:right;'>Total</td></tr>
+                    <?php echo $cart_html; ?>
                 </table>
                 <table>
-                    <tr>
-                        <td><hr/>Subtotal: </td><td id="subtotal">$0.00</td>
+                    <tr><hr/>
+                        <td>Subtotal: </td><td id="subtotal"><?php echo $subtotal; ?></td>
                     </tr>
                     <tr class="t_c">
                         <td colspan="2" style="text-align:center;"><hr/><input id="checkout" type="button" value="Checkout"/></td>
@@ -189,7 +203,9 @@ $menu_list_html .= '<li><input type="radio" id="rad'.$types[$j].'" name="menuIte
 <script> 
 //this is all for debugging purposes
 var data = <?php print json_encode($menu_items); ?>; 
-console.log(data);
+//var session_cart <?php //print json_encode($_SESSION['cart_data']); ?>; 
+//console.log(data);
+//console.log(session_cart);
 var json_cart = new Array();
     function addToCart(id) {
     
@@ -201,16 +217,16 @@ var json_cart = new Array();
             quantity = 1;
             data[index].Quantity = quantity;
             json_cart = JSON.stringify(data);
-            console.log(json_cart);
+            //console.log(json_cart);
             
             var request = $.ajax({
-                url: "./ajax_test_2.php",
+                url: "./ajax_cart.php",
                 type: "POST",
                 data: {data: json_cart}, // (variable to be passed, variable selected)
-                dataType: "html",
-                success: function() {
-                    alert("success!");
-                }
+                dataType: "html"
+                //success: function() {
+                //    alert("success!");
+                //}
             });
 						
             request.fail(
@@ -234,7 +250,25 @@ var json_cart = new Array();
             quantity++;
             data[index].Quantity = quantity;
             json_cart = JSON.stringify(data);
-            console.log(json_cart);
+            //console.log(json_cart);
+
+
+            var request = $.ajax({
+                url: "./ajax_cart.php",
+                type: "POST",
+                data: {data: json_cart}, // (variable to be passed, variable selected)
+                dataType: "html"
+                //success: function() {
+                //    alert("success!");
+                //}
+            });
+						
+            request.fail(
+                function(jqXHR, textStatus) {
+                    alert( "Request failed: " + textStatus );
+                }
+            );
+
             
             var total = parseFloat(data[index].Price * quantity);
             var price = parseFloat(data[index].Price + price);
@@ -246,9 +280,28 @@ var json_cart = new Array();
         }
         
         var subtotal = $("#subtotal").html();
-        //console.log("sub: "+subtotal);
+        console.log("sub: "+subtotal);
         subtotal = parseFloat(subtotal) + parseFloat(price);
         $("#subtotal").html(subtotal.toFixed(2));  
+              
+           
+           var request = $.ajax({
+                url: "./ajax_subtotal.php",
+                type: "POST",
+                data: {subtotal: subtotal}, // (variable to be passed, variable selected)
+                dataType: "html"
+                //success: function() {
+                //    alert("success!");
+                //}
+            });
+						
+            request.fail(
+                function(jqXHR, textStatus) {
+                    alert( "Request failed: " + textStatus );
+                }
+            );
+            
+            
     }
 
     function removeFromCart(id) {
@@ -257,21 +310,84 @@ var json_cart = new Array();
         quantity--;
         data[index].Quantity = quantity;
         json_cart = JSON.stringify(data);
-        console.log(json_cart);
+        
+        
+            var request = $.ajax({
+                url: "./ajax_cart.php",
+                type: "POST",
+                data: {data: json_cart}, // (variable to be passed, variable selected)
+                dataType: "html"
+                //success: function() {
+                //    alert("success!");
+                //}
+            });
+						
+            request.fail(
+                function(jqXHR, textStatus) {
+                    alert( "Request failed: " + textStatus );
+                }
+            );
+        
+        
+        //console.log(json_cart);
         if (quantity !== 0)
         {
             var price = data[index].Price * quantity;
             price = price.toFixed(2);
             $("#quantity"+index).html(quantity);
             $("#price"+index).html(price);
+            var subtotal = $("#subtotal").html();
+            subtotal = parseFloat(subtotal) - parseFloat(data[index].Price);
+            subtotal = (subtotal < 0) ? 0 : subtotal;
+            $("#subtotal").html(subtotal.toFixed(2));   
+            
+            
+           var request = $.ajax({
+                url: "./ajax_subtotal.php",
+                type: "POST",
+                data: {subtotal: subtotal}, // (variable to be passed, variable selected)
+                dataType: "html"
+                //success: function() {
+                //    alert("success!");
+                //}
+            });
+						
+            request.fail(
+                function(jqXHR, textStatus) {
+                    alert( "Request failed: " + textStatus );
+                }
+            );
+            
+            
         }
         else if (quantity == 0)
         {
             $("#r"+index).attr('disabled','disabled');  // disabling '-' button
-            $("#item"+index).remove();
             var subtotal = $("#subtotal").html();
             subtotal = parseFloat(subtotal) - (Math.round((parseFloat(data[index].Price) * parseFloat($("#quantity"+index).html())) * 100) / 100);
-            $("#subtotal").html(subtotal);   
+            subtotal = subtotal < 0 ? 0 : subtotal;
+            $("#subtotal").html(subtotal.toFixed(2));   
+            $("#item"+index).remove();
+           
+
+           var request = $.ajax({
+                url: "./ajax_subtotal.php",
+                type: "POST",
+                data: {subtotal: subtotal}, // (variable to be passed, variable selected)
+                dataType: "html"
+                //success: function() {
+                //    alert("success!");
+                //}
+            });
+						
+            request.fail(
+                function(jqXHR, textStatus) {
+                    alert( "Request failed: " + textStatus );
+                }
+            );
+           
+           
+           
         }
     }
     
