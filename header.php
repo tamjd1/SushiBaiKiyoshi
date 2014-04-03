@@ -136,7 +136,7 @@ if (!empty($_POST['logout_submit']))
                 echo "Welcome <a href=\"edit_profile.php\">".$_SESSION['UserFirst']." ".$_SESSION['UserLast']."!</a>";
                 echo "<input id='logout_submit' name='logout_submit' type='submit' class='float-right button' value='Logout' onclick='logout()'/>";
                 
-            
+            }
             ?>
         </form>
     </div>   
