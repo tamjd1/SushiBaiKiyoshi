@@ -7,6 +7,7 @@ $date = "20/03/2014";
 
 require 'header.php';
 
+
 if (!isset($_SESSION['UserID'])) // Non login in users to be sent back to index
 {
     $_SESSION['message'] = "You must login into access this page.";
@@ -19,25 +20,35 @@ if ($_SESSION['UserType'] != 'a') // If not an administrator redirect to main pa
     header('Location:./index.php');
 }
 
-// Tables created every time the page loads
-    $currentTable = "";
-    $sql = "SELECT *
-                FROM \"tblPromotions\"
-                WHERE \"EndDate\" > current_date
-                ORDER BY \"StartDate\"";    
+
+if($_SERVER["REQUEST_METHOD"] == "GET") // If it the first time the page is loaded
+{
+
+ $currentTable = "";
+ $sql = "SELECT *
+            FROM \"tblPromotions\"
+            WHERE \"EndDate\" > current_date
+            ORDER BY \"StartDate\"";    
+        
+       
+    
+  
+
     // connect to the database
     //$conn = db_connect();
-    $conn = db_connect();
+    $conn = pg_connect("host=localhost port=5432 dbname=sb user=postgres password=vdragon");
     //issue the query       
     $result = pg_query($conn, $sql);
     // set records variable to number of found results
     $records = pg_num_rows($result);    
     
     if ($records > 0) // If there are results from the query
-    {               
+    {       
+        
+        
         $currentTable .= '<table class="tableLayout">';
    
-        $currentTable .=   // Create the currentTable titles
+         $currentTable .=   // Create the currentTable titles
         '<tr>
             <td>ID</td>
             <td>Description</td>
@@ -53,33 +64,39 @@ if ($_SESSION['UserType'] != 'a') // If not an administrator redirect to main pa
         {
              $currentTable .=  // Generate the currentTable rows
             '<tr align="center">
-                <td>'.pg_fetch_result($result, $i, 0).'</td>
+                  <td>'.pg_fetch_result($result, $i, 0).'</td>
                 <td>'.pg_fetch_result($result, $i, 1).'</td>';
                 
-                $currentTable .=  '<td>';
+                 $currentTable .=  '<td>';
                 if(pg_fetch_result($result, $i, 2) <= 1) // hard coded check for if a percent cause database messed up
                 {
-                    $currentTable .=  (pg_fetch_result($result, $i, 2) * 100).'%</td>';
+                     $currentTable .=  (pg_fetch_result($result, $i, 2) * 100).'%</td>';
                 }
                 else
                 {
-                    $currentTable .=  pg_fetch_result($result, $i, 2).'$</td>';
+                     $currentTable .=  pg_fetch_result($result, $i, 2).'$</td>';
                 }
-                $currentTable .=  '</td>';                
+               $currentTable .=  '</td>';
+                
             
                // show dates
                  $currentTable .=  '<td>'.pg_fetch_result($result, $i, 4).'</td>
                 <td>'.pg_fetch_result($result, $i, 5).'</td>';
+             
+                
+             
+                  
    
-                $currentTable .=  "<td><a href=
-                                        \"./edit_a_promotion.php?
-                                        promotionID=".pg_fetch_result($result, $i, 0).
-                                        "&description=".pg_fetch_result($result, $i, 1).
-                                        "&value=".pg_fetch_result($result, $i, 2).
-                                        "&isPercent=".pg_fetch_result($result, $i, 3).
-                                        "&startDate=".pg_fetch_result($result, $i, 4).
-                                        "&endDate=".pg_fetch_result($result, $i, 5).
-                                        "\">Edit</a></td>                
+                   $currentTable .=  "<td><a href=
+                \"./edit_a_promotion.php?
+                promotionID=".pg_fetch_result($result, $i, 0).
+                "&description=".pg_fetch_result($result, $i, 1).
+                "&value=".pg_fetch_result($result, $i, 2).
+                 "&isPercent=".pg_fetch_result($result, $i, 3).
+                 "&startDate=".pg_fetch_result($result, $i, 4).
+                "&endDate=".pg_fetch_result($result, $i, 5).
+                "\">Edit</a></td>
+                
                  </tr>";  
         }
         
@@ -92,25 +109,31 @@ if ($_SESSION['UserType'] != 'a') // If not an administrator redirect to main pa
     }   
     
     
-    $previousTable = "";
-    $sql = "SELECT *
+ $previousTable = "";
+ $sql = "SELECT *
             FROM \"tblPromotions\"
             WHERE \"EndDate\" <= current_date
             ORDER BY \"StartDate\"";    
         
+       
+    
+  
+
     // connect to the database
     //$conn = db_connect();
-    $conn = db_connect();
+    $conn = pg_connect("host=localhost port=5432 dbname=sb user=postgres password=vdragon");
     //issue the query       
     $result = pg_query($conn, $sql);
     // set records variable to number of found results
     $records = pg_num_rows($result);    
     
     if ($records > 0) // If there are results from the query
-    {               
+    {       
+        
+        
         $previousTable .= '<table class="tableLayout">';
    
-        $previousTable .=   // Create the previousTable titles
+         $previousTable .=   // Create the previousTable titles
         '<tr>
             <td>ID</td>
             <td>Description</td>
@@ -169,44 +192,21 @@ if ($_SESSION['UserType'] != 'a') // If not an administrator redirect to main pa
     {
         echo "<br/>No search results";    
     }   
-if($_SERVER["REQUEST_METHOD"] == "GET") 
-{
-$errorMessage=  "";
- $description = "";
-    $value = "";
 }
 if($_SERVER["REQUEST_METHOD"] == "POST") 
 {
-$errorMessage=  "";
     //Trim the inputs
     $description = trim ($_POST["description"]);
     $value = trim ($_POST["value"]);
     $isPercent =trim ( $_POST["isPercent"]);
     $startDate =trim ( $_POST["startDate"]);
     $endDate =trim ( $_POST["endDate"]);
-    
-   if (!isset($description) || $description == "")//if user did not entered anything
-	{
-		
-		 $errorMessage .= "You must enter a description<br/>";
-	}
-    
-     if (!isset($value) || $value == "")
-	{
-		
-		$errorMessage .=  "You must enter a value<br/>";
-	}
-    else if(!is_numeric($value))//if user entered numeric value
-	{
-		$errorMessage .=  "Value must be numeric<br/>";
-	}
-    
-    
+   
+
     
     // Set the SQL statement
+    // Check if there is just one search field
 
-if($errorMessage== "")
-    {
 
     $sql = "INSERT INTO \"tblPromotions\"(
              \"PromotionDescription\", \"PromotionValue\", \"IsPercent\", 
@@ -216,7 +216,7 @@ if($errorMessage== "")
  
       // connect to the database
     //$conn = db_connect();
-    $conn = db_connect();
+    $conn = pg_connect("host=localhost port=5432 dbname=sb user=postgres password=vdragon");
     //issue the query       
     $result = pg_query($conn, $sql);
     // set records variable to number of found results
@@ -224,25 +224,26 @@ if($errorMessage== "")
     
     if (!$result)
     {
-       $errorMessage = "Error occurred"; 
+        $_SESSION['message'] = "Error occurred"; 
     }
     else
     {
-       $errorMessage = "'$description' has been added!";
+        $_SESSION['message'] = "Promotion Added!";
         
      
     }
-     $description = "";
-    $value = "";
-    }
 }
+   
 ?>
+
+
 
 <section id="MainContent">         
 
 
+<hr/>
 <a href="./admin.php">Back</a>
-<p class="t_c"><?php echo $errorMessage ;?><p> 
+
 <form action="" method="post">
 
     <table id="customerinfo">
@@ -254,7 +255,7 @@ if($errorMessage== "")
             Description
             </td>
             <td>
-            <input type="textbox"/ name="description" id="description" value="<?php echo $description;?>">
+            <input type="textbox"/ name="description" value="">
             </td> 
         </tr>
         <tr>
@@ -262,7 +263,7 @@ if($errorMessage== "")
             Value
             </td>
             <td>
-            <input type="number" name="value" value="<?php echo $value;?>" min="0" max="1000">
+            <input type="number" name="value" value="" min="0" max="1000">
             </td> 
         </tr>
          <tr>
@@ -281,7 +282,7 @@ if($errorMessage== "")
             Start Date
             </td>
             <td>
-            <input type="date"/ name="startDate" value="<?php echo date('Y-m-d'); ?>">
+            <input type="date"/ name="startDate" value="">
             </td> 
         </tr>
         <tr>
@@ -289,7 +290,7 @@ if($errorMessage== "")
             End Date
             </td>
             <td>
-            <input type="date"/ name="endDate" value="<?php echo date('Y-m-d'); ?>">
+            <input type="date"/ name="endDate" value="">
             </td> 
         </tr>
            <tr>
@@ -303,15 +304,12 @@ if($errorMessage== "")
     </table>
     </form>
 <br/>
-
-    <p class="t_c">Currently Active Promotions</p>    
-    <?php echo $currentTable?>
-    
-    <br/>
-    
-    <p class="t_c">Inactive Promotions</p>
-    <?php echo $previousTable?>
-    
+<p class="t_c">Currently Active Promotions</p>
+<?php echo $currentTable?>
 <br/>
-</section>            
+<p class="t_c">Inactive Promotions</p>
+<?php echo $previousTable?>
+<br/>
+</section>
+            
 <?php include 'footer.php'; ?>

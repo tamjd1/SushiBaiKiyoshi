@@ -11,13 +11,13 @@ require 'header.php';
 
 if (!isset($_SESSION['UserID'])) // Non login in users to be sent back to index
 {
-    $errorMessage= "You must login into access this page.";
+    $_SESSION['message'] = "You must login into access this page.";
     header('Location:./index.php');
 }
 
 if ($_SESSION['UserType'] != 'a') // If not an administrator redirect to main page
 {
-    $errorMessage= "You are not authorized to access the admin page.";
+    $_SESSION['message'] = "You are not authorized to access the admin page.";
     header('Location:./index.php');
 }
     
@@ -27,11 +27,7 @@ if($_SERVER["REQUEST_METHOD"] == "GET") // If it the first time the page is load
     
    
 //$_SESSION['message'] = "";
-$searchField = "";
-$errorMessage=  "";
     $description = "";
-    $type= "";
-    $price = "";
     $table = "";
     $sql= "SELECT \"tblMenuItems\".\"ItemID\", \"tblMenuItems\".\"ItemDescription\", \"tblMenuItems\".\"ItemPrice\", \"tblMenuItems\".\"ItemType\", \"tblMenuItems\".\"ItemStatus\", \"tblMenuItems\".\"PromotionID\", \"tblPromotions\".\"PromotionDescription\", \"tblPromotions\".\"PromotionValue\", \"tblPromotions\".\"IsPercent\", \"tblPromotions\".\"StartDate\", \"tblPromotions\".\"EndDate\" 
             FROM \"tblMenuItems\" 
@@ -163,7 +159,7 @@ $errorMessage=  "";
     // If no query results
     else 
     {
-        $errorMessage= "<br/>No search results";    
+        $_SESSION['message'] = "<br/>No search results";    
     }   
 
             
@@ -172,17 +168,12 @@ $errorMessage=  "";
 // Creates the search table
 if($_SERVER["REQUEST_METHOD"] == "POST") // If the page has been submitted
 {      
-$errorMessage=  "";
     $table = "";
-     $description = "";
-    $type= "";
-    $price = "";
-  
-    $searchField = "";
+    
     // Trim the inputs
-    //$searchField = trim ($_POST ["searchField"]); 
+    $description = trim ($_POST ["description"]); 
             
-    $errorMessage= "Results for '".$searchField."'";
+    $_SESSION['message'] = "Results for '".$description."'";
     // Set the SQL statement
     // Check if there is just one search field
   
@@ -193,16 +184,19 @@ $errorMessage=  "";
             ON \"tblMenuItems\".\"PromotionID\" = \"tblPromotions\".\"PromotionID\"
             
                 WHERE 
-                LOWER(\"ItemDescription\") LIKE LOWER('%$searchField%')OR 
+                LOWER(\"ItemDescription\") LIKE LOWER('%$description%')OR 
                
-                LOWER(\"ItemType\") LIKE LOWER('%$searchField%')
+                LOWER(\"ItemType\") LIKE LOWER('%$description%')
                              
                 ORDER BY \"ItemDescription\" ASC";  
-           
+        
+    
+     
+   
 
     // connect to the database
     //$conn = db_connect();
-    $conn = db_connect();
+    $conn = pg_connect("host=localhost port=5432 dbname=sb user=postgres password=vdragon");
     //issue the query       
     $result = pg_query($conn, $sql);
     // set records variable to number of found results
@@ -316,153 +310,21 @@ $errorMessage=  "";
     // If no query results
     else 
     {
-        $errorMessage= "<br/>No search results";    
+        $_SESSION['message'] = "<br/>No search results";    
     }   
 }#end of post
 
-if (!empty($_POST['add_menu_item'])) 
-{
-$errorMessage=  "";
-   $description = trim($_POST["description"]);
-    $price= trim($_POST["price"]);
-    $type = trim($_POST["type"]);
-     $promotion = trim($_POST["tblPromotions"]);
-      $enabled = trim($_POST["enabled"]);
-      
-       if (!isset($description) || $description == "")//if user did not entered anything
-	{
-		
-		 $errorMessage .= "You must enter a description<br/>";
-	}
-    
-     if (!isset($price) || $price == "")
-	{
-		
-		$errorMessage .=  "You must enter a price<br/>";
-	}
-    else if(!is_numeric($price))//if user entered numeric value
-	{
-		$errorMessage .=  "Price must be numeric<br/>";
-	}
-     if (!isset($type) || $type == "")//if user did not entered anything
-	{
-		
-		$errorMessage .=  "You must enter a type<br/>";//don't display the entered data
-	}
-      if($errorMessage== "")
-    {
-      if($promotion == 0){
-    $promotion='null';}
-      $sql = "INSERT INTO \"tblMenuItems\"(
-            \"ItemDescription\", \"ItemPrice\", \"ItemType\", \"ItemStatus\", 
-            \"PromotionID\")
-    VALUES ('$description', $price, '$type', '$enabled', $promotion)";
-
-
-    
-      // connect to the database
-    //$conn = db_connect();
-    $conn = db_connect();
-    //issue the query       
-    $result = pg_query($conn, $sql);
-    // set records variable to number of found results
-    $records = pg_num_rows($result);    
-    
-    if (!$result)
-    {
-        $errorMessage=  "Error occurred"; 
-    }
-    else
-    {
-        $errorMessage= "'$description' Added!";
-        
-    }
-    $description = "";
-    $type= "";
-    $price = "";
-     }
-}
 ?>
 
+
+
 <section id="MainContent">         
+<br/>   
 <a href="./admin.php">Back</a>
 
-<p class="t_c"><?php echo $errorMessage ;?><p> 
-
-<form method="post" action="">
-    <table class="center">
-        <th colspan="2" class="t_c">
-        Add a Menu Item
-        </th>
- <tr>
-       
-        <td>
-        Description:
-        </td> 
-        <td>
-        <input type="textbox"/ name="description" value="<?php echo $description;?>">
-        </td> 
-    </tr>
-     <tr>
-       
-        <td>
-        Price:
-        </td> 
-        <td>
-        <input type="textbox"/ name="price" value="<?php echo $price;?>">
-        </td> 
-    </tr>
-     <tr>
-       
-        <td>
-        Type:
-        </td> 
-        <td>
-            <select name="type">
-                <option value="" <?php if($type == ''){echo "selected=\"selected\"";}?> >
-                </option>
-                <option value="r" <?php if($type == 'r'){echo "selected=\"selected\"";}?> >Roll</option>
-                <option value="s" <?php if($type == 's'){echo "selected=\"selected\"";}?> >Sashimi</option>
-                <option value="sr" <?php if($type == 'sr'){echo "selected=\"selected\"";}?> >Special Roll</option>   
-                <option value="a" <?php if($type == 'a'){echo "selected=\"selected\"";}?> >Appetizer</option>   
-                <option value="c" <?php if($type == 'c'){echo "selected=\"selected\"";}?> >Combo</option>                   
-            </select>
-        </td> 
-    </tr>
-     <tr>
-       
-        <td>
-        Promotion:
-        </td> 
-        <td>
-         <?php create_sticky_dropdown("tblPromotions",'',"None")?>
-        </td> 
-    </tr>
-     <tr>
-       
-        <td>
-        Enabled:
-        </td> 
-        <td>
-         <select name="enabled">
-                <option value="e" >Enabled</option>
-                <option value="d" >Removed</option>                
-            </select>
-        </td> 
-    </tr>
-        <td colspan="2" style="text-align:center;">
-      
-        <input type="submit" name="add_menu_item"value="Add Item"/>
-        </td>
-    </tr>
-    </table>
-</form>
-<hr/>
-<br/>
 
 
-
-<form method="post" action="">
+<form method="post" action="<?php echo $_SERVER['PHP_SELF']; ?>">
     <table class="center">
         <th colspan="2" class="t_c">
         Menu Item Search
@@ -470,7 +332,7 @@ $errorMessage=  "";
     <tr>
        
         <td>
-        <input type="textbox"/ name="searchField" value="<?php echo $searchField;?>">
+        <input type="textbox"/ name="description" value="<?php echo $description;?>">
         </td> 
     
         <td colspan="2" style="text-align:center;">
@@ -480,8 +342,6 @@ $errorMessage=  "";
     </tr>
     </table>
 </form>
-
-
         
         
     <?php  echo $table; ?>     
