@@ -1,12 +1,12 @@
 <?php
 $file = "index.php";
-$title = "Sushi Bai Kiyoshi - Home Page";
-$banner = "Sushi Bai Kiyoshi - Home Page";
+$title = "Sushi Bai Kiyoshi - Customer Registration Page";
+$banner = "Sushi Bai Kiyoshi - Customer Registration Page";
 $description = "This page displays the promotions and general information about the business Sushi Bai Kiyoshi";
 $date = "05/03/2014";
 
 require 'header.php';
-require 'functions.php';
+//require 'functions.php';
 ?>
 <section id="MainContent">            
 
@@ -48,6 +48,8 @@ else if($_SERVER["REQUEST_METHOD"] == "POST"){
     define("MAX_ID_LENGTH", 20);
     define("MIN_PASSWORD_LENGTH", 6);
     define("MAX_PASSWORD_LENGTH", 15);
+    define("MIN_NAME_LENGTH", 2);
+    define("MAX_NAME_LENGTH", 35);
 
 
 	$requiredIsInvalid = false;
@@ -139,9 +141,14 @@ else if($_SERVER["REQUEST_METHOD"] == "POST"){
 		$error .= "Your first name cannot be a number, you entered: <em>$firstname</em> <br/>";	//display error message
 		echo $first_name = "";//display nothing in the firstname textbox	
 	}
-	else if (strlen($first_name) > 35)//if the length of firstname is more than 20 characters
+	else if (strlen($first_name) < MIN_NAME_LENGTH)//if the length of firstname is less than 2 characters
 	{
-		$error .= "Your first name needs to be less than " . 35 . " characters. <em>$firstname</em> is too long <br/>";//display error
+		$error .= "Your first name must be fore than " . MIN_NAME_LENGTH . " characters. <em>$firstname</em> is not enough <br/>";//display error
+		echo $first_name = "";//display nothing in the firstname textbox
+	}
+    else if (strlen($first_name) > MAX_NAME_LENGTH)//if the length of firstname is more than 20 characters
+	{
+		$error .= "Your first name needs to be less than " . MAXA_NAME_LENGTH . " characters. <em>$firstname</em> is too long <br/>";//display error
 		echo $first_name = "";//display nothing in the firstname textbox
 	}
 	
@@ -158,11 +165,16 @@ else if($_SERVER["REQUEST_METHOD"] == "POST"){
 		$error .= "Your last name cannot be a number, you entered: <em>$lastname</em> <br/>";
 		echo $last_name = "";
 	}
-	else if (strlen($last_name) > 35)//if lastname is more than the maximum value of 30 characters
+	else if (strlen($last_name) < MIN_NAME_LENGTH)//if the length of last_name is less than 2 characters
 	{
-		$error .= "Your last name needs to be less than " . 35 . " characters. <em>$lastname</em> is too long <br/>";
-		echo $last_name = "";
-	}	
+		$error .= "Your first name must be fore than " . MIN_NAME_LENGTH . " characters. <em>$last_name</em> is not enough <br/>";//display error
+		echo $last_name = "";//display nothing in the last_name textbox
+	}
+    else if (strlen($last_name) > MAX_NAME_LENGTH)//if the length of lastname is more than 20 characters
+	{
+		$error .= "Your first name needs to be less than " . MAXA_NAME_LENGTH . " characters. <em>$last_name</em> is too long <br/>";//display error
+		echo $last_name = "";//display nothing in the lastname textbox
+	}
     
     
 	//PHONE NUMBER VALIDATION
@@ -173,16 +185,16 @@ else if($_SERVER["REQUEST_METHOD"] == "POST"){
 		$error .= "You did not enter your phone number <br/>";//display error message
 		echo $phoneNumber = "";//don't display the entered data
 	}
-	else if (strlen($phoneNumber) != MAX_PHONE_NUMBER_LENGTH)//if phone number is more than the maximum value 
+	else if (strlen($phoneNumber) != MAX_PHONE_NUMBER_LENGTH)//if phone number must be 10 digit long
 	{
-		$error .= "Your phone number needs to be less than " . MAX_PHONE_NUMBER_LENGTH . " characters & numbers. <em>$phone</em> is too long <br/>";
+		$error .= "Your phone number needs to be less than " . MAX_PHONE_NUMBER_LENGTH . " characters & numbers. <em>$phoneNumber</em> is too long <br/>";
 		echo $phoneNumber= "";
 	}
 
 
 
 	//USER TYPE
-	//set user type to "u" by default;
+	//set user type to "c" by default;
 	$user_type = "c";
 
 	//if($error == "")
@@ -207,7 +219,8 @@ else if($_SERVER["REQUEST_METHOD"] == "POST"){
             '".$user_type."')";
           
 		pg_query($conn,$sql);//connect to the id database and execute the sql statement
-		header ("location: welcome.php");//redirects to login.php which is the login process		
+		header ("location: welcome.php");//redirects to the welcome page
+        $_SESSION['message'] = "You Are Now REGISTERED!<br/> Login To Order!";
 	}
 	else
 	{
